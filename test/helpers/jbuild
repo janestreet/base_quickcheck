@@ -1,0 +1,6 @@
+(library
+ ((name base_quickcheck_test_helpers)
+  (libraries (base base_quickcheck expect_test_helpers_kernel))
+  (preprocess (pps (ppx_jane ppxlib.runner)))))
+
+(jbuild_version 1)
