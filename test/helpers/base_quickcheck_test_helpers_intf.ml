@@ -11,6 +11,8 @@ module type With_examples = sig
 end
 
 module type Base_quickcheck_test_helpers = sig
+  module type With_examples = With_examples
+
   (** This module provides rough sanity tests of generators, observers, and shrinkers
       based on a handful of example values for the relevant type. *)
 
@@ -98,6 +100,16 @@ module type Base_quickcheck_test_helpers = sig
     :  (module With_examples with type t = 'a)
     -> (module With_examples with type t = 'b)
     -> (module With_examples with type t = 'a -> 'b)
+
+  val m_arrow_named
+    :  (module With_examples with type t = 'a)
+    -> (module With_examples with type t = 'b)
+    -> (module With_examples with type t = x:'a -> 'b)
+
+  val m_arrow_optional
+    :  (module With_examples with type t = 'a)
+    -> (module With_examples with type t = 'b)
+    -> (module With_examples with type t = ?x:'a -> unit -> 'b)
 
   val m_set
     :  (module Comparator.S with type t = 'a and type comparator_witness = 'c)

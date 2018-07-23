@@ -335,6 +335,22 @@ let m_arrow (type a) (type b)
       end
   end)
 
+let m_arrow_named (type a) (type b)
+      (module A : With_examples with type t = a)
+      (module B : With_examples with type t = b)
+  : (module With_examples with type t = x:a -> b)
+  = m_biject (m_arrow (module A) (module B))
+      ~f:(fun f ~x -> f x)
+      ~f_inverse:(fun f x -> f ~x)
+
+let m_arrow_optional (type a) (type b)
+      (module A : With_examples with type t = a)
+      (module B : With_examples with type t = b)
+  : (module With_examples with type t = ?x:a -> unit -> b)
+  = m_biject (m_arrow (m_option (module A)) (module B))
+      ~f:(fun f ?x () -> f x)
+      ~f_inverse:(fun f x -> f ?x ())
+
 let m_either (type a) (type b)
       (module A : With_examples with type t = a)
       (module B : With_examples with type t = b)

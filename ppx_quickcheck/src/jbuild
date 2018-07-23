@@ -1,0 +1,9 @@
+(library
+ ((name ppx_quickcheck)
+  (public_name base_quickcheck.ppx_quickcheck)
+  (kind ppx_deriver)
+  (libraries (base ppxlib ppx_quickcheck_expander))
+  (preprocess no_preprocessing)
+))
+
+(jbuild_version 1)
