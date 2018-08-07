@@ -291,7 +291,7 @@ let%expect_test "recursive_union" =
     m_sexp;
   [%expect {|
     (generator
-     ("generated 2_424 distinct values in 10_000 iterations"
+     ("generated 2_519 distinct values in 10_000 iterations"
       ("did not generate these values" ((a bc def (a) (bc) (def) (a bc def)))))) |}];
   (* [recursive_union] should only have to call its argument once *)
   let recursive_calls = ref 0 in
@@ -323,7 +323,7 @@ let%expect_test "weighted_recursive_union" =
     m_sexp;
   [%expect {|
     (generator
-     ("generated 1_625 distinct values in 10_000 iterations"
+     ("generated 1_520 distinct values in 10_000 iterations"
       ("did not generate these values" ((a bc def (a) (bc) (def) (a bc def)))))) |}];
   (* [weighted_recursive_union] should only have to call its argument once *)
   let recursive_calls = ref 0 in
@@ -415,7 +415,7 @@ let small_positive_or_zero_int = Generator.small_positive_or_zero_int
 let%expect_test "small_positive_or_zero_int" =
   test_generator
     Generator.small_positive_or_zero_int
-    (m_nat ~up_to:30);
+    (m_nat ~up_to:31);
   [%expect {| (generator exhaustive) |}];
 ;;
 
@@ -966,7 +966,7 @@ let%expect_test "float" =
   test_generator ~mode:`inexhaustive Generator.float m_float;
   [%expect {|
     (generator
-     ("generated 9_126 distinct values in 10_000 iterations"
+     ("generated 9_127 distinct values in 10_000 iterations"
       ("did not generate these values"
        (-1.7976931348623157E+308 1.7976931348623157E+308)))) |}];
 ;;
@@ -977,7 +977,7 @@ let%expect_test "float_without_nan" =
   test_generator ~mode:`inexhaustive Generator.float_without_nan m_float;
   [%expect {|
     (generator
-     ("generated 9_173 distinct values in 10_000 iterations"
+     ("generated 9_170 distinct values in 10_000 iterations"
       ("did not generate these values"
        (NAN -1.7976931348623157E+308 1.7976931348623157E+308)))) |}];
 ;;
@@ -988,7 +988,7 @@ let%expect_test "float_finite" =
   test_generator ~mode:`inexhaustive Generator.float_finite m_float;
   [%expect {|
     (generator
-     ("generated 9_255 distinct values in 10_000 iterations"
+     ("generated 9_252 distinct values in 10_000 iterations"
       ("did not generate these values"
        (NAN -INF -1.7976931348623157E+308 1.7976931348623157E+308 INF)))) |}];
 ;;
@@ -999,7 +999,7 @@ let%expect_test "float_strictly_positive" =
   test_generator ~mode:`inexhaustive Generator.float_strictly_positive m_float;
   [%expect {|
     (generator
-     ("generated 9_175 distinct values in 10_000 iterations"
+     ("generated 9_171 distinct values in 10_000 iterations"
       ("did not generate these values"
        (NAN
         -INF
@@ -1018,7 +1018,7 @@ let%expect_test "float_strictly_negative" =
   test_generator ~mode:`inexhaustive Generator.float_strictly_negative m_float;
   [%expect {|
     (generator
-     ("generated 9_175 distinct values in 10_000 iterations"
+     ("generated 9_171 distinct values in 10_000 iterations"
       ("did not generate these values"
        (NAN
         -INF
@@ -1037,7 +1037,7 @@ let%expect_test "float_positive_or_zero" =
   test_generator ~mode:`inexhaustive Generator.float_positive_or_zero m_float;
   [%expect {|
     (generator
-     ("generated 9_097 distinct values in 10_000 iterations"
+     ("generated 9_095 distinct values in 10_000 iterations"
       ("did not generate these values"
        (NAN
         -INF
@@ -1055,7 +1055,7 @@ let%expect_test "float_negative_or_zero" =
   test_generator ~mode:`inexhaustive Generator.float_negative_or_zero m_float;
   [%expect {|
     (generator
-     ("generated 9_097 distinct values in 10_000 iterations"
+     ("generated 9_095 distinct values in 10_000 iterations"
       ("did not generate these values"
        (NAN
         -INF
@@ -1119,7 +1119,7 @@ let%expect_test "float_of_class" =
   test_generator ~mode:`inexhaustive (Generator.float_of_class Normal) m_float;
   [%expect {|
     (generator
-     ("generated 9_363 distinct values in 10_000 iterations"
+     ("generated 9_360 distinct values in 10_000 iterations"
       ("did not generate these values"
        (NAN
         -INF
@@ -1150,7 +1150,7 @@ let char = Generator.char
 
 let%expect_test "char" =
   test_generator Generator.char m_char;
-  [%expect {| (generator "generated 252 distinct values in 10_000 iterations") |}];
+  [%expect {| (generator "generated 249 distinct values in 10_000 iterations") |}];
 ;;
 
 let char_lowercase = Generator.char_lowercase
@@ -1229,8 +1229,8 @@ let%expect_test "string" =
   test_generator ~mode:`inexhaustive Generator.string m_string;
   [%expect {|
     (generator
-     ("generated 8_560 distinct values in 10_000 iterations"
-      ("did not generate these values" ("\000" "\000\000" "  " 00 AA __ zz)))) |}];
+     ("generated 8_583 distinct values in 10_000 iterations"
+      ("did not generate these values" (" " "\000\000" "  " 00 AA __ zz)))) |}];
 ;;
 
 let string_non_empty = Generator.string_non_empty
@@ -1239,8 +1239,8 @@ let%expect_test "string_non_empty" =
   test_generator ~mode:`inexhaustive Generator.string_non_empty m_string;
   [%expect {|
     (generator
-     ("generated 8_875 distinct values in 10_000 iterations"
-      ("did not generate these values" ("" "\000" "\000\000" "  " 00 AA __ zz)))) |}];
+     ("generated 8_936 distinct values in 10_000 iterations"
+      ("did not generate these values" ("" " " "\000\000" "  " 00 AA __ zz)))) |}];
 ;;
 
 let string_with_length = Generator.string_with_length
@@ -1249,7 +1249,7 @@ let%expect_test "string_with_length" =
   test_generator ~mode:`inexhaustive (Generator.string_with_length ~length:2) m_string;
   [%expect {|
     (generator
-     ("generated 5_083 distinct values in 10_000 iterations"
+     ("generated 5_239 distinct values in 10_000 iterations"
       ("did not generate these values" ("" "\000" " " 0 A _ z "\000\000" "  " __)))) |}];
 ;;
 
@@ -1261,7 +1261,7 @@ let%expect_test "string_of" =
     m_string;
   [%expect {|
     (generator
-     ("generated 8_231 distinct values in 10_000 iterations"
+     ("generated 8_320 distinct values in 10_000 iterations"
       ("did not generate these values"
        ("\000" " " 0 A _ "\000\000" "  " 00 AA __)))) |}];
 ;;
@@ -1275,9 +1275,9 @@ let%expect_test "string_non_empty_of" =
     m_string;
   [%expect {|
     (generator
-     ("generated 8_605 distinct values in 10_000 iterations"
+     ("generated 8_569 distinct values in 10_000 iterations"
       ("did not generate these values"
-       ("" "\000" " " 0 A _ "\000\000" "  " 00 AA __)))) |}];
+       ("" "\000" " " 0 A _ "\000\000" "  " 00 AA __ zz)))) |}];
 ;;
 
 let string_with_length_of = Generator.string_with_length_of
@@ -1300,7 +1300,7 @@ let%expect_test "sexp" =
   test_generator ~mode:`inexhaustive Generator.sexp m_sexp;
   [%expect {|
     (generator
-     ("generated 7_172 distinct values in 10_000 iterations"
+     ("generated 7_175 distinct values in 10_000 iterations"
       ("did not generate these values"
        (bc def (a bc def) (a bc def (a) (bc) (def) (a bc def)) (bc) (def))))) |}];
 ;;
@@ -1313,7 +1313,7 @@ let%expect_test "sexp_of" =
     m_sexp;
   [%expect {|
     (generator
-     ("generated 4_843 distinct values in 10_000 iterations"
+     ("generated 4_917 distinct values in 10_000 iterations"
       ("did not generate these values"
        ((a bc def) (a bc def (a) (bc) (def) (a bc def)))))) |}];
 ;;

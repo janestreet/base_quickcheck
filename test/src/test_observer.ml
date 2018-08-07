@@ -81,14 +81,12 @@ let%expect_test "fn" =
      ((false true) (true true))) |}];
   let higher_order = m_arrow first_order m_bool in
   let (module Higher_order) = higher_order in
-  test_observer ~config ~cr:CR_soon
+  test_observer ~config
     (Observer.fn
        (Generator.fn Observer.bool Generator.bool)
        Observer.bool)
     higher_order;
-  [%expect {|
-    (observer transparent)
-    "did not generate any single function that distinguishes all values" |}];
+  [%expect {| (observer transparent) |}];
 ;;
 
 let both = Observer.both

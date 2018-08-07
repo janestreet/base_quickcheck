@@ -348,3 +348,15 @@ sig
   val quickcheck_observer : t Observer.t
   val quickcheck_shrinker : t Shrinker.t
 end
+module Wildcard :
+functor (Elt : sig type t val examples : t list end) ->
+  sig
+    type t = Elt.t list[@@deriving quickcheck]
+    include
+      sig
+        [@@@ocaml.warning "-32"]
+        val quickcheck_generator : t Base_quickcheck.Generator.t
+        val quickcheck_observer : t Base_quickcheck.Observer.t
+        val quickcheck_shrinker : t Base_quickcheck.Shrinker.t
+      end
+  end

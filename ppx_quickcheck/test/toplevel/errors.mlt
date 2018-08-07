@@ -58,3 +58,9 @@ let _ = [%quickcheck.shrinker: unit * [%custom: bool] * char]
 Line _, characters 38-53:
 Error: ppx_quickcheck: invalid syntax: [%custom] extension expects a single expression as its payload
 |}];;
+
+let _ = [%quickcheck.generator: _ list]
+[%%expect {|
+Line _, characters 32-33:
+Error: ppx_quickcheck: unsupported: wildcard type
+|}];;

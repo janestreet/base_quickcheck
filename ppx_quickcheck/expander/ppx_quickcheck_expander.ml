@@ -94,7 +94,8 @@ and observer_of_core_type core_type ~obs_env ~gen_env =
     unsupported ~loc "polymorphic variant type with [<]"
   | Ptyp_extension (tag, payload) ->
     custom_extension ~loc tag payload
-  | Ptyp_any
+  | Ptyp_any ->
+    Ppx_observer_expander.any ~loc
   | Ptyp_object _
   | Ptyp_class _
   | Ptyp_alias _
@@ -134,7 +135,8 @@ and shrinker_of_core_type core_type ~env =
     unsupported ~loc "polymorphic variant type with [<]"
   | Ptyp_extension (tag, payload) ->
     custom_extension ~loc tag payload
-  | Ptyp_any
+  | Ptyp_any ->
+    Ppx_shrinker_expander.any ~loc
   | Ptyp_object _
   | Ptyp_class _
   | Ptyp_alias _

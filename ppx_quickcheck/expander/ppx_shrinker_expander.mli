@@ -1,5 +1,9 @@
 open! Import
 
+val any
+  :  loc : location
+  -> expression
+
 val arrow
   :  loc : location
   -> expression

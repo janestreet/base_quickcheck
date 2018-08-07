@@ -44,20 +44,22 @@ let%expect_test "run_exn" =
     assert (List.is_sorted list ~compare:[%compare: bool option])
   in
   (* large sizes to demonstrate shrinking *)
-  let config = { Test.default_config with sizes = Sequence.of_list [10; 20; 30] } in
+  let config =
+    { Test.default_config with sizes = Sequence.cycle_list_exn [10; 20; 30] }
+  in
   (* simple failure *)
   require_does_raise [%here] ~hide_positions:true (fun () ->
     Test.run_exn ~config ~f:failure (module M));
   [%expect {|
     ("Base_quickcheck.Test.run: test failed"
-     (input ((true) ()))
+     (input ((false) ()))
      (error "Assert_failure test_test.ml:LINE:COL")) |}];
   (* failure without shrinking *)
   require_does_raise [%here] ~hide_positions:true (fun () ->
     Test.run_exn ~config ~f:failure (module M_without_shrinker));
   [%expect {|
     ("Base_quickcheck.Test.run: test failed"
-     (input ((true) (true) (false)))
+     (input (() () (false) (true) (false) ()))
      (error "Assert_failure test_test.ml:LINE:COL")) |}];
   (* failure from examples *)
   require_does_raise [%here] ~hide_positions:true (fun () ->
@@ -92,24 +94,24 @@ let%expect_test "with_sample_exn" =
   [%expect {|
     ()
     ()
-    ((true) ())
-    ((false) (true) ())
+    (() (true))
+    (() (true) (false))
     ()
     ((true))
     ((true))
     ((true))
     ()
-    ((true) (false) ())
-    (() () (true) () (true) (false) () ())
-    (() (false) (true) () () () (true))
-    ((false) (false) () () (true) () ())
-    (() (true) () (false) (true) (true) () ())
+    (() (false) (true))
+    (() () (false) (true) () (true) () ())
+    ((true) () () () (true) (false) ())
+    (() () (true) () () (false) (false))
+    (() () (true) (true) (false) () (true) ())
     ()
     ()
-    (() (false) (false) (true) () () (true) () () () () (false) (false) ()
-     (true) (true))
+    ((true) (true) () (false) (false) () () () () (true) () () (true) (false)
+     (false) ())
     ((true) (false) (true))
-    ((false) () () () () (true) () (false) (false) () () () (false) () ()
+    ((false) () () (false) () () () (false) (false) () (true) () () () ()
      (false))
     () |}];
 ;;

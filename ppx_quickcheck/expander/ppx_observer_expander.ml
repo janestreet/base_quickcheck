@@ -1,5 +1,8 @@
 open! Import
 
+let any ~loc =
+  [%expr Base_quickcheck.Observer.opaque]
+
 let arrow
       ~observer_of_core_type
       ~generator_of_core_type
@@ -120,7 +123,10 @@ let variant
                       [value_binding
                          ~loc
                          ~pat:hash_pat
-                         ~expr:[%expr hash_fold_int [%e hash_expr] [%e eint ~loc salt]]]
+                         ~expr:[%expr
+                           Base.hash_fold_int
+                             [%e hash_expr]
+                             [%e eint ~loc salt]]]
                       body
                 in
                 case ~lhs ~guard:None ~rhs))])]

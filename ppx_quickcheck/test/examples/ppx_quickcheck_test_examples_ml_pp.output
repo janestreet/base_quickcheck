@@ -155,27 +155,27 @@ module Poly_variant =
              fun ~hash:_hash__019_ ->
                match _x__017_ with
                | `A ->
-                   let _hash__019_ = hash_fold_int _hash__019_ 65 in
+                   let _hash__019_ = Base.hash_fold_int _hash__019_ 65 in
                    _hash__019_
                | `B ->
-                   let _hash__019_ = hash_fold_int _hash__019_ 66 in
+                   let _hash__019_ = Base.hash_fold_int _hash__019_ 66 in
                    _hash__019_
                | `C _x__020_ ->
-                   let _hash__019_ = hash_fold_int _hash__019_ 67 in
+                   let _hash__019_ = Base.hash_fold_int _hash__019_ 67 in
                    let _hash__019_ =
                      Base_quickcheck.Observer.observe
                        quickcheck_observer_bool _x__020_ ~size:_size__018_
                        ~hash:_hash__019_ in
                    _hash__019_
                | `D _x__021_ ->
-                   let _hash__019_ = hash_fold_int _hash__019_ 68 in
+                   let _hash__019_ = Base.hash_fold_int _hash__019_ 68 in
                    let _hash__019_ =
                      Base_quickcheck.Observer.observe
                        quickcheck_observer_bool _x__021_ ~size:_size__018_
                        ~hash:_hash__019_ in
                    _hash__019_
                | `E _x__026_ ->
-                   let _hash__019_ = hash_fold_int _hash__019_ 69 in
+                   let _hash__019_ = Base.hash_fold_int _hash__019_ 69 in
                    let _hash__019_ =
                      Base_quickcheck.Observer.observe
                        (Base_quickcheck.Observer.create
@@ -195,7 +195,7 @@ module Poly_variant =
                        ~hash:_hash__019_ in
                    _hash__019_
                | `F _x__031_ ->
-                   let _hash__019_ = hash_fold_int _hash__019_ 70 in
+                   let _hash__019_ = Base.hash_fold_int _hash__019_ 70 in
                    let _hash__019_ =
                      Base_quickcheck.Observer.observe
                        (Base_quickcheck.Observer.create
@@ -299,7 +299,7 @@ module Inherit_poly_variant =
              fun ~hash:_hash__052_ ->
                match _x__050_ with
                | `X ->
-                   let _hash__052_ = hash_fold_int _hash__052_ 88 in
+                   let _hash__052_ = Base.hash_fold_int _hash__052_ 88 in
                    _hash__052_
                | #Poly_variant.t as _x__053_ ->
                    let _hash__052_ =
@@ -308,7 +308,7 @@ module Inherit_poly_variant =
                        ~size:_size__051_ ~hash:_hash__052_ in
                    _hash__052_
                | `Z _x__054_ ->
-                   let _hash__052_ = hash_fold_int _hash__052_ 90 in
+                   let _hash__052_ = Base.hash_fold_int _hash__052_ 90 in
                    let _hash__052_ =
                      Base_quickcheck.Observer.observe
                        (quickcheck_observer_option quickcheck_observer_unit)
@@ -421,20 +421,20 @@ module Nullary_and_unary_variant =
              fun ~hash:_hash__073_ ->
                match _x__071_ with
                | A ->
-                   let _hash__073_ = hash_fold_int _hash__073_ 0 in
+                   let _hash__073_ = Base.hash_fold_int _hash__073_ 0 in
                    _hash__073_
                | B ->
-                   let _hash__073_ = hash_fold_int _hash__073_ 1 in
+                   let _hash__073_ = Base.hash_fold_int _hash__073_ 1 in
                    _hash__073_
                | C _x__074_ ->
-                   let _hash__073_ = hash_fold_int _hash__073_ 2 in
+                   let _hash__073_ = Base.hash_fold_int _hash__073_ 2 in
                    let _hash__073_ =
                      Base_quickcheck.Observer.observe
                        quickcheck_observer_unit _x__074_ ~size:_size__072_
                        ~hash:_hash__073_ in
                    _hash__073_
                | D _x__075_ ->
-                   let _hash__073_ = hash_fold_int _hash__073_ 3 in
+                   let _hash__073_ = Base.hash_fold_int _hash__073_ 3 in
                    let _hash__073_ =
                      Base_quickcheck.Observer.observe
                        quickcheck_observer_unit _x__075_ ~size:_size__072_
@@ -556,7 +556,7 @@ module Binary_and_record_variant =
              fun ~hash:_hash__096_ ->
                match _x__094_ with
                | A (_x__101_, _x__102_) ->
-                   let _hash__096_ = hash_fold_int _hash__096_ 0 in
+                   let _hash__096_ = Base.hash_fold_int _hash__096_ 0 in
                    let _hash__096_ =
                      Base_quickcheck.Observer.observe
                        quickcheck_observer_bool _x__101_ ~size:_size__095_
@@ -570,15 +570,15 @@ module Binary_and_record_variant =
                                  match _x__097_ with
                                  | `X ->
                                      let _hash__099_ =
-                                       hash_fold_int _hash__099_ 88 in
+                                       Base.hash_fold_int _hash__099_ 88 in
                                      _hash__099_
                                  | `Y ->
                                      let _hash__099_ =
-                                       hash_fold_int _hash__099_ 89 in
+                                       Base.hash_fold_int _hash__099_ 89 in
                                      _hash__099_
                                  | `Z _x__100_ ->
                                      let _hash__099_ =
-                                       hash_fold_int _hash__099_ 90 in
+                                       Base.hash_fold_int _hash__099_ 90 in
                                      let _hash__099_ =
                                        Base_quickcheck.Observer.observe
                                          quickcheck_observer_unit _x__100_
@@ -587,7 +587,7 @@ module Binary_and_record_variant =
                        ~hash:_hash__096_ in
                    _hash__096_
                | B (_x__107_, _x__108_) ->
-                   let _hash__096_ = hash_fold_int _hash__096_ 1 in
+                   let _hash__096_ = Base.hash_fold_int _hash__096_ 1 in
                    let _hash__096_ =
                      Base_quickcheck.Observer.observe
                        quickcheck_observer_bool _x__107_ ~size:_size__095_
@@ -601,15 +601,15 @@ module Binary_and_record_variant =
                                  match _x__103_ with
                                  | `X ->
                                      let _hash__105_ =
-                                       hash_fold_int _hash__105_ 88 in
+                                       Base.hash_fold_int _hash__105_ 88 in
                                      _hash__105_
                                  | `Y ->
                                      let _hash__105_ =
-                                       hash_fold_int _hash__105_ 89 in
+                                       Base.hash_fold_int _hash__105_ 89 in
                                      _hash__105_
                                  | `Z _x__106_ ->
                                      let _hash__105_ =
-                                       hash_fold_int _hash__105_ 90 in
+                                       Base.hash_fold_int _hash__105_ 90 in
                                      let _hash__105_ =
                                        Base_quickcheck.Observer.observe
                                          quickcheck_observer_unit _x__106_
@@ -618,7 +618,7 @@ module Binary_and_record_variant =
                        ~hash:_hash__096_ in
                    _hash__096_
                | C { x = _x__109_; y = _x__110_ } ->
-                   let _hash__096_ = hash_fold_int _hash__096_ 2 in
+                   let _hash__096_ = Base.hash_fold_int _hash__096_ 2 in
                    let _hash__096_ =
                      Base_quickcheck.Observer.observe
                        (quickcheck_observer_option quickcheck_observer_unit)
@@ -629,7 +629,7 @@ module Binary_and_record_variant =
                        ~hash:_hash__096_ in
                    _hash__096_
                | D { x = _x__111_; y = _x__112_ } ->
-                   let _hash__096_ = hash_fold_int _hash__096_ 3 in
+                   let _hash__096_ = Base.hash_fold_int _hash__096_ 3 in
                    let _hash__096_ =
                      Base_quickcheck.Observer.observe
                        (quickcheck_observer_option quickcheck_observer_unit)
@@ -1035,7 +1035,7 @@ module Instance_with_phantom =
                   match _x__186_ with
                   | `phantom ->
                       let _hash__188_ =
-                        hash_fold_int _hash__188_ (-378691891) in
+                        Base.hash_fold_int _hash__188_ (-378691891) in
                       _hash__188_))
     let _ = quickcheck_observer
     let quickcheck_shrinker =
@@ -1103,10 +1103,10 @@ module Extensions =
              fun ~hash:_hash__199_ ->
                match _x__197_ with
                | `A ->
-                   let _hash__199_ = hash_fold_int _hash__199_ 65 in
+                   let _hash__199_ = Base.hash_fold_int _hash__199_ 65 in
                    _hash__199_
                | `B _x__204_ ->
-                   let _hash__199_ = hash_fold_int _hash__199_ 66 in
+                   let _hash__199_ = Base.hash_fold_int _hash__199_ 66 in
                    let _hash__199_ =
                      Base_quickcheck.Observer.observe
                        (Base_quickcheck.Observer.create
@@ -1193,4 +1193,14 @@ module Escaped =
              Base.Sequence.map
                (Base_quickcheck.Shrinker.shrink Shrinker.atomic _x__217_)
                ~f:(fun _x__217_ -> (_x__215_, _x__216_, _x__217_))])
+  end
+module Wildcard(Elt:sig type t val examples : t list end) =
+  struct
+    type t = Elt.t list
+    let quickcheck_generator =
+      Generator.list (Generator.of_list Elt.examples)
+    let quickcheck_observer : t Observer.t =
+      quickcheck_observer_list Base_quickcheck.Observer.opaque
+    let quickcheck_shrinker : t Shrinker.t =
+      quickcheck_shrinker_list Base_quickcheck.Shrinker.atomic
   end

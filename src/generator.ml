@@ -67,19 +67,44 @@ let bind t ~f =
     let x = generate t ~size ~random in
     generate (f x) ~size ~random)
 
-include Applicative.Make (struct
+let all list =
+  create (fun ~size ~random ->
+    List.map list ~f:(generate ~size ~random))
+
+let all_unit list =
+  create (fun ~size ~random ->
+    List.iter list ~f:(generate ~size ~random))
+
+let all_ignore = all_unit
+
+module For_applicative = Applicative.Make (struct
     type nonrec 'a t = 'a t
     let return = return
     let apply = apply
     let map = `Custom map
   end)
 
-include Monad.Make (struct
+let both = For_applicative.both
+let map2 = For_applicative.map2
+let map3 = For_applicative.map3
+
+module Applicative_infix = For_applicative.Applicative_infix
+include Applicative_infix
+
+module For_monad = Monad.Make (struct
     type nonrec 'a t = 'a t
     let return = return
     let bind = bind
     let map = `Custom map
   end)
+
+let ignore_m = For_monad.ignore_m
+let join = For_monad.join
+
+module Monad_infix = For_monad.Monad_infix
+include Monad_infix
+
+module Let_syntax = For_monad.Let_syntax
 
 open Let_syntax
 
@@ -231,13 +256,9 @@ let result ok_t err_t =
       | Second err -> Error err)
 
 let list_generic ?min_length ?max_length elt_gen =
-  create (fun ~size ~random ->
-    let sizes =
-      generate (sizes ?min_length ?max_length ()) ~size ~random
-      |> Array.of_list
-    in
-    List.init (Array.length sizes) ~f:(fun i ->
-      generate elt_gen ~size:sizes.(i) ~random))
+  let%bind sizes = sizes ?min_length ?max_length () in
+  List.map sizes ~f:(fun size -> with_size ~size elt_gen)
+  |> all
 
 let list elt_gen =
   list_generic elt_gen
@@ -289,17 +310,26 @@ let char_print =
 
 let char =
   weighted_union
-    [ 10., char_print
-    ;  1., char_uniform
+    [ 100., char_print
+    ;  10., char_uniform
+    ;   1., return Char.min_value
+    ;   1., return Char.max_value
     ]
 
-let small_positive_or_zero_int =
+(* Produces a number from 0 or 1 to size + 1, weighted high. We have found this
+   distribution empirically useful for string lengths. *)
+let small_int ~allow_zero =
   create (fun ~size ~random ->
-    Splittable_random.int random ~lo:0 ~hi:size)
+    let lower_bound = if allow_zero then 0 else 1 in
+    let upper_bound = size + 1 in
+    let weighted_low =
+      Splittable_random.Log_uniform.int random ~lo:0 ~hi:(upper_bound - lower_bound)
+    in
+    let weighted_high = upper_bound - weighted_low in
+    weighted_high)
 
-let small_strictly_positive_int =
-  create (fun ~size ~random ->
-    Splittable_random.int random ~lo:1 ~hi:(size + 1))
+let small_positive_or_zero_int = small_int ~allow_zero:true
+let small_strictly_positive_int = small_int ~allow_zero:false
 
 module type Int_with_random = sig
   include Int.S
@@ -453,9 +483,9 @@ let float_exponent_weighted_high lower_bound upper_bound =
 (* We weight exponents such that values near 1 are more likely. *)
 let float_exponent =
   let midpoint = Float.ieee_exponent 1. in
-  weighted_union
-    [ 0.5, float_exponent_weighted_high float_min_normal_exponent midpoint
-    ; 0.5, float_exponent_weighted_low  midpoint float_max_normal_exponent
+  union
+    [ float_exponent_weighted_high float_min_normal_exponent midpoint
+    ; float_exponent_weighted_low  midpoint float_max_normal_exponent
     ]
 
 let float_zero =
@@ -571,29 +601,16 @@ let float_inclusive lower_bound upper_bound =
     ; 0.9,  float_uniform_exclusive lower_bound upper_bound
     ]
 
-let default_string_length ~allow_empty =
-  (* At any size we generate strings of length up to [size+1]. This is so that we have
-     sensible behaviour when size = 0:
-     1. when [allow_empty] is false, we need to be able to generate something valid;
-     2. when [allow_empty] is true, generating the empty string for every case is far
-     more tests of the empty string than we need. *)
-  let%bind size = size in
-  let lower_bound = if allow_empty then 0 else 1 in
-  let upper_bound = size + 1 in
-  let%bind weighted_low = For_int.log_uniform_inclusive 0 (upper_bound - lower_bound) in
-  let weighted_high = upper_bound - weighted_low in
-  return weighted_high
-
 let string_with_length_of char_gen ~length =
   list_with_length char_gen ~length
   |> map ~f:String.of_char_list
 
 let string_of char_gen =
-  bind (default_string_length ~allow_empty:true) ~f:(fun length ->
+  bind small_positive_or_zero_int ~f:(fun length ->
     string_with_length_of char_gen ~length)
 
 let string_non_empty_of char_gen =
-  bind (default_string_length ~allow_empty:false) ~f:(fun length ->
+  bind small_strictly_positive_int ~f:(fun length ->
     string_with_length_of char_gen ~length)
 
 let string = string_of char

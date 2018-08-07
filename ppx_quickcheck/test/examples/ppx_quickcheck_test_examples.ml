@@ -193,3 +193,13 @@ module Escaped = struct
   let quickcheck_shrinker =
     [%quickcheck.shrinker: int * char * [%custom Shrinker.atomic]]
 end
+
+module Wildcard (Elt : sig type t val examples : t list end) = struct
+  type t = Elt.t list
+
+  let quickcheck_generator =
+    Generator.list (Generator.of_list Elt.examples)
+
+  let quickcheck_observer : t Observer.t = [%quickcheck.observer: _ list]
+  let quickcheck_shrinker : t Shrinker.t = [%quickcheck.shrinker: _ list]
+end

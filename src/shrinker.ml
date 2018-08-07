@@ -100,11 +100,11 @@ let map_tree_using_comparator ~comparator key_t data_t =
     in
     let shrink_keys =
       Sequence.round_robin (List.map alist ~f:(fun (key, data) ->
-        Sequence.map (shrink key_t key) ~f:(fun smaller_key ->
-          Map.Using_comparator.Tree.set ~comparator
-            (Map.Using_comparator.Tree.remove ~comparator tree key)
-            ~key:smaller_key
-            ~data)))
+        let tree = Map.Using_comparator.Tree.remove ~comparator tree key in
+        Sequence.filter_map (shrink key_t key) ~f:(fun smaller_key ->
+          match Map.Using_comparator.Tree.add ~comparator tree ~key:smaller_key ~data with
+          | `Ok tree -> Some tree
+          | `Duplicate -> None)))
     in
     let shrink_data =
       Sequence.round_robin (List.map alist ~f:(fun (key, data) ->
@@ -122,10 +122,11 @@ let set_tree_using_comparator ~comparator elt_t =
     in
     let shrink_elts =
       Sequence.round_robin (List.map list ~f:(fun elt ->
-        Sequence.map (shrink elt_t elt) ~f:(fun smaller_elt ->
-          Set.Using_comparator.Tree.add ~comparator
-            (Set.Using_comparator.Tree.remove ~comparator tree elt)
-            smaller_elt)))
+        let tree = Set.Using_comparator.Tree.remove ~comparator tree elt in
+        Sequence.filter_map (shrink elt_t elt) ~f:(fun smaller_elt ->
+          match Set.Using_comparator.Tree.mem ~comparator tree smaller_elt with
+          | true  -> None
+          | false -> Some (Set.Using_comparator.Tree.add tree ~comparator smaller_elt))))
     in
     Sequence.round_robin [drop_elts; shrink_elts])
 

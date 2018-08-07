@@ -10,7 +10,10 @@ build: [
 ]
 depends: [
   "base"
-  "ppx_jane"
+  "ppx_base"
+  "ppx_fields_conv"
+  "ppx_let"
+  "ppx_sexp_message"
   "splittable_random"
   "jbuilder"                {build & >= "1.0+beta18.1"}
   "ocaml-migrate-parsetree" {>= "1.0"}

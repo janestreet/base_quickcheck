@@ -1,5 +1,8 @@
 open! Import
 
+let any ~loc =
+  [%expr Base_quickcheck.Shrinker.atomic]
+
 let arrow ~loc =
   [%expr Base_quickcheck.Shrinker.atomic]
 

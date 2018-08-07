@@ -1,5 +1,9 @@
 open! Import
 
+val any
+  :  loc : location
+  -> expression
+
 val compound
   :  observer_of_core_type : (core_type -> expression)
   -> loc : location

@@ -141,3 +141,7 @@ module Escaped : sig
   val quickcheck_observer : t Observer.t
   val quickcheck_shrinker : t Shrinker.t
 end
+
+module Wildcard (Elt : sig type t val examples : t list end) : sig
+  type t = Elt.t list [@@deriving quickcheck]
+end

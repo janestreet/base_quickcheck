@@ -183,19 +183,17 @@ let%expect_test "first order arrow type" =
     (generator exhaustive)
     (observer transparent)
     (shrinker atomic) |}];
-  test ~cr:CR_soon (module Optional_arrow) (m_arrow_optional (m_option m_unit) m_bool);
+  test (module Optional_arrow) (m_arrow_optional (m_option m_unit) m_bool);
   [%expect {|
     (generator exhaustive)
     (observer transparent)
-    "did not generate any single function that distinguishes all values"
     (shrinker atomic) |}];
-  test ~cr:CR_soon
+  test
     (module Curried_arrow)
     (m_arrow (m_option m_unit) (m_arrow (m_option m_bool) m_bool));
   [%expect {|
     (generator "generated 64 distinct values in 1_000 iterations")
     (observer transparent)
-    "did not generate any single function that distinguishes all values"
     (shrinker atomic) |}];
 ;;
 
@@ -210,21 +208,21 @@ let%expect_test "higher order arrow type" =
     (module Simple_higher_order)
     (m_arrow (m_arrow (m_option m_unit) (m_option m_bool)) m_bool);
   [%expect {|
-    (generator "generated 21 distinct values in 100 iterations")
+    (generator "generated 55 distinct values in 100 iterations")
     (observer transparent)
     (shrinker atomic) |}];
   test
     (module Named_higher_order)
     (m_arrow (m_arrow_named (m_option m_unit) (m_option m_bool)) m_bool);
   [%expect {|
-    (generator "generated 21 distinct values in 100 iterations")
+    (generator "generated 55 distinct values in 100 iterations")
     (observer transparent)
     (shrinker atomic) |}];
   test
     (module Optional_higher_order)
     (m_arrow (m_arrow_optional (m_option m_unit) (m_option m_bool)) m_bool);
   [%expect {|
-    (generator "generated 11 distinct values in 100 iterations")
+    (generator "generated 49 distinct values in 100 iterations")
     (observer transparent)
     (shrinker atomic) |}];
 ;;
@@ -316,7 +314,7 @@ let%expect_test "expressions" =
 
 module Escaped = Escaped
 
-let%expect_test "expressions" =
+let%expect_test "escaped" =
   let module Escaped' = struct
     type t = int * char * bool option
     [@@deriving compare, sexp_of]
@@ -331,7 +329,7 @@ let%expect_test "expressions" =
      nor strictly opaque, so it will fail the test in either observer mode we give it. *)
   test ~cr:Comment ~shrinker:`atomic (module Escaped) (module Escaped');
   [%expect {|
-    (generator "generated 4_381 distinct values in 10_000 iterations")
+    (generator "generated 4_992 distinct values in 10_000 iterations")
     (observer
      (partitions
       (((1 a ()) (1 b ()))
@@ -341,4 +339,31 @@ let%expect_test "expressions" =
     (* require-failed: lib/base_quickcheck/test/helpers/base_quickcheck_test_helpers.ml:LINE:COL. *)
     "did not generate any single function that distinguishes all values"
     (shrinker atomic) |}];
+;;
+
+module Wildcard = Wildcard
+
+let%expect_test "wildcard" =
+  let module Instance = struct
+    include Wildcard (val m_bool)
+    let compare = [%compare: bool list]
+    let sexp_of_t = [%sexp_of: bool list]
+    let examples = let module T = (val m_list m_bool) in T.examples
+  end in
+  (* We disable CRs in test output because the observer is neither strictly transparent
+     nor strictly opaque, so it will fail the test in either observer mode we give it. *)
+  test ~cr:Comment (module Instance) (module Instance);
+  [%expect {|
+    (generator "generated 2_248 distinct values in 10_000 iterations")
+    (observer (partitions ((()) ((false) (true)) ((false true) (true false)))))
+    (* require-failed: lib/base_quickcheck/test/helpers/base_quickcheck_test_helpers.ml:LINE:COL. *)
+    "did not generate any single function that distinguishes all values"
+    (shrinker
+     (((false) => ())
+      ((true) => ())
+      ((false true) => (true))
+      ((false true) => (false))
+      ((true false) => (false))
+      ((true false) => (true)))) |}];
+;;
 ;;
