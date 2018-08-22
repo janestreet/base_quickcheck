@@ -1223,6 +1223,18 @@ let%expect_test "char_print" =
       ("did not generate these values" ("\000" "\t" "\255")))) |}];
 ;;
 
+let char_uniform_inclusive = Generator.char_uniform_inclusive
+
+let%expect_test "char_uniform_inclusive" =
+  test_generator ~mode:`inexhaustive
+    (Generator.char_uniform_inclusive 'A' 'Z')
+    m_char;
+  [%expect {|
+    (generator
+     ("generated 26 distinct values in 10_000 iterations"
+      ("did not generate these values" ("\000" "\t" " " ! 0 9 a z ~ "\255")))) |}];
+;;
+
 let string = Generator.string
 
 let%expect_test "string" =

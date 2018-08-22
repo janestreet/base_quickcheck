@@ -295,6 +295,7 @@ val char_alpha      : char t
 val char_alphanum   : char t
 val char_whitespace : char t
 val char_print      : char t
+val char_uniform_inclusive : char -> char -> char t
 
 (** {3 String Distributions} *)
 
