@@ -5,7 +5,7 @@ type 'a t = 'a Observer.t
 let create = Observer.create
 let observe = Observer.observe
 
-let%expect_test "observe & create" =
+let%expect_test "observe & create" [@tags "64-bits-only"] =
   let obs =
     Observer.create (fun x ~size ~hash ->
       hash_fold_int hash
@@ -135,7 +135,7 @@ let%expect_test "int" =
 
 let int32 = Observer.int32
 
-let%expect_test "int32" =
+let%expect_test "int32" [@tags "64-bits-only"] =
   test_observer Observer.int32 (m_int (module Int32));
   [%expect {| (observer transparent) |}];
 ;;

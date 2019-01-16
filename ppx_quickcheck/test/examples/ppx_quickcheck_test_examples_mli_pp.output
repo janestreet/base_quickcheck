@@ -294,22 +294,22 @@ sig
     end
 end
 module Poly_with_phantom :
-(sig
-   type _ t[@@deriving quickcheck]
-   include
-     sig
-       [@@@ocaml.warning "-32"]
-       val quickcheck_generator :
-         'v_x__003_ Base_quickcheck.Generator.t ->
-           'v_x__003_ t Base_quickcheck.Generator.t
-       val quickcheck_observer :
-         'v_x__002_ Base_quickcheck.Observer.t ->
-           'v_x__002_ t Base_quickcheck.Observer.t
-       val quickcheck_shrinker :
-         'v_x__001_ Base_quickcheck.Shrinker.t ->
-           'v_x__001_ t Base_quickcheck.Shrinker.t
-     end
- end with type _ t =  unit option)
+sig
+  type _ t[@@deriving quickcheck]
+  include
+    sig
+      [@@@ocaml.warning "-32"]
+      val quickcheck_generator :
+        'v_x__003_ Base_quickcheck.Generator.t ->
+          'v_x__003_ t Base_quickcheck.Generator.t
+      val quickcheck_observer :
+        'v_x__002_ Base_quickcheck.Observer.t ->
+          'v_x__002_ t Base_quickcheck.Observer.t
+      val quickcheck_shrinker :
+        'v_x__001_ Base_quickcheck.Shrinker.t ->
+          'v_x__001_ t Base_quickcheck.Shrinker.t
+    end
+end with type _ t =  unit option
 module Instance_with_phantom :
 sig
   type t = [ `phantom ] Poly_with_phantom.t[@@deriving quickcheck]
