@@ -38,8 +38,7 @@ let%expect_test "opaque" =
 ;;
 
 let unmap = Observer.unmap
-
-let%expect_test "unmap" =
+let%expect_test "unmap" [@tags "no-js"] =
   test_observer (Observer.unmap Observer.int64 ~f:Int.to_int64) (m_int (module Int));
   [%expect {| (observer transparent) |}];
 ;;
@@ -149,14 +148,14 @@ let%expect_test "int63" =
 
 let int64 = Observer.int64
 
-let%expect_test "int64" =
+let%expect_test "int64" [@tags "no-js"] =
   test_observer Observer.int64 (m_int (module Int64));
   [%expect {| (observer transparent) |}];
 ;;
 
 let nativeint = Observer.nativeint
 
-let%expect_test "nativeint" =
+let%expect_test "nativeint" [@tags "no-js"] =
   test_observer Observer.nativeint (m_int (module Nativeint));
   [%expect {| (observer transparent) |}];
 ;;
