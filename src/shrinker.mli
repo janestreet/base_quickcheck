@@ -10,25 +10,20 @@ type 'a t
 (** This shrinker treats a type as atomic, never attempting to produce smaller values. *)
 val atomic : _ t
 
-include With_basic_types.S with type 'a t := 'a t (** @inline *)
+(** @inline *)
+include With_basic_types.S with type 'a t := 'a t
 
-val map_t
-  :  'key  t
-  -> 'data t
-  -> ('key, 'data, 'cmp) Map.t t
-
-val set_t
-  :  'elt t
-  -> ('elt, 'cmp) Set.t t
+val map_t : 'key t -> 'data t -> ('key, 'data, 'cmp) Map.t t
+val set_t : 'elt t -> ('elt, 'cmp) Set.t t
 
 val map_tree_using_comparator
-  :  comparator : ('key, 'cmp) Comparator.t
-  -> 'key  t
+  :  comparator:('key, 'cmp) Comparator.t
+  -> 'key t
   -> 'data t
   -> ('key, 'data, 'cmp) Map.Using_comparator.Tree.t t
 
 val set_tree_using_comparator
-  :  comparator : ('elt, 'cmp) Comparator.t
+  :  comparator:('elt, 'cmp) Comparator.t
   -> 'elt t
   -> ('elt, 'cmp) Set.Using_comparator.Tree.t t
 
@@ -63,5 +58,4 @@ val fixed_point : ('a t -> 'a t) -> 'a t
 *)
 
 val create : ('a -> 'a Sequence.t) -> 'a t
-
 val shrink : 'a t -> 'a -> 'a Sequence.t

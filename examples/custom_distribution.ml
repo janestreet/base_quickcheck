@@ -1,5 +1,5 @@
 open! Base
-open  Base_quickcheck
+open Base_quickcheck
 
 module Variant : sig
   type t =
@@ -20,15 +20,17 @@ end = struct
      default derived generator with one that uses [Generator.weighted_union] to skew the
      distribution. *)
   let quickcheck_generator =
-    Generator.weighted_union [
-      (1., Generator.return Nullary);
-      (2., [%quickcheck.generator: bool]
-           |> Generator.map ~f:(fun bool -> Unary bool));
-      (4., [%quickcheck.generator: int * float]
-           |> Generator.map ~f:(fun (int, float) -> Binary (int, float)));
-      (10., [%quickcheck.generator: string list]
-            |> Generator.map ~f:(fun list -> N_ary list));
-    ]
+    Generator.weighted_union
+      [ 1., Generator.return Nullary
+      ; 2., [%quickcheck.generator: bool] |> Generator.map ~f:(fun bool -> Unary bool)
+      ; ( 4.
+        , [%quickcheck.generator: int * float]
+          |> Generator.map ~f:(fun (int, float) -> Binary (int, float)) )
+      ; ( 10.
+        , [%quickcheck.generator: string list]
+          |> Generator.map ~f:(fun list -> N_ary list) )
+      ]
+  ;;
 
   (* We can test our distribution: *)
   let%expect_test _ =
@@ -42,7 +44,8 @@ end = struct
         |> List.sort ~compare
         |> List.map ~f:sexp_of_t
         |> List.iter ~f:print_s);
-    [%expect {|
+    [%expect
+      {|
       Nullary
       Nullary
       (Binary -58823712978749242 1.326895442392441E+36)
@@ -63,19 +66,20 @@ end = struct
       (N_ary (L7N))
       (N_ary (bAW6zR `y7O 1V7))
       (N_ary ("\219\171nqZ" "asa\250Y")) |}]
+  ;;
 end
 
 module Record : sig
-  type t = {
-    rationals : float list;
-    index : int;
-  }
+  type t =
+    { rationals : float list
+    ; index : int
+    }
   [@@deriving quickcheck]
 end = struct
-  type t = {
-    rationals : float list;
-    index : int;
-  }
+  type t =
+    { rationals : float list
+    ; index : int
+    }
   [@@deriving compare, quickcheck, sexp_of]
 
   (* We might want to choose [rationals] from a distribution of finite floats, and for
@@ -87,6 +91,7 @@ end = struct
     let%bind rationals = Generator.list_non_empty Generator.float_positive_or_zero in
     let%bind index = Generator.int_uniform_inclusive 0 (List.length rationals - 1) in
     return { rationals; index }
+  ;;
 
   (* We can test our distribution: *)
   let%expect_test _ =
@@ -99,11 +104,12 @@ end = struct
         |> Sequence.to_list
         |> List.sort ~compare
         |> List.stable_sort
-             ~compare:(Comparable.lift Int.ascending ~f:(fun t ->
-               List.length t.rationals))
+             ~compare:
+               (Comparable.lift Int.ascending ~f:(fun t -> List.length t.rationals))
         |> List.map ~f:sexp_of_t
         |> List.iter ~f:print_s);
-    [%expect {|
+    [%expect
+      {|
       ((rationals (2.8280262305352377E-308)) (index 0))
       ((rationals (4.2366697150646817E-308)) (index 0))
       ((rationals (1.3789672079675011E-186)) (index 0))
@@ -190,4 +196,5 @@ end = struct
          126.14432978630066
          2.716326520622772E+60))
        (index 6)) |}]
+  ;;
 end

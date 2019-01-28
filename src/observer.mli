@@ -11,29 +11,17 @@ type -'a t = 'a Observer0.t
     using this observer will be constant with respect to the value(s) it observes. *)
 val opaque : _ t
 
-include With_basic_types.S with type 'a t := 'a t (** @inline *)
+(** @inline *)
+include With_basic_types.S with type 'a t := 'a t
 
 (** Produces an observer that generates random inputs for a given function, calls the
     function on them, then observes the corresponding outputs. *)
 val fn : 'a Generator.t -> 'b t -> ('a -> 'b) t
 
-val map_t
-  :  'key  t
-  -> 'data t
-  -> ('key, 'data, 'cmp) Map.t t
-
-val set_t
-  :  'elt t
-  -> ('elt, 'cmp) Set.t t
-
-val map_tree
-  :  'key  t
-  -> 'data t
-  -> ('key, 'data, 'cmp) Map.Using_comparator.Tree.t t
-
-val set_tree
-  :  'elt t
-  -> ('elt, 'cmp) Set.Using_comparator.Tree.t t
+val map_t : 'key t -> 'data t -> ('key, 'data, 'cmp) Map.t t
+val set_t : 'elt t -> ('elt, 'cmp) Set.t t
+val map_tree : 'key t -> 'data t -> ('key, 'data, 'cmp) Map.Using_comparator.Tree.t t
+val set_tree : 'elt t -> ('elt, 'cmp) Set.Using_comparator.Tree.t t
 
 (** {2 Observers Based on Hash Functions} *)
 
@@ -68,5 +56,4 @@ val fixed_point : ('a t -> 'a t) -> 'a t
 *)
 
 val create : ('a -> size:int -> hash:Hash.state -> Hash.state) -> 'a t
-
 val observe : 'a t -> 'a -> size:int -> hash:Hash.state -> Hash.state

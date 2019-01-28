@@ -11,7 +11,8 @@ type +'a t
     designed to hit corner cases reasonably often, and also generate reasonably good
     coverage of common cases and arbitrary values. *)
 
-include With_basic_types.S with type 'a t := 'a t (** @inline *)
+(** @inline *)
+include With_basic_types.S with type 'a t := 'a t
 
 (** Generates random functions that use the given observer to perturb the pseudo-random
     state that is then used to generate the output value. The resulting functions are
@@ -20,23 +21,20 @@ val fn : 'a Observer0.t -> 'b t -> ('a -> 'b) t
 
 val map_t_m
   :  ('key, 'cmp) Set.comparator
-  -> 'key  t
+  -> 'key t
   -> 'data t
   -> ('key, 'data, 'cmp) Map.t t
 
-val set_t_m
-  :  ('elt, 'cmp) Set.comparator
-  -> 'elt t
-  -> ('elt, 'cmp) Set.t t
+val set_t_m : ('elt, 'cmp) Set.comparator -> 'elt t -> ('elt, 'cmp) Set.t t
 
 val map_tree_using_comparator
-  :  comparator : ('key, 'cmp) Comparator.t
-  -> 'key  t
+  :  comparator:('key, 'cmp) Comparator.t
+  -> 'key t
   -> 'data t
   -> ('key, 'data, 'cmp) Map.Using_comparator.Tree.t t
 
 val set_tree_using_comparator
-  :  comparator : ('elt, 'cmp) Comparator.t
+  :  comparator:('elt, 'cmp) Comparator.t
   -> 'elt t
   -> ('elt, 'cmp) Set.Using_comparator.Tree.t t
 
@@ -50,7 +48,7 @@ val of_list : 'a list -> 'a t
 val union : 'a t list -> 'a t
 
 include Applicative.S with type 'a t := 'a t
-include Monad.S       with type 'a t := 'a t
+include Monad.S with type 'a t := 'a t
 
 (** {2 Size of Random Values}
 
@@ -198,7 +196,7 @@ val weighted_recursive_union
 (** Produces an integer between 0 and an unspecified upper bound which is proportional to
     [size]. This is a good generator to use for sizes of values like strings which have a
     variable number of fixed-size elements. *)
-val small_positive_or_zero_int  : int t
+val small_positive_or_zero_int : int t
 
 (** Like [small_positive_or_zero_int] but with a minimum of [1]. *)
 val small_strictly_positive_int : int t
@@ -210,10 +208,10 @@ val small_strictly_positive_int : int t
     corner cases, e.g. [min_value] and [max_value].
 *)
 
-val int_uniform       : int       t
-val int32_uniform     : int32     t
-val int63_uniform     : Int63.t   t
-val int64_uniform     : int64     t
+val int_uniform : int t
+val int32_uniform : int32 t
+val int63_uniform : Int63.t t
+val int64_uniform : int64 t
 val nativeint_uniform : nativeint t
 
 (** {4 Bounded Distributions}
@@ -223,10 +221,10 @@ val nativeint_uniform : nativeint t
     themselves.
 *)
 
-val int_inclusive       : int       -> int       -> int       t
-val int32_inclusive     : int32     -> int32     -> int32     t
-val int63_inclusive     : Int63.t   -> Int63.t   -> Int63.t   t
-val int64_inclusive     : int64     -> int64     -> int64     t
+val int_inclusive : int -> int -> int t
+val int32_inclusive : int32 -> int32 -> int32 t
+val int63_inclusive : Int63.t -> Int63.t -> Int63.t t
+val int64_inclusive : int64 -> int64 -> int64 t
 val nativeint_inclusive : nativeint -> nativeint -> nativeint t
 
 (** {4 Uniform Bounded Distributions}
@@ -235,10 +233,10 @@ val nativeint_inclusive : nativeint -> nativeint -> nativeint t
     given in nondecreasing order. All values are given equal weight.
 *)
 
-val int_uniform_inclusive       : int       -> int       -> int       t
-val int32_uniform_inclusive     : int32     -> int32     -> int32     t
-val int63_uniform_inclusive     : Int63.t   -> Int63.t   -> Int63.t   t
-val int64_uniform_inclusive     : int64     -> int64     -> int64     t
+val int_uniform_inclusive : int -> int -> int t
+val int32_uniform_inclusive : int32 -> int32 -> int32 t
+val int63_uniform_inclusive : Int63.t -> Int63.t -> Int63.t t
+val int64_uniform_inclusive : int64 -> int64 -> int64 t
 val nativeint_uniform_inclusive : nativeint -> nativeint -> nativeint t
 
 (** {4 Uniform in Log Space Distributions}
@@ -248,10 +246,10 @@ val nativeint_uniform_inclusive : nativeint -> nativeint -> nativeint t
     bit-length between the bounds. The bounds must be given in nondecreasing order.
 *)
 
-val int_log_uniform_inclusive       : int       -> int       -> int       t
-val int32_log_uniform_inclusive     : int32     -> int32     -> int32     t
-val int63_log_uniform_inclusive     : Int63.t   -> Int63.t   -> Int63.t   t
-val int64_log_uniform_inclusive     : int64     -> int64     -> int64     t
+val int_log_uniform_inclusive : int -> int -> int t
+val int32_log_uniform_inclusive : int32 -> int32 -> int32 t
+val int63_log_uniform_inclusive : Int63.t -> Int63.t -> Int63.t t
+val int64_log_uniform_inclusive : int64 -> int64 -> int64 t
 val nativeint_log_uniform_inclusive : nativeint -> nativeint -> nativeint t
 
 (** {4 Log Space Distributions}
@@ -260,10 +258,10 @@ val nativeint_log_uniform_inclusive : nativeint -> nativeint -> nativeint t
     corner cases, e.g. the given bounds.
 *)
 
-val int_log_inclusive       : int       -> int       -> int       t
-val int32_log_inclusive     : int32     -> int32     -> int32     t
-val int63_log_inclusive     : Int63.t   -> Int63.t   -> Int63.t   t
-val int64_log_inclusive     : int64     -> int64     -> int64     t
+val int_log_inclusive : int -> int -> int t
+val int32_log_inclusive : int32 -> int32 -> int32 t
+val int63_log_inclusive : Int63.t -> Int63.t -> Int63.t t
+val int64_log_inclusive : int64 -> int64 -> int64 t
 val nativeint_log_inclusive : nativeint -> nativeint -> nativeint t
 
 (** {3 Floating Point Distributions} *)
@@ -277,33 +275,31 @@ val float_inclusive : float -> float -> float t
     uniformly across the resulting range, rounding error notwithstanding. *)
 val float_uniform_exclusive : float -> float -> float t
 
-val float_without_nan       : float t
-val float_finite            : float t
+val float_without_nan : float t
+val float_finite : float t
 val float_strictly_positive : float t
 val float_strictly_negative : float t
-val float_positive_or_zero  : float t
-val float_negative_or_zero  : float t
-
+val float_positive_or_zero : float t
+val float_negative_or_zero : float t
 val float_of_class : Float.Class.t -> float t
 
 (** {3 Character Distributions} *)
 
-val char_lowercase  : char t
-val char_uppercase  : char t
-val char_digit      : char t
-val char_alpha      : char t
-val char_alphanum   : char t
+val char_lowercase : char t
+val char_uppercase : char t
+val char_digit : char t
+val char_alpha : char t
+val char_alphanum : char t
 val char_whitespace : char t
-val char_print      : char t
+val char_print : char t
 val char_uniform_inclusive : char -> char -> char t
 
 (** {3 String Distributions} *)
 
-val string_non_empty   :               string t
+val string_non_empty : string t
 val string_with_length : length:int -> string t
-
-val string_of             : char t               -> string t
-val string_non_empty_of   : char t               -> string t
+val string_of : char t -> string t
+val string_non_empty_of : char t -> string t
 val string_with_length_of : char t -> length:int -> string t
 
 (** {3 Sexp Distributions} *)
@@ -313,7 +309,7 @@ val sexp_of : string t -> Sexp.t t
 
 (** {3 List Distrubtions} *)
 
-val list_non_empty   : 'a t               -> 'a list t
+val list_non_empty : 'a t -> 'a list t
 val list_with_length : 'a t -> length:int -> 'a list t
 
 (** Produces permutations of the given list, weighted uniformly. *)
@@ -338,4 +334,4 @@ val create : (size:int -> random:Splittable_random.State.t -> 'a) -> 'a t
 
 (** Generates a random value using the given size and pseudorandom state. Useful when
     using [create] and dispatching to other existing generators. *)
-val generate : 'a t -> (size:int -> random:Splittable_random.State.t -> 'a)
+val generate : 'a t -> size:int -> random:Splittable_random.State.t -> 'a
