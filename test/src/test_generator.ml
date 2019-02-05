@@ -1418,6 +1418,20 @@ let%expect_test "list_with_length" =
       ("did not generate these values" (() (false) (true))))) |}]
 ;;
 
+let list_filtered = Generator.list_filtered
+
+let%expect_test "list_filtered" =
+  let original_list = List.range 1 4 ~start:`inclusive ~stop:`inclusive in
+  test_generator
+    (Generator.list_filtered original_list)
+    (module struct
+      type t = int list [@@deriving compare, sexp_of]
+
+      let examples = [ [] ] @ List.map original_list ~f:List.return @ [ original_list ]
+    end);
+  [%expect {| (generator "generated 16 distinct values in 10_000 iterations") |}]
+;;
+
 let list_permutations = Generator.list_permutations
 
 let%expect_test "list_permutations" =

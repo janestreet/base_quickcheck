@@ -312,6 +312,10 @@ val sexp_of : string t -> Sexp.t t
 val list_non_empty : 'a t -> 'a list t
 val list_with_length : 'a t -> length:int -> 'a list t
 
+(** Randomly drops elements from a list. The length of each result is chosen uniformly
+    between 0 and the length of the input, inclusive. *)
+val list_filtered : 'a list -> 'a list t
+
 (** Produces permutations of the given list, weighted uniformly. *)
 val list_permutations : 'a list -> 'a list t
 

@@ -251,6 +251,23 @@ let list_with_length elt_gen ~length =
   list_generic ~min_length:length ~max_length:length elt_gen
 ;;
 
+let list_filtered elts =
+  let elts = Array.of_list elts in
+  let length_of_input = Array.length elts in
+  create (fun ~size:_ ~random ->
+    let length_of_output = Splittable_random.int random ~lo:0 ~hi:length_of_input in
+    let indices = Array.init length_of_input ~f:Fn.id in
+    (* Choose [length_of_output] random values in the prefix of [indices]. *)
+    for i = 0 to length_of_output - 1 do
+      let j = Splittable_random.int random ~lo:i ~hi:(length_of_input - 1) in
+      Array.swap indices i j
+    done;
+    (* Sort the chosen indices because we don't want to reorder them. *)
+    Array.sort indices ~pos:0 ~len:length_of_output ~compare:Int.compare;
+    (* Return the chosen elements. *)
+    List.init length_of_output ~f:(fun i -> elts.(indices.(i))))
+;;
+
 let list_permutations list =
   create (fun ~size:_ ~random ->
     let array = Array.of_list list in
