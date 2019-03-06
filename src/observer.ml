@@ -3,10 +3,11 @@ include Observer0
 
 let unmap t ~f = create (fun x ~size ~hash -> observe t (f x) ~size ~hash)
 let of_hash_fold f = create (fun x ~size:_ ~hash -> f hash x)
+let of_lazy lazy_t = create (fun x ~size ~hash -> observe (force lazy_t) x ~size ~hash)
 
 let fixed_point wrap =
-  let rec f x ~size ~hash = observe (wrap (create f)) x ~size ~hash in
-  create f
+  let rec lazy_t = lazy (wrap (of_lazy lazy_t)) in
+  of_lazy lazy_t
 ;;
 
 let unit = opaque

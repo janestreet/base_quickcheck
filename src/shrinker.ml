@@ -17,10 +17,11 @@ end
 include T
 
 let map t ~f ~f_inverse = create (fun x -> Sequence.map ~f (shrink t (f_inverse x)))
+let of_lazy lazy_t = create (fun x -> Sequence.of_lazy (lazy (shrink (force lazy_t) x)))
 
 let fixed_point of_shrinker =
-  let rec f x = Sequence.of_lazy (lazy (shrink (of_shrinker (create f)) x)) in
-  create f
+  let rec lazy_t = lazy (of_shrinker (of_lazy lazy_t)) in
+  of_lazy lazy_t
 ;;
 
 let both fst_t snd_t =

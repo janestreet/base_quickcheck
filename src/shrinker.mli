@@ -52,6 +52,10 @@ val map : 'a t -> f:('a -> 'b) -> f_inverse:('b -> 'a) -> 'b t
 *)
 val fixed_point : ('a t -> 'a t) -> 'a t
 
+(** Creates a [t] that forces the lazy argument as necessary. Can be used to tie
+    (mutually) recursive knots. *)
+val of_lazy : 'a t Lazy.t -> 'a t
+
 (** {2 Low-level functions}
 
     Most users will not need to call these.

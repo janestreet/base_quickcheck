@@ -5,7 +5,6 @@ open! Import
 type t
 
 val empty : t
-
 val lookup : t -> loc:location -> tyvar:string -> expression
 
 val create

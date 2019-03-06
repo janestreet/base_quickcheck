@@ -96,57 +96,63 @@ module Poly_variant =
       | `F of (bool * unit option) ][@@deriving quickcheck]
     let _ = fun (_ : t) -> ()
     let quickcheck_generator =
-      Base_quickcheck.Generator.union
-        [Base_quickcheck.Generator.create
-           (fun ~size:_size__032_ -> fun ~random:_random__033_ -> `A);
-        Base_quickcheck.Generator.create
-          (fun ~size:_size__034_ -> fun ~random:_random__035_ -> `B);
-        Base_quickcheck.Generator.create
-          (fun ~size:_size__036_ ->
-             fun ~random:_random__037_ ->
-               `C
-                 (Base_quickcheck.Generator.generate
-                    quickcheck_generator_bool ~size:_size__036_
-                    ~random:_random__037_));
-        Base_quickcheck.Generator.create
-          (fun ~size:_size__038_ ->
-             fun ~random:_random__039_ ->
-               `D
-                 (Base_quickcheck.Generator.generate
-                    quickcheck_generator_bool ~size:_size__038_
-                    ~random:_random__039_));
-        Base_quickcheck.Generator.create
-          (fun ~size:_size__042_ ->
-             fun ~random:_random__043_ ->
-               `E
-                 (Base_quickcheck.Generator.generate
-                    (Base_quickcheck.Generator.create
-                       (fun ~size:_size__040_ ->
-                          fun ~random:_random__041_ ->
-                            ((Base_quickcheck.Generator.generate
-                                quickcheck_generator_bool ~size:_size__040_
-                                ~random:_random__041_),
-                              (Base_quickcheck.Generator.generate
-                                 (quickcheck_generator_option
-                                    quickcheck_generator_unit)
-                                 ~size:_size__040_ ~random:_random__041_))))
-                    ~size:_size__042_ ~random:_random__043_));
-        Base_quickcheck.Generator.create
-          (fun ~size:_size__046_ ->
-             fun ~random:_random__047_ ->
-               `F
-                 (Base_quickcheck.Generator.generate
-                    (Base_quickcheck.Generator.create
-                       (fun ~size:_size__044_ ->
-                          fun ~random:_random__045_ ->
-                            ((Base_quickcheck.Generator.generate
-                                quickcheck_generator_bool ~size:_size__044_
-                                ~random:_random__045_),
-                              (Base_quickcheck.Generator.generate
-                                 (quickcheck_generator_option
-                                    quickcheck_generator_unit)
-                                 ~size:_size__044_ ~random:_random__045_))))
-                    ~size:_size__046_ ~random:_random__047_))]
+      Base_quickcheck.Generator.weighted_union
+        [(1.,
+           (Base_quickcheck.Generator.create
+              (fun ~size:_size__032_ -> fun ~random:_random__033_ -> `A)));
+        (1.,
+          (Base_quickcheck.Generator.create
+             (fun ~size:_size__034_ -> fun ~random:_random__035_ -> `B)));
+        (1.,
+          (Base_quickcheck.Generator.create
+             (fun ~size:_size__036_ ->
+                fun ~random:_random__037_ ->
+                  `C
+                    (Base_quickcheck.Generator.generate
+                       quickcheck_generator_bool ~size:_size__036_
+                       ~random:_random__037_))));
+        (1.,
+          (Base_quickcheck.Generator.create
+             (fun ~size:_size__038_ ->
+                fun ~random:_random__039_ ->
+                  `D
+                    (Base_quickcheck.Generator.generate
+                       quickcheck_generator_bool ~size:_size__038_
+                       ~random:_random__039_))));
+        (1.,
+          (Base_quickcheck.Generator.create
+             (fun ~size:_size__042_ ->
+                fun ~random:_random__043_ ->
+                  `E
+                    (Base_quickcheck.Generator.generate
+                       (Base_quickcheck.Generator.create
+                          (fun ~size:_size__040_ ->
+                             fun ~random:_random__041_ ->
+                               ((Base_quickcheck.Generator.generate
+                                   quickcheck_generator_bool
+                                   ~size:_size__040_ ~random:_random__041_),
+                                 (Base_quickcheck.Generator.generate
+                                    (quickcheck_generator_option
+                                       quickcheck_generator_unit)
+                                    ~size:_size__040_ ~random:_random__041_))))
+                       ~size:_size__042_ ~random:_random__043_))));
+        (1.,
+          (Base_quickcheck.Generator.create
+             (fun ~size:_size__046_ ->
+                fun ~random:_random__047_ ->
+                  `F
+                    (Base_quickcheck.Generator.generate
+                       (Base_quickcheck.Generator.create
+                          (fun ~size:_size__044_ ->
+                             fun ~random:_random__045_ ->
+                               ((Base_quickcheck.Generator.generate
+                                   quickcheck_generator_bool
+                                   ~size:_size__044_ ~random:_random__045_),
+                                 (Base_quickcheck.Generator.generate
+                                    (quickcheck_generator_option
+                                       quickcheck_generator_unit)
+                                    ~size:_size__044_ ~random:_random__045_))))
+                       ~size:_size__046_ ~random:_random__047_))))]
     let _ = quickcheck_generator
     let quickcheck_observer =
       Base_quickcheck.Observer.create
@@ -272,25 +278,29 @@ module Inherit_poly_variant =
                                                            quickcheck]
     let _ = fun (_ : t) -> ()
     let quickcheck_generator =
-      Base_quickcheck.Generator.union
-        [Base_quickcheck.Generator.create
-           (fun ~size:_size__055_ -> fun ~random:_random__056_ -> `X);
-        Base_quickcheck.Generator.create
-          (fun ~size:_size__057_ ->
-             fun ~random:_random__058_ ->
-               (Base_quickcheck.Generator.generate
-                  Poly_variant.quickcheck_generator ~size:_size__057_
-                  ~random:_random__058_ : Poly_variant.t  :> [ `X 
-                                                             | Poly_variant.t
-                                                             | `Z of
-                                                                 unit option ]));
-        Base_quickcheck.Generator.create
-          (fun ~size:_size__059_ ->
-             fun ~random:_random__060_ ->
-               `Z
-                 (Base_quickcheck.Generator.generate
-                    (quickcheck_generator_option quickcheck_generator_unit)
-                    ~size:_size__059_ ~random:_random__060_))]
+      Base_quickcheck.Generator.weighted_union
+        [(1.,
+           (Base_quickcheck.Generator.create
+              (fun ~size:_size__055_ -> fun ~random:_random__056_ -> `X)));
+        (1.,
+          (Base_quickcheck.Generator.create
+             (fun ~size:_size__057_ ->
+                fun ~random:_random__058_ ->
+                  (Base_quickcheck.Generator.generate
+                     Poly_variant.quickcheck_generator ~size:_size__057_
+                     ~random:_random__058_ : Poly_variant.t  :> [ `X 
+                                                                | Poly_variant.t
+                                                                | `Z of
+                                                                    unit
+                                                                    option ]))));
+        (1.,
+          (Base_quickcheck.Generator.create
+             (fun ~size:_size__059_ ->
+                fun ~random:_random__060_ ->
+                  `Z
+                    (Base_quickcheck.Generator.generate
+                       (quickcheck_generator_option quickcheck_generator_unit)
+                       ~size:_size__059_ ~random:_random__060_))))]
     let _ = quickcheck_generator
     let quickcheck_observer =
       Base_quickcheck.Observer.create
@@ -394,25 +404,29 @@ module Nullary_and_unary_variant =
       | D of unit [@@deriving quickcheck]
     let _ = fun (_ : t) -> ()
     let quickcheck_generator =
-      Base_quickcheck.Generator.union
-        [Base_quickcheck.Generator.create
-           (fun ~size:_size__076_ -> fun ~random:_random__077_ -> A);
-        Base_quickcheck.Generator.create
-          (fun ~size:_size__078_ -> fun ~random:_random__079_ -> B);
-        Base_quickcheck.Generator.create
-          (fun ~size:_size__080_ ->
-             fun ~random:_random__081_ ->
-               C
-                 (Base_quickcheck.Generator.generate
-                    quickcheck_generator_unit ~size:_size__080_
-                    ~random:_random__081_));
-        Base_quickcheck.Generator.create
-          (fun ~size:_size__082_ ->
-             fun ~random:_random__083_ ->
-               D
-                 (Base_quickcheck.Generator.generate
-                    quickcheck_generator_unit ~size:_size__082_
-                    ~random:_random__083_))]
+      Base_quickcheck.Generator.weighted_union
+        [(1.,
+           (Base_quickcheck.Generator.create
+              (fun ~size:_size__076_ -> fun ~random:_random__077_ -> A)));
+        (1.,
+          (Base_quickcheck.Generator.create
+             (fun ~size:_size__078_ -> fun ~random:_random__079_ -> B)));
+        (1.,
+          (Base_quickcheck.Generator.create
+             (fun ~size:_size__080_ ->
+                fun ~random:_random__081_ ->
+                  C
+                    (Base_quickcheck.Generator.generate
+                       quickcheck_generator_unit ~size:_size__080_
+                       ~random:_random__081_))));
+        (1.,
+          (Base_quickcheck.Generator.create
+             (fun ~size:_size__082_ ->
+                fun ~random:_random__083_ ->
+                  D
+                    (Base_quickcheck.Generator.generate
+                       quickcheck_generator_unit ~size:_size__082_
+                       ~random:_random__083_))))]
     let _ = quickcheck_generator
     let quickcheck_observer =
       Base_quickcheck.Observer.create
@@ -471,83 +485,95 @@ module Binary_and_record_variant =
       mutable y: bool } [@@deriving quickcheck]
     let _ = fun (_ : t) -> ()
     let quickcheck_generator =
-      Base_quickcheck.Generator.union
-        [Base_quickcheck.Generator.create
-           (fun ~size:_size__119_ ->
-              fun ~random:_random__120_ ->
-                A
-                  ((Base_quickcheck.Generator.generate
-                      quickcheck_generator_bool ~size:_size__119_
-                      ~random:_random__120_),
-                    (Base_quickcheck.Generator.generate
-                       (Base_quickcheck.Generator.union
-                          [Base_quickcheck.Generator.create
-                             (fun ~size:_size__113_ ->
-                                fun ~random:_random__114_ -> `X);
-                          Base_quickcheck.Generator.create
-                            (fun ~size:_size__115_ ->
-                               fun ~random:_random__116_ -> `Y);
-                          Base_quickcheck.Generator.create
-                            (fun ~size:_size__117_ ->
-                               fun ~random:_random__118_ ->
-                                 `Z
-                                   (Base_quickcheck.Generator.generate
-                                      quickcheck_generator_unit
-                                      ~size:_size__117_ ~random:_random__118_))])
-                       ~size:_size__119_ ~random:_random__120_)));
-        Base_quickcheck.Generator.create
-          (fun ~size:_size__127_ ->
-             fun ~random:_random__128_ ->
-               B
-                 ((Base_quickcheck.Generator.generate
-                     quickcheck_generator_bool ~size:_size__127_
-                     ~random:_random__128_),
-                   (Base_quickcheck.Generator.generate
-                      (Base_quickcheck.Generator.union
-                         [Base_quickcheck.Generator.create
-                            (fun ~size:_size__121_ ->
-                               fun ~random:_random__122_ -> `X);
-                         Base_quickcheck.Generator.create
-                           (fun ~size:_size__123_ ->
-                              fun ~random:_random__124_ -> `Y);
-                         Base_quickcheck.Generator.create
-                           (fun ~size:_size__125_ ->
-                              fun ~random:_random__126_ ->
-                                `Z
-                                  (Base_quickcheck.Generator.generate
-                                     quickcheck_generator_unit
-                                     ~size:_size__125_ ~random:_random__126_))])
-                      ~size:_size__127_ ~random:_random__128_)));
-        Base_quickcheck.Generator.create
-          (fun ~size:_size__129_ ->
-             fun ~random:_random__130_ ->
-               C
-                 {
-                   x =
-                     (Base_quickcheck.Generator.generate
-                        (quickcheck_generator_option
-                           quickcheck_generator_unit) ~size:_size__129_
-                        ~random:_random__130_);
-                   y =
-                     (Base_quickcheck.Generator.generate
-                        quickcheck_generator_bool ~size:_size__129_
-                        ~random:_random__130_)
-                 });
-        Base_quickcheck.Generator.create
-          (fun ~size:_size__131_ ->
-             fun ~random:_random__132_ ->
-               D
-                 {
-                   x =
-                     (Base_quickcheck.Generator.generate
-                        (quickcheck_generator_option
-                           quickcheck_generator_unit) ~size:_size__131_
-                        ~random:_random__132_);
-                   y =
-                     (Base_quickcheck.Generator.generate
-                        quickcheck_generator_bool ~size:_size__131_
-                        ~random:_random__132_)
-                 })]
+      Base_quickcheck.Generator.weighted_union
+        [(1.,
+           (Base_quickcheck.Generator.create
+              (fun ~size:_size__119_ ->
+                 fun ~random:_random__120_ ->
+                   A
+                     ((Base_quickcheck.Generator.generate
+                         quickcheck_generator_bool ~size:_size__119_
+                         ~random:_random__120_),
+                       (Base_quickcheck.Generator.generate
+                          (Base_quickcheck.Generator.weighted_union
+                             [(1.,
+                                (Base_quickcheck.Generator.create
+                                   (fun ~size:_size__113_ ->
+                                      fun ~random:_random__114_ -> `X)));
+                             (1.,
+                               (Base_quickcheck.Generator.create
+                                  (fun ~size:_size__115_ ->
+                                     fun ~random:_random__116_ -> `Y)));
+                             (1.,
+                               (Base_quickcheck.Generator.create
+                                  (fun ~size:_size__117_ ->
+                                     fun ~random:_random__118_ ->
+                                       `Z
+                                         (Base_quickcheck.Generator.generate
+                                            quickcheck_generator_unit
+                                            ~size:_size__117_
+                                            ~random:_random__118_))))])
+                          ~size:_size__119_ ~random:_random__120_)))));
+        (1.,
+          (Base_quickcheck.Generator.create
+             (fun ~size:_size__127_ ->
+                fun ~random:_random__128_ ->
+                  B
+                    ((Base_quickcheck.Generator.generate
+                        quickcheck_generator_bool ~size:_size__127_
+                        ~random:_random__128_),
+                      (Base_quickcheck.Generator.generate
+                         (Base_quickcheck.Generator.weighted_union
+                            [(1.,
+                               (Base_quickcheck.Generator.create
+                                  (fun ~size:_size__121_ ->
+                                     fun ~random:_random__122_ -> `X)));
+                            (1.,
+                              (Base_quickcheck.Generator.create
+                                 (fun ~size:_size__123_ ->
+                                    fun ~random:_random__124_ -> `Y)));
+                            (1.,
+                              (Base_quickcheck.Generator.create
+                                 (fun ~size:_size__125_ ->
+                                    fun ~random:_random__126_ ->
+                                      `Z
+                                        (Base_quickcheck.Generator.generate
+                                           quickcheck_generator_unit
+                                           ~size:_size__125_
+                                           ~random:_random__126_))))])
+                         ~size:_size__127_ ~random:_random__128_)))));
+        (1.,
+          (Base_quickcheck.Generator.create
+             (fun ~size:_size__129_ ->
+                fun ~random:_random__130_ ->
+                  C
+                    {
+                      x =
+                        (Base_quickcheck.Generator.generate
+                           (quickcheck_generator_option
+                              quickcheck_generator_unit) ~size:_size__129_
+                           ~random:_random__130_);
+                      y =
+                        (Base_quickcheck.Generator.generate
+                           quickcheck_generator_bool ~size:_size__129_
+                           ~random:_random__130_)
+                    })));
+        (1.,
+          (Base_quickcheck.Generator.create
+             (fun ~size:_size__131_ ->
+                fun ~random:_random__132_ ->
+                  D
+                    {
+                      x =
+                        (Base_quickcheck.Generator.generate
+                           (quickcheck_generator_option
+                              quickcheck_generator_unit) ~size:_size__131_
+                           ~random:_random__132_);
+                      y =
+                        (Base_quickcheck.Generator.generate
+                           quickcheck_generator_bool ~size:_size__131_
+                           ~random:_random__132_)
+                    })))]
     let _ = quickcheck_generator
     let quickcheck_observer =
       Base_quickcheck.Observer.create
@@ -1022,9 +1048,11 @@ module Instance_with_phantom =
     let _ = fun (_ : t) -> ()
     let quickcheck_generator =
       Poly_with_phantom.quickcheck_generator
-        (Base_quickcheck.Generator.union
-           [Base_quickcheck.Generator.create
-              (fun ~size:_size__189_ -> fun ~random:_random__190_ -> `phantom)])
+        (Base_quickcheck.Generator.weighted_union
+           [(1.,
+              (Base_quickcheck.Generator.create
+                 (fun ~size:_size__189_ ->
+                    fun ~random:_random__190_ -> `phantom)))])
     let _ = quickcheck_generator
     let quickcheck_observer =
       Poly_with_phantom.quickcheck_observer
@@ -1048,151 +1076,516 @@ module Recursive =
   struct
     type t =
       | Leaf 
-      | Node of t * t 
+      | Node of t * t [@@deriving quickcheck]
+    let _ = fun (_ : t) -> ()
     let quickcheck_generator =
-      Generator.recursive_union [Generator.return Leaf]
-        ~f:(fun self ->
-              [Generator.map2 self self ~f:(fun l -> fun r -> Node (l, r))])
+      let rec quickcheck_generator =
+        lazy
+          (let quickcheck_generator =
+             Base_quickcheck.Generator.of_lazy quickcheck_generator in
+           let _pair__201_ =
+             (1.,
+               (Base_quickcheck.Generator.create
+                  (fun ~size:_size__205_ -> fun ~random:_random__206_ -> Leaf)))
+           and _pair__202_ =
+             (1.,
+               (Base_quickcheck.Generator.bind Base_quickcheck.Generator.size
+                  ~f:(fun _size__198_ ->
+                        Base_quickcheck.Generator.with_size
+                          ~size:(Base.Int.pred _size__198_)
+                          (Base_quickcheck.Generator.create
+                             (fun ~size:_size__203_ ->
+                                fun ~random:_random__204_ ->
+                                  Node
+                                    ((Base_quickcheck.Generator.generate
+                                        quickcheck_generator
+                                        ~size:_size__203_
+                                        ~random:_random__204_),
+                                      (Base_quickcheck.Generator.generate
+                                         quickcheck_generator
+                                         ~size:_size__203_
+                                         ~random:_random__204_))))))) in
+           let _gen__199_ =
+             Base_quickcheck.Generator.weighted_union [_pair__201_]
+           and _gen__200_ =
+             Base_quickcheck.Generator.weighted_union
+               [_pair__201_; _pair__202_] in
+           Base_quickcheck.Generator.bind Base_quickcheck.Generator.size
+             ~f:(function | 0 -> _gen__199_ | _ -> _gen__200_)) in
+      Base_quickcheck.Generator.of_lazy quickcheck_generator
+    let _ = quickcheck_generator
     let quickcheck_observer =
-      Observer.fixed_point
-        (fun self ->
-           (Observer.either Observer.unit (Observer.both self self)) |>
-             (Observer.unmap
-                ~f:(function
-                    | Leaf -> Either.First ()
-                    | Node (l, r) -> Either.Second (l, r))))
+      let rec quickcheck_observer =
+        lazy
+          (let quickcheck_observer =
+             Base_quickcheck.Observer.of_lazy quickcheck_observer in
+           Base_quickcheck.Observer.create
+             (fun _x__193_ ->
+                fun ~size:_size__194_ ->
+                  fun ~hash:_hash__195_ ->
+                    match _x__193_ with
+                    | Leaf ->
+                        let _hash__195_ = Base.hash_fold_int _hash__195_ 0 in
+                        _hash__195_
+                    | Node (_x__196_, _x__197_) ->
+                        let _hash__195_ = Base.hash_fold_int _hash__195_ 1 in
+                        let _hash__195_ =
+                          Base_quickcheck.Observer.observe
+                            quickcheck_observer _x__196_ ~size:_size__194_
+                            ~hash:_hash__195_ in
+                        let _hash__195_ =
+                          Base_quickcheck.Observer.observe
+                            quickcheck_observer _x__197_ ~size:_size__194_
+                            ~hash:_hash__195_ in
+                        _hash__195_)) in
+      Base_quickcheck.Observer.of_lazy quickcheck_observer
+    let _ = quickcheck_observer
     let quickcheck_shrinker =
-      let rec shrink =
-        function
-        | Leaf -> Sequence.empty
-        | Node (l, r) ->
-            Sequence.round_robin
-              [Sequence.singleton l;
-              Sequence.singleton r;
-              Sequence.map (shrink l) ~f:(fun l -> Node (l, r));
-              Sequence.map (shrink r) ~f:(fun r -> Node (l, r))] in
-      Shrinker.create shrink
+      let rec quickcheck_shrinker =
+        lazy
+          (let quickcheck_shrinker =
+             Base_quickcheck.Shrinker.of_lazy quickcheck_shrinker in
+           Base_quickcheck.Shrinker.create
+             (function
+              | Leaf -> Base.Sequence.round_robin []
+              | Node (_x__191_, _x__192_) ->
+                  Base.Sequence.round_robin
+                    [Base.Sequence.map
+                       (Base_quickcheck.Shrinker.shrink quickcheck_shrinker
+                          _x__191_)
+                       ~f:(fun _x__191_ -> Node (_x__191_, _x__192_));
+                    Base.Sequence.map
+                      (Base_quickcheck.Shrinker.shrink quickcheck_shrinker
+                         _x__192_)
+                      ~f:(fun _x__192_ -> Node (_x__191_, _x__192_))])) in
+      Base_quickcheck.Shrinker.of_lazy quickcheck_shrinker
+    let _ = quickcheck_shrinker
+  end
+module Recursive_with_indirect_base_case =
+  struct
+    type t = {
+      children: t list }[@@deriving quickcheck]
+    let _ = fun (_ : t) -> ()
+    let quickcheck_generator =
+      let rec quickcheck_generator =
+        lazy
+          (let quickcheck_generator =
+             Base_quickcheck.Generator.of_lazy quickcheck_generator in
+           Base_quickcheck.Generator.create
+             (fun ~size:_size__211_ ->
+                fun ~random:_random__212_ ->
+                  {
+                    children =
+                      (Base_quickcheck.Generator.generate
+                         (quickcheck_generator_list quickcheck_generator)
+                         ~size:_size__211_ ~random:_random__212_)
+                  })) in
+      Base_quickcheck.Generator.of_lazy quickcheck_generator
+    let _ = quickcheck_generator
+    let quickcheck_observer =
+      let rec quickcheck_observer =
+        lazy
+          (let quickcheck_observer =
+             Base_quickcheck.Observer.of_lazy quickcheck_observer in
+           Base_quickcheck.Observer.create
+             (fun { children = _x__208_ } ->
+                fun ~size:_size__209_ ->
+                  fun ~hash:_hash__210_ ->
+                    let _hash__210_ =
+                      Base_quickcheck.Observer.observe
+                        (quickcheck_observer_list quickcheck_observer)
+                        _x__208_ ~size:_size__209_ ~hash:_hash__210_ in
+                    _hash__210_)) in
+      Base_quickcheck.Observer.of_lazy quickcheck_observer
+    let _ = quickcheck_observer
+    let quickcheck_shrinker =
+      let rec quickcheck_shrinker =
+        lazy
+          (let quickcheck_shrinker =
+             Base_quickcheck.Shrinker.of_lazy quickcheck_shrinker in
+           Base_quickcheck.Shrinker.create
+             (fun { children = _x__207_ } ->
+                Base.Sequence.round_robin
+                  [Base.Sequence.map
+                     (Base_quickcheck.Shrinker.shrink
+                        (quickcheck_shrinker_list quickcheck_shrinker)
+                        _x__207_)
+                     ~f:(fun _x__207_ -> { children = _x__207_ })])) in
+      Base_quickcheck.Shrinker.of_lazy quickcheck_shrinker
+    let _ = quickcheck_shrinker
+  end
+module Mutually_recursive =
+  struct
+    type expr =
+      | Constant of int64 
+      | Operator of op 
+      | Application of expr * args 
+    and op = [ `plus  | `minus  | `abs ]
+    and args = expr list[@@deriving quickcheck]
+    let _ = fun (_ : expr) -> ()
+    let _ = fun (_ : op) -> ()
+    let _ = fun (_ : args) -> ()
+    let (quickcheck_generator_expr, quickcheck_generator_op,
+         quickcheck_generator_args)
+      =
+      let rec quickcheck_generator_expr =
+        lazy
+          (let quickcheck_generator_expr =
+             Base_quickcheck.Generator.of_lazy quickcheck_generator_expr
+           and quickcheck_generator_op =
+             Base_quickcheck.Generator.of_lazy quickcheck_generator_op
+           and quickcheck_generator_args =
+             Base_quickcheck.Generator.of_lazy quickcheck_generator_args in
+           let _pair__230_ =
+             (1.,
+               (Base_quickcheck.Generator.create
+                  (fun ~size:_size__237_ ->
+                     fun ~random:_random__238_ ->
+                       Constant
+                         (Base_quickcheck.Generator.generate
+                            quickcheck_generator_int64 ~size:_size__237_
+                            ~random:_random__238_))))
+           and _pair__231_ =
+             (1.,
+               (Base_quickcheck.Generator.bind Base_quickcheck.Generator.size
+                  ~f:(fun _size__227_ ->
+                        Base_quickcheck.Generator.with_size
+                          ~size:(Base.Int.pred _size__227_)
+                          (Base_quickcheck.Generator.create
+                             (fun ~size:_size__233_ ->
+                                fun ~random:_random__234_ ->
+                                  Operator
+                                    (Base_quickcheck.Generator.generate
+                                       quickcheck_generator_op
+                                       ~size:_size__233_
+                                       ~random:_random__234_))))))
+           and _pair__232_ =
+             (1.,
+               (Base_quickcheck.Generator.bind Base_quickcheck.Generator.size
+                  ~f:(fun _size__227_ ->
+                        Base_quickcheck.Generator.with_size
+                          ~size:(Base.Int.pred _size__227_)
+                          (Base_quickcheck.Generator.create
+                             (fun ~size:_size__235_ ->
+                                fun ~random:_random__236_ ->
+                                  Application
+                                    ((Base_quickcheck.Generator.generate
+                                        quickcheck_generator_expr
+                                        ~size:_size__235_
+                                        ~random:_random__236_),
+                                      (Base_quickcheck.Generator.generate
+                                         quickcheck_generator_args
+                                         ~size:_size__235_
+                                         ~random:_random__236_))))))) in
+           let _gen__228_ =
+             Base_quickcheck.Generator.weighted_union [_pair__230_]
+           and _gen__229_ =
+             Base_quickcheck.Generator.weighted_union
+               [_pair__230_; _pair__231_; _pair__232_] in
+           Base_quickcheck.Generator.bind Base_quickcheck.Generator.size
+             ~f:(function | 0 -> _gen__228_ | _ -> _gen__229_))
+      and quickcheck_generator_op =
+        lazy
+          (let quickcheck_generator_expr =
+             Base_quickcheck.Generator.of_lazy quickcheck_generator_expr
+           and quickcheck_generator_op =
+             Base_quickcheck.Generator.of_lazy quickcheck_generator_op
+           and quickcheck_generator_args =
+             Base_quickcheck.Generator.of_lazy quickcheck_generator_args in
+           Base_quickcheck.Generator.weighted_union
+             [(1.,
+                (Base_quickcheck.Generator.create
+                   (fun ~size:_size__239_ ->
+                      fun ~random:_random__240_ -> `plus)));
+             (1.,
+               (Base_quickcheck.Generator.create
+                  (fun ~size:_size__241_ ->
+                     fun ~random:_random__242_ -> `minus)));
+             (1.,
+               (Base_quickcheck.Generator.create
+                  (fun ~size:_size__243_ -> fun ~random:_random__244_ -> `abs)))])
+      and quickcheck_generator_args =
+        lazy
+          (let quickcheck_generator_expr =
+             Base_quickcheck.Generator.of_lazy quickcheck_generator_expr
+           and quickcheck_generator_op =
+             Base_quickcheck.Generator.of_lazy quickcheck_generator_op
+           and quickcheck_generator_args =
+             Base_quickcheck.Generator.of_lazy quickcheck_generator_args in
+           quickcheck_generator_list quickcheck_generator_expr) in
+      ((Base_quickcheck.Generator.of_lazy quickcheck_generator_expr),
+        (Base_quickcheck.Generator.of_lazy quickcheck_generator_op),
+        (Base_quickcheck.Generator.of_lazy quickcheck_generator_args))
+    let _ = quickcheck_generator_expr
+    and _ = quickcheck_generator_op
+    and _ = quickcheck_generator_args
+    let (quickcheck_observer_expr, quickcheck_observer_op,
+         quickcheck_observer_args)
+      =
+      let rec quickcheck_observer_expr =
+        lazy
+          (let quickcheck_observer_expr =
+             Base_quickcheck.Observer.of_lazy quickcheck_observer_expr
+           and quickcheck_observer_op =
+             Base_quickcheck.Observer.of_lazy quickcheck_observer_op
+           and quickcheck_observer_args =
+             Base_quickcheck.Observer.of_lazy quickcheck_observer_args in
+           Base_quickcheck.Observer.create
+             (fun _x__217_ ->
+                fun ~size:_size__218_ ->
+                  fun ~hash:_hash__219_ ->
+                    match _x__217_ with
+                    | Constant _x__220_ ->
+                        let _hash__219_ = Base.hash_fold_int _hash__219_ 0 in
+                        let _hash__219_ =
+                          Base_quickcheck.Observer.observe
+                            quickcheck_observer_int64 _x__220_
+                            ~size:_size__218_ ~hash:_hash__219_ in
+                        _hash__219_
+                    | Operator _x__221_ ->
+                        let _hash__219_ = Base.hash_fold_int _hash__219_ 1 in
+                        let _hash__219_ =
+                          Base_quickcheck.Observer.observe
+                            quickcheck_observer_op _x__221_ ~size:_size__218_
+                            ~hash:_hash__219_ in
+                        _hash__219_
+                    | Application (_x__222_, _x__223_) ->
+                        let _hash__219_ = Base.hash_fold_int _hash__219_ 2 in
+                        let _hash__219_ =
+                          Base_quickcheck.Observer.observe
+                            quickcheck_observer_expr _x__222_
+                            ~size:_size__218_ ~hash:_hash__219_ in
+                        let _hash__219_ =
+                          Base_quickcheck.Observer.observe
+                            quickcheck_observer_args _x__223_
+                            ~size:_size__218_ ~hash:_hash__219_ in
+                        _hash__219_))
+      and quickcheck_observer_op =
+        lazy
+          (let quickcheck_observer_expr =
+             Base_quickcheck.Observer.of_lazy quickcheck_observer_expr
+           and quickcheck_observer_op =
+             Base_quickcheck.Observer.of_lazy quickcheck_observer_op
+           and quickcheck_observer_args =
+             Base_quickcheck.Observer.of_lazy quickcheck_observer_args in
+           Base_quickcheck.Observer.create
+             (fun _x__224_ ->
+                fun ~size:_size__225_ ->
+                  fun ~hash:_hash__226_ ->
+                    match _x__224_ with
+                    | `plus ->
+                        let _hash__226_ =
+                          Base.hash_fold_int _hash__226_ (-900055206) in
+                        _hash__226_
+                    | `minus ->
+                        let _hash__226_ =
+                          Base.hash_fold_int _hash__226_ 141066352 in
+                        _hash__226_
+                    | `abs ->
+                        let _hash__226_ =
+                          Base.hash_fold_int _hash__226_ 4845682 in
+                        _hash__226_))
+      and quickcheck_observer_args =
+        lazy
+          (let quickcheck_observer_expr =
+             Base_quickcheck.Observer.of_lazy quickcheck_observer_expr
+           and quickcheck_observer_op =
+             Base_quickcheck.Observer.of_lazy quickcheck_observer_op
+           and quickcheck_observer_args =
+             Base_quickcheck.Observer.of_lazy quickcheck_observer_args in
+           quickcheck_observer_list quickcheck_observer_expr) in
+      ((Base_quickcheck.Observer.of_lazy quickcheck_observer_expr),
+        (Base_quickcheck.Observer.of_lazy quickcheck_observer_op),
+        (Base_quickcheck.Observer.of_lazy quickcheck_observer_args))
+    let _ = quickcheck_observer_expr
+    and _ = quickcheck_observer_op
+    and _ = quickcheck_observer_args
+    let (quickcheck_shrinker_expr, quickcheck_shrinker_op,
+         quickcheck_shrinker_args)
+      =
+      let rec quickcheck_shrinker_expr =
+        lazy
+          (let quickcheck_shrinker_expr =
+             Base_quickcheck.Shrinker.of_lazy quickcheck_shrinker_expr
+           and quickcheck_shrinker_op =
+             Base_quickcheck.Shrinker.of_lazy quickcheck_shrinker_op
+           and quickcheck_shrinker_args =
+             Base_quickcheck.Shrinker.of_lazy quickcheck_shrinker_args in
+           Base_quickcheck.Shrinker.create
+             (function
+              | Constant _x__213_ ->
+                  Base.Sequence.round_robin
+                    [Base.Sequence.map
+                       (Base_quickcheck.Shrinker.shrink
+                          quickcheck_shrinker_int64 _x__213_)
+                       ~f:(fun _x__213_ -> Constant _x__213_)]
+              | Operator _x__214_ ->
+                  Base.Sequence.round_robin
+                    [Base.Sequence.map
+                       (Base_quickcheck.Shrinker.shrink
+                          quickcheck_shrinker_op _x__214_)
+                       ~f:(fun _x__214_ -> Operator _x__214_)]
+              | Application (_x__215_, _x__216_) ->
+                  Base.Sequence.round_robin
+                    [Base.Sequence.map
+                       (Base_quickcheck.Shrinker.shrink
+                          quickcheck_shrinker_expr _x__215_)
+                       ~f:(fun _x__215_ -> Application (_x__215_, _x__216_));
+                    Base.Sequence.map
+                      (Base_quickcheck.Shrinker.shrink
+                         quickcheck_shrinker_args _x__216_)
+                      ~f:(fun _x__216_ -> Application (_x__215_, _x__216_))]))
+      and quickcheck_shrinker_op =
+        lazy
+          (let quickcheck_shrinker_expr =
+             Base_quickcheck.Shrinker.of_lazy quickcheck_shrinker_expr
+           and quickcheck_shrinker_op =
+             Base_quickcheck.Shrinker.of_lazy quickcheck_shrinker_op
+           and quickcheck_shrinker_args =
+             Base_quickcheck.Shrinker.of_lazy quickcheck_shrinker_args in
+           Base_quickcheck.Shrinker.create
+             (function
+              | `plus -> Base.Sequence.round_robin []
+              | `minus -> Base.Sequence.round_robin []
+              | `abs -> Base.Sequence.round_robin []))
+      and quickcheck_shrinker_args =
+        lazy
+          (let quickcheck_shrinker_expr =
+             Base_quickcheck.Shrinker.of_lazy quickcheck_shrinker_expr
+           and quickcheck_shrinker_op =
+             Base_quickcheck.Shrinker.of_lazy quickcheck_shrinker_op
+           and quickcheck_shrinker_args =
+             Base_quickcheck.Shrinker.of_lazy quickcheck_shrinker_args in
+           quickcheck_shrinker_list quickcheck_shrinker_expr) in
+      ((Base_quickcheck.Shrinker.of_lazy quickcheck_shrinker_expr),
+        (Base_quickcheck.Shrinker.of_lazy quickcheck_shrinker_op),
+        (Base_quickcheck.Shrinker.of_lazy quickcheck_shrinker_args))
+    let _ = quickcheck_shrinker_expr
+    and _ = quickcheck_shrinker_op
+    and _ = quickcheck_shrinker_args
   end
 module Extensions =
   struct
     type t = [ `A  | `B of (bool * unit option) ]
     let quickcheck_generator =
-      Base_quickcheck.Generator.union
-        [Base_quickcheck.Generator.create
-           (fun ~size:_size__191_ -> fun ~random:_random__192_ -> `A);
-        Base_quickcheck.Generator.create
-          (fun ~size:_size__195_ ->
-             fun ~random:_random__196_ ->
-               `B
-                 (Base_quickcheck.Generator.generate
-                    (Base_quickcheck.Generator.create
-                       (fun ~size:_size__193_ ->
-                          fun ~random:_random__194_ ->
-                            ((Base_quickcheck.Generator.generate
-                                quickcheck_generator_bool ~size:_size__193_
-                                ~random:_random__194_),
-                              (Base_quickcheck.Generator.generate
-                                 (quickcheck_generator_option
-                                    quickcheck_generator_unit)
-                                 ~size:_size__193_ ~random:_random__194_))))
-                    ~size:_size__195_ ~random:_random__196_))]
+      Base_quickcheck.Generator.weighted_union
+        [(1.,
+           (Base_quickcheck.Generator.create
+              (fun ~size:_size__245_ -> fun ~random:_random__246_ -> `A)));
+        (1.,
+          (Base_quickcheck.Generator.create
+             (fun ~size:_size__249_ ->
+                fun ~random:_random__250_ ->
+                  `B
+                    (Base_quickcheck.Generator.generate
+                       (Base_quickcheck.Generator.create
+                          (fun ~size:_size__247_ ->
+                             fun ~random:_random__248_ ->
+                               ((Base_quickcheck.Generator.generate
+                                   quickcheck_generator_bool
+                                   ~size:_size__247_ ~random:_random__248_),
+                                 (Base_quickcheck.Generator.generate
+                                    (quickcheck_generator_option
+                                       quickcheck_generator_unit)
+                                    ~size:_size__247_ ~random:_random__248_))))
+                       ~size:_size__249_ ~random:_random__250_))))]
     let quickcheck_observer =
       Base_quickcheck.Observer.create
-        (fun _x__197_ ->
-           fun ~size:_size__198_ ->
-             fun ~hash:_hash__199_ ->
-               match _x__197_ with
+        (fun _x__251_ ->
+           fun ~size:_size__252_ ->
+             fun ~hash:_hash__253_ ->
+               match _x__251_ with
                | `A ->
-                   let _hash__199_ = Base.hash_fold_int _hash__199_ 65 in
-                   _hash__199_
-               | `B _x__204_ ->
-                   let _hash__199_ = Base.hash_fold_int _hash__199_ 66 in
-                   let _hash__199_ =
+                   let _hash__253_ = Base.hash_fold_int _hash__253_ 65 in
+                   _hash__253_
+               | `B _x__258_ ->
+                   let _hash__253_ = Base.hash_fold_int _hash__253_ 66 in
+                   let _hash__253_ =
                      Base_quickcheck.Observer.observe
                        (Base_quickcheck.Observer.create
-                          (fun (_x__200_, _x__201_) ->
-                             fun ~size:_size__202_ ->
-                               fun ~hash:_hash__203_ ->
-                                 let _hash__203_ =
+                          (fun (_x__254_, _x__255_) ->
+                             fun ~size:_size__256_ ->
+                               fun ~hash:_hash__257_ ->
+                                 let _hash__257_ =
                                    Base_quickcheck.Observer.observe
-                                     quickcheck_observer_bool _x__200_
-                                     ~size:_size__202_ ~hash:_hash__203_ in
-                                 let _hash__203_ =
+                                     quickcheck_observer_bool _x__254_
+                                     ~size:_size__256_ ~hash:_hash__257_ in
+                                 let _hash__257_ =
                                    Base_quickcheck.Observer.observe
                                      (quickcheck_observer_option
-                                        quickcheck_observer_unit) _x__201_
-                                     ~size:_size__202_ ~hash:_hash__203_ in
-                                 _hash__203_)) _x__204_ ~size:_size__198_
-                       ~hash:_hash__199_ in
-                   _hash__199_)
+                                        quickcheck_observer_unit) _x__255_
+                                     ~size:_size__256_ ~hash:_hash__257_ in
+                                 _hash__257_)) _x__258_ ~size:_size__252_
+                       ~hash:_hash__253_ in
+                   _hash__253_)
     let quickcheck_shrinker =
       Base_quickcheck.Shrinker.create
         (function
          | `A -> Base.Sequence.round_robin []
-         | `B _x__205_ ->
+         | `B _x__259_ ->
              Base.Sequence.round_robin
                [Base.Sequence.map
                   (Base_quickcheck.Shrinker.shrink
                      (Base_quickcheck.Shrinker.create
-                        (fun (_x__206_, _x__207_) ->
+                        (fun (_x__260_, _x__261_) ->
                            Base.Sequence.round_robin
                              [Base.Sequence.map
                                 (Base_quickcheck.Shrinker.shrink
-                                   quickcheck_shrinker_bool _x__206_)
-                                ~f:(fun _x__206_ -> (_x__206_, _x__207_));
+                                   quickcheck_shrinker_bool _x__260_)
+                                ~f:(fun _x__260_ -> (_x__260_, _x__261_));
                              Base.Sequence.map
                                (Base_quickcheck.Shrinker.shrink
                                   (quickcheck_shrinker_option
-                                     quickcheck_shrinker_unit) _x__207_)
-                               ~f:(fun _x__207_ -> (_x__206_, _x__207_))]))
-                     _x__205_) ~f:(fun _x__205_ -> `B _x__205_)])
+                                     quickcheck_shrinker_unit) _x__261_)
+                               ~f:(fun _x__261_ -> (_x__260_, _x__261_))]))
+                     _x__259_) ~f:(fun _x__259_ -> `B _x__259_)])
   end
 module Escaped =
   struct
     type t = (int * char * bool option)
     let quickcheck_generator =
       Base_quickcheck.Generator.create
-        (fun ~size:_size__208_ ->
-           fun ~random:_random__209_ ->
+        (fun ~size:_size__262_ ->
+           fun ~random:_random__263_ ->
              ((Base_quickcheck.Generator.generate
-                 Generator.small_strictly_positive_int ~size:_size__208_
-                 ~random:_random__209_),
+                 Generator.small_strictly_positive_int ~size:_size__262_
+                 ~random:_random__263_),
                (Base_quickcheck.Generator.generate quickcheck_generator_char
-                  ~size:_size__208_ ~random:_random__209_),
+                  ~size:_size__262_ ~random:_random__263_),
                (Base_quickcheck.Generator.generate
                   (quickcheck_generator_option quickcheck_generator_bool)
-                  ~size:_size__208_ ~random:_random__209_)))
+                  ~size:_size__262_ ~random:_random__263_)))
     let quickcheck_observer =
       Base_quickcheck.Observer.create
-        (fun (_x__210_, _x__211_, _x__212_) ->
-           fun ~size:_size__213_ ->
-             fun ~hash:_hash__214_ ->
-               let _hash__214_ =
+        (fun (_x__264_, _x__265_, _x__266_) ->
+           fun ~size:_size__267_ ->
+             fun ~hash:_hash__268_ ->
+               let _hash__268_ =
                  Base_quickcheck.Observer.observe quickcheck_observer_int
-                   _x__210_ ~size:_size__213_ ~hash:_hash__214_ in
-               let _hash__214_ =
-                 Base_quickcheck.Observer.observe Observer.opaque _x__211_
-                   ~size:_size__213_ ~hash:_hash__214_ in
-               let _hash__214_ =
+                   _x__264_ ~size:_size__267_ ~hash:_hash__268_ in
+               let _hash__268_ =
+                 Base_quickcheck.Observer.observe Observer.opaque _x__265_
+                   ~size:_size__267_ ~hash:_hash__268_ in
+               let _hash__268_ =
                  Base_quickcheck.Observer.observe
                    (quickcheck_observer_option quickcheck_observer_bool)
-                   _x__212_ ~size:_size__213_ ~hash:_hash__214_ in
-               _hash__214_)
+                   _x__266_ ~size:_size__267_ ~hash:_hash__268_ in
+               _hash__268_)
     let quickcheck_shrinker =
       Base_quickcheck.Shrinker.create
-        (fun (_x__215_, _x__216_, _x__217_) ->
+        (fun (_x__269_, _x__270_, _x__271_) ->
            Base.Sequence.round_robin
              [Base.Sequence.map
                 (Base_quickcheck.Shrinker.shrink quickcheck_shrinker_int
-                   _x__215_)
-                ~f:(fun _x__215_ -> (_x__215_, _x__216_, _x__217_));
+                   _x__269_)
+                ~f:(fun _x__269_ -> (_x__269_, _x__270_, _x__271_));
              Base.Sequence.map
                (Base_quickcheck.Shrinker.shrink quickcheck_shrinker_char
-                  _x__216_)
-               ~f:(fun _x__216_ -> (_x__215_, _x__216_, _x__217_));
+                  _x__270_)
+               ~f:(fun _x__270_ -> (_x__269_, _x__270_, _x__271_));
              Base.Sequence.map
-               (Base_quickcheck.Shrinker.shrink Shrinker.atomic _x__217_)
-               ~f:(fun _x__217_ -> (_x__215_, _x__216_, _x__217_))])
+               (Base_quickcheck.Shrinker.shrink Shrinker.atomic _x__271_)
+               ~f:(fun _x__271_ -> (_x__269_, _x__270_, _x__271_))])
   end
 module Wildcard(Elt:sig type t val examples : t list end) =
   struct
@@ -1203,4 +1596,303 @@ module Wildcard(Elt:sig type t val examples : t list end) =
       quickcheck_observer_list Base_quickcheck.Observer.opaque
     let quickcheck_shrinker : t Shrinker.t =
       quickcheck_shrinker_list Base_quickcheck.Shrinker.atomic
+  end
+module Attribute_override =
+  struct
+    type t =
+      | Null [@quickcheck.weight 0.1]
+      | Text of
+      ((string)[@quickcheck.generator
+                 Generator.string_of Generator.char_lowercase])
+      
+      | Number of
+      ((float)[@quickcheck.generator Generator.float_strictly_positive]) 
+    [@@deriving quickcheck]
+    let _ = fun (_ : t) -> ()
+    let quickcheck_generator =
+      Base_quickcheck.Generator.weighted_union
+        [(0.1,
+           (Base_quickcheck.Generator.create
+              (fun ~size:_size__279_ -> fun ~random:_random__280_ -> Null)));
+        (1.,
+          (Base_quickcheck.Generator.create
+             (fun ~size:_size__281_ ->
+                fun ~random:_random__282_ ->
+                  Text
+                    (Base_quickcheck.Generator.generate
+                       (Generator.string_of Generator.char_lowercase)
+                       ~size:_size__281_ ~random:_random__282_))));
+        (1.,
+          (Base_quickcheck.Generator.create
+             (fun ~size:_size__283_ ->
+                fun ~random:_random__284_ ->
+                  Number
+                    (Base_quickcheck.Generator.generate
+                       Generator.float_strictly_positive ~size:_size__283_
+                       ~random:_random__284_))))]
+    let _ = quickcheck_generator
+    let quickcheck_observer =
+      Base_quickcheck.Observer.create
+        (fun _x__274_ ->
+           fun ~size:_size__275_ ->
+             fun ~hash:_hash__276_ ->
+               match _x__274_ with
+               | Null ->
+                   let _hash__276_ = Base.hash_fold_int _hash__276_ 0 in
+                   _hash__276_
+               | Text _x__277_ ->
+                   let _hash__276_ = Base.hash_fold_int _hash__276_ 1 in
+                   let _hash__276_ =
+                     Base_quickcheck.Observer.observe
+                       quickcheck_observer_string _x__277_ ~size:_size__275_
+                       ~hash:_hash__276_ in
+                   _hash__276_
+               | Number _x__278_ ->
+                   let _hash__276_ = Base.hash_fold_int _hash__276_ 2 in
+                   let _hash__276_ =
+                     Base_quickcheck.Observer.observe
+                       quickcheck_observer_float _x__278_ ~size:_size__275_
+                       ~hash:_hash__276_ in
+                   _hash__276_)
+    let _ = quickcheck_observer
+    let quickcheck_shrinker =
+      Base_quickcheck.Shrinker.create
+        (function
+         | Null -> Base.Sequence.round_robin []
+         | Text _x__272_ ->
+             Base.Sequence.round_robin
+               [Base.Sequence.map
+                  (Base_quickcheck.Shrinker.shrink quickcheck_shrinker_string
+                     _x__272_) ~f:(fun _x__272_ -> Text _x__272_)]
+         | Number _x__273_ ->
+             Base.Sequence.round_robin
+               [Base.Sequence.map
+                  (Base_quickcheck.Shrinker.shrink quickcheck_shrinker_float
+                     _x__273_) ~f:(fun _x__273_ -> Number _x__273_)])
+    let _ = quickcheck_shrinker
+  end
+module Attribute_override_recursive =
+  struct
+    type t =
+      | Leaf 
+      | Node1 of t * int64 * t [@quickcheck.weight 0.5]
+      | Node2 of t * int64 * t * int64 * t [@quickcheck.weight 0.25][@@deriving
+                                                                    quickcheck]
+    let _ = fun (_ : t) -> ()
+    let quickcheck_generator =
+      let rec quickcheck_generator =
+        lazy
+          (let quickcheck_generator =
+             Base_quickcheck.Generator.of_lazy quickcheck_generator in
+           let _pair__307_ =
+             (1.,
+               (Base_quickcheck.Generator.create
+                  (fun ~size:_size__314_ -> fun ~random:_random__315_ -> Leaf)))
+           and _pair__308_ =
+             (0.5,
+               (Base_quickcheck.Generator.bind Base_quickcheck.Generator.size
+                  ~f:(fun _size__304_ ->
+                        Base_quickcheck.Generator.with_size
+                          ~size:(Base.Int.pred _size__304_)
+                          (Base_quickcheck.Generator.create
+                             (fun ~size:_size__310_ ->
+                                fun ~random:_random__311_ ->
+                                  Node1
+                                    ((Base_quickcheck.Generator.generate
+                                        quickcheck_generator
+                                        ~size:_size__310_
+                                        ~random:_random__311_),
+                                      (Base_quickcheck.Generator.generate
+                                         quickcheck_generator_int64
+                                         ~size:_size__310_
+                                         ~random:_random__311_),
+                                      (Base_quickcheck.Generator.generate
+                                         quickcheck_generator
+                                         ~size:_size__310_
+                                         ~random:_random__311_)))))))
+           and _pair__309_ =
+             (0.25,
+               (Base_quickcheck.Generator.bind Base_quickcheck.Generator.size
+                  ~f:(fun _size__304_ ->
+                        Base_quickcheck.Generator.with_size
+                          ~size:(Base.Int.pred _size__304_)
+                          (Base_quickcheck.Generator.create
+                             (fun ~size:_size__312_ ->
+                                fun ~random:_random__313_ ->
+                                  Node2
+                                    ((Base_quickcheck.Generator.generate
+                                        quickcheck_generator
+                                        ~size:_size__312_
+                                        ~random:_random__313_),
+                                      (Base_quickcheck.Generator.generate
+                                         quickcheck_generator_int64
+                                         ~size:_size__312_
+                                         ~random:_random__313_),
+                                      (Base_quickcheck.Generator.generate
+                                         quickcheck_generator
+                                         ~size:_size__312_
+                                         ~random:_random__313_),
+                                      (Base_quickcheck.Generator.generate
+                                         quickcheck_generator_int64
+                                         ~size:_size__312_
+                                         ~random:_random__313_),
+                                      (Base_quickcheck.Generator.generate
+                                         quickcheck_generator
+                                         ~size:_size__312_
+                                         ~random:_random__313_))))))) in
+           let _gen__305_ =
+             Base_quickcheck.Generator.weighted_union [_pair__307_]
+           and _gen__306_ =
+             Base_quickcheck.Generator.weighted_union
+               [_pair__307_; _pair__308_; _pair__309_] in
+           Base_quickcheck.Generator.bind Base_quickcheck.Generator.size
+             ~f:(function | 0 -> _gen__305_ | _ -> _gen__306_)) in
+      Base_quickcheck.Generator.of_lazy quickcheck_generator
+    let _ = quickcheck_generator
+    let quickcheck_observer =
+      let rec quickcheck_observer =
+        lazy
+          (let quickcheck_observer =
+             Base_quickcheck.Observer.of_lazy quickcheck_observer in
+           Base_quickcheck.Observer.create
+             (fun _x__293_ ->
+                fun ~size:_size__294_ ->
+                  fun ~hash:_hash__295_ ->
+                    match _x__293_ with
+                    | Leaf ->
+                        let _hash__295_ = Base.hash_fold_int _hash__295_ 0 in
+                        _hash__295_
+                    | Node1 (_x__296_, _x__297_, _x__298_) ->
+                        let _hash__295_ = Base.hash_fold_int _hash__295_ 1 in
+                        let _hash__295_ =
+                          Base_quickcheck.Observer.observe
+                            quickcheck_observer _x__296_ ~size:_size__294_
+                            ~hash:_hash__295_ in
+                        let _hash__295_ =
+                          Base_quickcheck.Observer.observe
+                            quickcheck_observer_int64 _x__297_
+                            ~size:_size__294_ ~hash:_hash__295_ in
+                        let _hash__295_ =
+                          Base_quickcheck.Observer.observe
+                            quickcheck_observer _x__298_ ~size:_size__294_
+                            ~hash:_hash__295_ in
+                        _hash__295_
+                    | Node2
+                        (_x__299_, _x__300_, _x__301_, _x__302_, _x__303_) ->
+                        let _hash__295_ = Base.hash_fold_int _hash__295_ 2 in
+                        let _hash__295_ =
+                          Base_quickcheck.Observer.observe
+                            quickcheck_observer _x__299_ ~size:_size__294_
+                            ~hash:_hash__295_ in
+                        let _hash__295_ =
+                          Base_quickcheck.Observer.observe
+                            quickcheck_observer_int64 _x__300_
+                            ~size:_size__294_ ~hash:_hash__295_ in
+                        let _hash__295_ =
+                          Base_quickcheck.Observer.observe
+                            quickcheck_observer _x__301_ ~size:_size__294_
+                            ~hash:_hash__295_ in
+                        let _hash__295_ =
+                          Base_quickcheck.Observer.observe
+                            quickcheck_observer_int64 _x__302_
+                            ~size:_size__294_ ~hash:_hash__295_ in
+                        let _hash__295_ =
+                          Base_quickcheck.Observer.observe
+                            quickcheck_observer _x__303_ ~size:_size__294_
+                            ~hash:_hash__295_ in
+                        _hash__295_)) in
+      Base_quickcheck.Observer.of_lazy quickcheck_observer
+    let _ = quickcheck_observer
+    let quickcheck_shrinker =
+      let rec quickcheck_shrinker =
+        lazy
+          (let quickcheck_shrinker =
+             Base_quickcheck.Shrinker.of_lazy quickcheck_shrinker in
+           Base_quickcheck.Shrinker.create
+             (function
+              | Leaf -> Base.Sequence.round_robin []
+              | Node1 (_x__285_, _x__286_, _x__287_) ->
+                  Base.Sequence.round_robin
+                    [Base.Sequence.map
+                       (Base_quickcheck.Shrinker.shrink quickcheck_shrinker
+                          _x__285_)
+                       ~f:(fun _x__285_ ->
+                             Node1 (_x__285_, _x__286_, _x__287_));
+                    Base.Sequence.map
+                      (Base_quickcheck.Shrinker.shrink
+                         quickcheck_shrinker_int64 _x__286_)
+                      ~f:(fun _x__286_ ->
+                            Node1 (_x__285_, _x__286_, _x__287_));
+                    Base.Sequence.map
+                      (Base_quickcheck.Shrinker.shrink quickcheck_shrinker
+                         _x__287_)
+                      ~f:(fun _x__287_ ->
+                            Node1 (_x__285_, _x__286_, _x__287_))]
+              | Node2 (_x__288_, _x__289_, _x__290_, _x__291_, _x__292_) ->
+                  Base.Sequence.round_robin
+                    [Base.Sequence.map
+                       (Base_quickcheck.Shrinker.shrink quickcheck_shrinker
+                          _x__288_)
+                       ~f:(fun _x__288_ ->
+                             Node2
+                               (_x__288_, _x__289_, _x__290_, _x__291_,
+                                 _x__292_));
+                    Base.Sequence.map
+                      (Base_quickcheck.Shrinker.shrink
+                         quickcheck_shrinker_int64 _x__289_)
+                      ~f:(fun _x__289_ ->
+                            Node2
+                              (_x__288_, _x__289_, _x__290_, _x__291_,
+                                _x__292_));
+                    Base.Sequence.map
+                      (Base_quickcheck.Shrinker.shrink quickcheck_shrinker
+                         _x__290_)
+                      ~f:(fun _x__290_ ->
+                            Node2
+                              (_x__288_, _x__289_, _x__290_, _x__291_,
+                                _x__292_));
+                    Base.Sequence.map
+                      (Base_quickcheck.Shrinker.shrink
+                         quickcheck_shrinker_int64 _x__291_)
+                      ~f:(fun _x__291_ ->
+                            Node2
+                              (_x__288_, _x__289_, _x__290_, _x__291_,
+                                _x__292_));
+                    Base.Sequence.map
+                      (Base_quickcheck.Shrinker.shrink quickcheck_shrinker
+                         _x__292_)
+                      ~f:(fun _x__292_ ->
+                            Node2
+                              (_x__288_, _x__289_, _x__290_, _x__291_,
+                                _x__292_))])) in
+      Base_quickcheck.Shrinker.of_lazy quickcheck_shrinker
+    let _ = quickcheck_shrinker
+  end
+module Deriving_from_wildcard =
+  struct
+    type _ transparent = string[@@deriving quickcheck]
+    let _ = fun (_ : _ transparent) -> ()
+    let quickcheck_generator_transparent _generator__321_ =
+      quickcheck_generator_string
+    let _ = quickcheck_generator_transparent
+    let quickcheck_observer_transparent _observer__319_ =
+      quickcheck_observer_string
+    let _ = quickcheck_observer_transparent
+    let quickcheck_shrinker_transparent _shrinker__317_ =
+      quickcheck_shrinker_string
+    let _ = quickcheck_shrinker_transparent
+    type 'a opaque = 'a option[@@deriving quickcheck]
+    let _ = fun (_ : 'a opaque) -> ()
+    let quickcheck_generator_opaque _generator__324_ =
+      quickcheck_generator_option _generator__324_
+    let _ = quickcheck_generator_opaque
+    let quickcheck_observer_opaque _observer__323_ =
+      quickcheck_observer_option _observer__323_
+    let _ = quickcheck_observer_opaque
+    let quickcheck_shrinker_opaque _shrinker__322_ =
+      quickcheck_shrinker_option _shrinker__322_
+    let _ = quickcheck_shrinker_opaque
+    let compare_opaque = compare_option
+    let sexp_of_opaque = sexp_of_option
+    let opaque_examples = [None; Some 0L; Some 1L]
   end

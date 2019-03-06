@@ -173,6 +173,10 @@ val recursive_union : 'a t list -> f:('a t -> 'a t list) -> 'a t
 *)
 val fixed_point : ('a t -> 'a t) -> 'a t
 
+(** Creates a [t] that forces the lazy argument as necessary. Can be used to tie
+    (mutually) recursive knots. *)
+val of_lazy : 'a t Lazy.t -> 'a t
+
 (** {2 Custom Random Distributions} *)
 
 (** Produces one of the given values, chosen with the corresponding weight. Weights must

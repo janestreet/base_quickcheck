@@ -2,7 +2,6 @@ open! Import
 
 module type S = sig
   type ast
-
   type t
 
   val create_list : ast list -> t list
@@ -14,6 +13,9 @@ module type S = sig
 
   (** location of the clause's definition *)
   val location : t -> location
+
+  (** weight of the clause relative to other clauses in the generator distribution *)
+  val weight : t -> expression
 
   (** types of the clause's arguments *)
   val core_type_list : t -> core_type list
@@ -29,6 +31,5 @@ module type Clause_syntax = sig
   module type S = S
 
   module Variant : S with type ast = constructor_declaration
-
   module Polymorphic_variant : S with type ast = row_field
 end

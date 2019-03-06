@@ -60,6 +60,30 @@ let observer = [%quickcheck.observer: float * int * [`A | `B | `C]]
 let shrinker = [%quickcheck.shrinker: float * int * [`A | `B | `C]]
 ```
 
+Attributes
+----------
+
+The `@quickcheck.generator` attribute overrides the distribution for a type.
+
+```ocaml
+type ranking =
+  { name : (string [@quickcheck.generator Generator.string_of Generator.char_alpha])
+  ; high_score : (int [@quickcheck.generator Generator.int_inclusive 0 999_999])
+  }
+[@@deriving quickcheck]
+```
+
+The `@quickcheck.weight` attribute overrides the weight with which a variant clause is
+chosen. The default weight for each clause is 1.
+
+```ocaml
+type tree =
+  | Leaf
+  | Node1 of tree * int * tree [@quickcheck.weight 1. /. 2.]
+  | Node2 of tree * int * tree * int * tree [@quickcheck.weight 1. /. 3.]
+[@@deriving quickcheck]
+```
+
 Escaping
 --------
 

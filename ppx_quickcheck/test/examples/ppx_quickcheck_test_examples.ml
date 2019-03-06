@@ -11,6 +11,7 @@ end
 
 module Nonrec_reference = struct
   open Dotted_reference
+
   type nonrec t = t [@@deriving quickcheck]
 end
 
@@ -24,24 +25,29 @@ end
 
 module Poly_variant = struct
   (* deliberately make pairs of isomorphic tags to make sure we hash tags properly *)
-  type t = [
-    | `A
+  type t =
+    [ `A
     | `B
     | `C of bool
     | `D of bool
     | `E of bool * unit option
-    | `F of bool * unit option
-  ]
+    | `F of bool * unit option ]
   [@@deriving quickcheck]
 end
 
 module Inherit_poly_variant = struct
-  type t = [`X | Poly_variant.t | `Z of unit option]
+  type t =
+    [ `X
+    | Poly_variant.t
+    | `Z of unit option ]
   [@@deriving quickcheck]
 end
 
 module Record_type = struct
-  type t = { x : bool; y : unit option }
+  type t =
+    { x : bool
+    ; y : unit option
+    }
   [@@deriving quickcheck]
 end
 
@@ -105,8 +111,7 @@ module Poly_binary = struct
 end
 
 module Instance_of_binary = struct
-  type t = (bool, unit option) Poly_binary.t
-  [@@deriving quickcheck]
+  type t = (bool, unit option) Poly_binary.t [@@deriving quickcheck]
 end
 
 module Poly_with_variance = struct
@@ -122,14 +127,19 @@ module Instance_with_variance = struct
     Poly_with_variance.quickcheck_generator
       quickcheck_observer_bool
       (quickcheck_generator_option quickcheck_generator_unit)
+  ;;
+
   let quickcheck_observer =
     Poly_with_variance.quickcheck_observer
       quickcheck_generator_bool
       (quickcheck_observer_option quickcheck_observer_unit)
+  ;;
+
   let quickcheck_shrinker =
     Poly_with_variance.quickcheck_shrinker
       quickcheck_shrinker_bool
       (quickcheck_shrinker_option quickcheck_shrinker_unit)
+  ;;
 end
 
 module Poly_with_phantom = struct
@@ -141,39 +151,34 @@ module Instance_with_phantom = struct
 end
 
 module Recursive = struct
-  type t = Leaf | Node of t * t
+  type t =
+    | Leaf
+    | Node of t * t
+  [@@deriving quickcheck]
+end
 
-  (* we cannot derive definitions for recursive types, so we write these ourselves *)
+module Recursive_with_indirect_base_case = struct
+  type t = { children : t list } [@@deriving quickcheck]
+end
 
-  let quickcheck_generator =
-    Generator.recursive_union
-      [Generator.return Leaf]
-      ~f:(fun self ->
-        [Generator.map2 self self ~f:(fun l r -> Node (l, r))])
+module Mutually_recursive = struct
+  type expr =
+    | Constant of int64
+    | Operator of op
+    | Application of expr * args
 
-  let quickcheck_observer =
-    Observer.fixed_point (fun self ->
-      Observer.either Observer.unit (Observer.both self self)
-      |> Observer.unmap ~f:(function
-        | Leaf -> Either.First ()
-        | Node (l, r) -> Either.Second (l, r)))
+  and op =
+    [ `plus
+    | `minus
+    | `abs ]
 
-  let quickcheck_shrinker =
-    let rec shrink = function
-      | Leaf -> Sequence.empty
-      | Node (l, r) ->
-        Sequence.round_robin [
-          Sequence.singleton l;
-          Sequence.singleton r;
-          Sequence.map (shrink l) ~f:(fun l -> Node (l, r));
-          Sequence.map (shrink r) ~f:(fun r -> Node (l, r));
-        ]
-    in
-    Shrinker.create shrink
+  and args = expr list [@@deriving quickcheck]
 end
 
 module Extensions = struct
-  type t = [`A | `B of bool * unit option]
+  type t =
+    [ `A
+    | `B of bool * unit option ]
 
   let quickcheck_generator = [%quickcheck.generator: [`A | `B of bool * unit option]]
   let quickcheck_observer = [%quickcheck.observer: [`A | `B of bool * unit option]]
@@ -186,20 +191,52 @@ module Escaped = struct
   let quickcheck_generator =
     [%quickcheck.generator:
       [%custom Generator.small_strictly_positive_int] * char * bool option]
+  ;;
 
   let quickcheck_observer =
     [%quickcheck.observer: int * [%custom Observer.opaque] * bool option]
+  ;;
 
   let quickcheck_shrinker =
     [%quickcheck.shrinker: int * char * [%custom Shrinker.atomic]]
+  ;;
 end
 
-module Wildcard (Elt : sig type t val examples : t list end) = struct
+module Wildcard (Elt : sig
+    type t
+
+    val examples : t list
+  end) =
+struct
   type t = Elt.t list
 
-  let quickcheck_generator =
-    Generator.list (Generator.of_list Elt.examples)
-
+  let quickcheck_generator = Generator.list (Generator.of_list Elt.examples)
   let quickcheck_observer : t Observer.t = [%quickcheck.observer: _ list]
   let quickcheck_shrinker : t Shrinker.t = [%quickcheck.shrinker: _ list]
+end
+
+module Attribute_override = struct
+  type t =
+    | Null [@quickcheck.weight 0.1]
+    | Text of
+        (string[@quickcheck.generator Generator.string_of Generator.char_lowercase])
+    | Number of (float[@quickcheck.generator Generator.float_strictly_positive])
+  [@@deriving quickcheck]
+end
+
+module Attribute_override_recursive = struct
+  type t =
+    | Leaf
+    | Node1 of t * int64 * t [@quickcheck.weight 0.5]
+    | Node2 of t * int64 * t * int64 * t [@quickcheck.weight 0.25]
+  [@@deriving quickcheck]
+end
+
+module Deriving_from_wildcard = struct
+  type _ transparent = string [@@deriving quickcheck]
+  type 'a opaque = 'a option [@@deriving quickcheck]
+
+  let compare_opaque = compare_option
+  let sexp_of_opaque = sexp_of_option
+  let opaque_examples = [ None; Some 0L; Some 1L ]
 end

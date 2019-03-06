@@ -432,3 +432,62 @@ let%expect_test "set_t" =
       ((2 3) => (1 3))
       ((2 3) => (2)))) |}]
 ;;
+
+let of_lazy = Shrinker.of_lazy
+
+let%expect_test "of_lazy, forced" =
+  test_shrinker (Shrinker.of_lazy (lazy Shrinker.string)) m_string;
+  [%expect
+    {|
+    (shrinker
+     ((A => "")
+      (z => "")
+      (0 => "")
+      (_ => "")
+      (" " => "")
+      ("\000" => "")
+      (AA => A)
+      (AA => A)
+      (zz => z)
+      (zz => z)
+      (00 => 0)
+      (00 => 0)
+      (__ => _)
+      (__ => _)
+      ("  " => " ")
+      ("  " => " ")
+      ("\000\000" => "\000")
+      ("\000\000" => "\000"))) |}]
+;;
+
+let%expect_test "of_lazy, unforced" =
+  test_shrinker
+    (Shrinker.either Shrinker.string (Shrinker.of_lazy (lazy (assert false))))
+    (m_biject
+       m_string
+       ~f:(fun string -> Either.First string)
+       ~f_inverse:(function
+         | Either.First string -> string
+         | Either.Second (_ : (int, string) Type_equal.t) -> .));
+  [%expect
+    {|
+    (shrinker
+     (("\000" => "")
+      (" " => "")
+      (0 => "")
+      (A => "")
+      (_ => "")
+      (z => "")
+      ("\000\000" => "\000")
+      ("\000\000" => "\000")
+      ("  " => " ")
+      ("  " => " ")
+      (00 => 0)
+      (00 => 0)
+      (AA => A)
+      (AA => A)
+      (__ => _)
+      (__ => _)
+      (zz => z)
+      (zz => z))) |}]
+;;

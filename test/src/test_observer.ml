@@ -221,3 +221,22 @@ let%expect_test "set_t" =
   test_observer (Observer.set_t Observer.bool) (m_set (module Bool) m_bool);
   [%expect {| (observer transparent) |}]
 ;;
+
+let of_lazy = Observer.of_lazy
+
+let%expect_test "of_lazy, forced" =
+  test_observer (Observer.of_lazy (lazy Observer.string)) m_string;
+  [%expect {| (observer transparent) |}]
+;;
+
+let%expect_test "of_lazy, unforced" =
+  test_observer
+    (Observer.either Observer.string (Observer.of_lazy (lazy (assert false))))
+    (m_biject
+       m_string
+       ~f:(fun string -> Either.First string)
+       ~f_inverse:(function
+         | Either.First string -> string
+         | Either.Second (_ : (int, string) Type_equal.t) -> .));
+  [%expect {| (observer transparent) |}]
+;;

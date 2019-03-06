@@ -2,7 +2,6 @@ open! Import
 
 module type S = sig
   type ast
-
   type t
 
   val create : ast -> t
@@ -24,6 +23,5 @@ module type Field_syntax = sig
   module type S = S
 
   module Tuple : S with type ast = core_type
-
   module Record : S with type ast = label_declaration
 end

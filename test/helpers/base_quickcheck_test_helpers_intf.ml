@@ -127,4 +127,10 @@ module type Base_quickcheck_test_helpers = sig
     -> (module With_examples with type t = 'a)
     -> (module With_examples with type t = 'b)
     -> (module With_examples with type t = ('a, 'b, 'c) Map.t)
+
+  val m_biject
+    :  (module With_examples with type t = 'a)
+    -> f:('a -> 'b)
+    -> f_inverse:('b -> 'a)
+    -> (module With_examples with type t = 'b)
 end

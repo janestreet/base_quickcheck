@@ -1445,3 +1445,20 @@ let%expect_test "list_permutations" =
     end);
   [%expect {| (generator "generated 24 distinct values in 10_000 iterations") |}]
 ;;
+
+let of_lazy = Generator.of_lazy
+
+let%expect_test "of_lazy, forced" =
+  test_generator (Generator.of_lazy (lazy Generator.size)) (m_nat ~up_to:30);
+  [%expect {| (generator exhaustive) |}]
+;;
+
+let%expect_test "of_lazy, unforced" =
+  test_generator
+    (Generator.weighted_union
+       [ Float.max_finite_value, Generator.size
+       ; Float.min_positive_subnormal_value, Generator.of_lazy (lazy (assert false))
+       ])
+    (m_nat ~up_to:30);
+  [%expect {| (generator exhaustive) |}]
+;;
