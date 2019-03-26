@@ -135,7 +135,7 @@ let test_generator (type a) ?config ?(mode = `exhaustive) ?cr generator m =
                 "did not generate these values"
                   ~_:(Set.to_list failed_to_generate : Value.t list)]
         in
-        [%message description ~_:(error_message : Sexp.t sexp_option)])
+        [%message description ~_:(error_message : (Sexp.t option[@sexp.option]))])
     in
     print_s [%message "generator" ~_:(message : Sexp.t)];
     match mode with
