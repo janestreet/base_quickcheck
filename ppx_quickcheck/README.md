@@ -1,7 +1,4 @@
----
-title: ppx_quickcheck
-parent: ../README.md
----
+# ppx_quickcheck
 
 Generation of Base_quickcheck generators, observers, and shrinkers from types.
 

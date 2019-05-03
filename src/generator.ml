@@ -72,8 +72,6 @@ let all_unit list =
   create (fun ~size ~random -> List.iter list ~f:(generate ~size ~random))
 ;;
 
-let all_ignore = all_unit
-
 module For_applicative = Applicative.Make (struct
     type nonrec 'a t = 'a t
 
