@@ -18,7 +18,7 @@ depends: [
   "ppx_sexp_message"
   "splittable_random"
   "dune"              {build & >= "1.5.1"}
-  "ppxlib"            {>= "0.6.0"}
+  "ppxlib"            {>= "0.7.0"}
 ]
 synopsis: "Randomized testing framework, designed for compatibility with Base"
 description: "
