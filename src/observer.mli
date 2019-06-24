@@ -11,8 +11,7 @@ type -'a t = 'a Observer0.t
     using this observer will be constant with respect to the value(s) it observes. *)
 val opaque : _ t
 
-(** @inline *)
-include With_basic_types.S with type 'a t := 'a t
+include With_basic_types.S with type 'a t := 'a t (** @inline *)
 
 (** Produces an observer that generates random inputs for a given function, calls the
     function on them, then observes the corresponding outputs. *)

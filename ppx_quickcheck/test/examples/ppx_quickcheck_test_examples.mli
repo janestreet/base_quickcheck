@@ -30,7 +30,8 @@ module Poly_variant : sig
     | `C of bool
     | `D of bool
     | `E of bool * unit option
-    | `F of bool * unit option ]
+    | `F of bool * unit option
+    ]
   [@@deriving quickcheck]
 end
 
@@ -38,7 +39,8 @@ module Inherit_poly_variant : sig
   type t =
     [ `X
     | Poly_variant.t
-    | `Z of unit option ]
+    | `Z of unit option
+    ]
   [@@deriving quickcheck]
 end
 
@@ -61,8 +63,8 @@ end
 
 module Binary_and_record_variant : sig
   type t =
-    | A of bool * [`X | `Y | `Z of unit]
-    | B of bool * [`X | `Y | `Z of unit]
+    | A of bool * [ `X | `Y | `Z of unit ]
+    | B of bool * [ `X | `Y | `Z of unit ]
     | C of { x : unit option; mutable y : bool }
     | D of { x : unit option; mutable y : bool }
   [@@deriving quickcheck]
@@ -120,14 +122,13 @@ module Instance_with_variance : sig
   type t = (bool, unit option) Poly_with_variance.t [@@deriving quickcheck]
 end
 
-module Poly_with_phantom :
-sig
+module Poly_with_phantom : sig
   type _ t [@@deriving quickcheck]
 end
 with type _ t = unit option
 
 module Instance_with_phantom : sig
-  type t = [`phantom] Poly_with_phantom.t [@@deriving quickcheck]
+  type t = [ `phantom ] Poly_with_phantom.t [@@deriving quickcheck]
 end
 
 module Recursive : sig
@@ -150,7 +151,8 @@ module Mutually_recursive : sig
   and op =
     [ `plus
     | `minus
-    | `abs ]
+    | `abs
+    ]
 
   and args = expr list [@@deriving quickcheck]
 end
@@ -158,7 +160,8 @@ end
 module Extensions : sig
   type t =
     [ `A
-    | `B of bool * unit option ]
+    | `B of bool * unit option
+    ]
 
   val quickcheck_generator : t Generator.t
   val quickcheck_observer : t Observer.t

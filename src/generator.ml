@@ -581,7 +581,7 @@ let float_negative_or_zero =
 
 let float_uniform_exclusive lower_bound upper_bound =
   let open Float.O in
-  if not (Float.is_finite lower_bound) || not (Float.is_finite upper_bound)
+  if (not (Float.is_finite lower_bound)) || not (Float.is_finite upper_bound)
   then
     raise_s
       [%message
@@ -658,9 +658,7 @@ let set_tree_using_comparator ~comparator elt_gen =
 
 let comparator_of_m
       (type a c)
-      (module M : Comparator.S
-        with type t = a
-         and type comparator_witness = c)
+      (module M : Comparator.S with type t = a and type comparator_witness = c)
   =
   M.comparator
 ;;

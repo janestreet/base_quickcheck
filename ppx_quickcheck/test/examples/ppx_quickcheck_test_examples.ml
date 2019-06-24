@@ -31,7 +31,8 @@ module Poly_variant = struct
     | `C of bool
     | `D of bool
     | `E of bool * unit option
-    | `F of bool * unit option ]
+    | `F of bool * unit option
+    ]
   [@@deriving quickcheck]
 end
 
@@ -39,7 +40,8 @@ module Inherit_poly_variant = struct
   type t =
     [ `X
     | Poly_variant.t
-    | `Z of unit option ]
+    | `Z of unit option
+    ]
   [@@deriving quickcheck]
 end
 
@@ -63,8 +65,8 @@ end
 
 module Binary_and_record_variant = struct
   type t =
-    | A of bool * [`X | `Y | `Z of unit]
-    | B of bool * [`X | `Y | `Z of unit]
+    | A of bool * [ `X | `Y | `Z of unit ]
+    | B of bool * [ `X | `Y | `Z of unit ]
     | C of { x : unit option; mutable y : bool }
     | D of { x : unit option; mutable y : bool }
   [@@deriving quickcheck]
@@ -147,7 +149,7 @@ module Poly_with_phantom = struct
 end
 
 module Instance_with_phantom = struct
-  type t = [`phantom] Poly_with_phantom.t [@@deriving quickcheck]
+  type t = [ `phantom ] Poly_with_phantom.t [@@deriving quickcheck]
 end
 
 module Recursive = struct
@@ -170,7 +172,8 @@ module Mutually_recursive = struct
   and op =
     [ `plus
     | `minus
-    | `abs ]
+    | `abs
+    ]
 
   and args = expr list [@@deriving quickcheck]
 end
@@ -178,11 +181,12 @@ end
 module Extensions = struct
   type t =
     [ `A
-    | `B of bool * unit option ]
+    | `B of bool * unit option
+    ]
 
-  let quickcheck_generator = [%quickcheck.generator: [`A | `B of bool * unit option]]
-  let quickcheck_observer = [%quickcheck.observer: [`A | `B of bool * unit option]]
-  let quickcheck_shrinker = [%quickcheck.shrinker: [`A | `B of bool * unit option]]
+  let quickcheck_generator = [%quickcheck.generator: [ `A | `B of bool * unit option ]]
+  let quickcheck_observer = [%quickcheck.observer: [ `A | `B of bool * unit option ]]
+  let quickcheck_shrinker = [%quickcheck.shrinker: [ `A | `B of bool * unit option ]]
 end
 
 module Escaped = struct

@@ -21,7 +21,7 @@ module type Base_quickcheck_test_helpers = sig
       cr if the result is inconsistent with the [~mode] argument. *)
   val test_generator
     :  ?config:Test.Config.t
-    -> ?mode:[`exhaustive | `inexhaustive] (** default: [`exhaustive] *)
+    -> ?mode:[ `exhaustive | `inexhaustive ] (** default: [`exhaustive] *)
     -> ?cr:Expect_test_helpers_kernel.CR.t
     -> 'a Generator.t
     -> (module With_examples with type t = 'a)
@@ -31,7 +31,7 @@ module type Base_quickcheck_test_helpers = sig
       if the result is inconsistent with the [~mode] argument. *)
   val test_observer
     :  ?config:Test.Config.t
-    -> ?mode:[`transparent | `opaque] (** default: [`transparent] *)
+    -> ?mode:[ `transparent | `opaque ] (** default: [`transparent] *)
     -> ?cr:Expect_test_helpers_kernel.CR.t
     -> 'a Observer.t
     -> (module With_examples with type t = 'a)
@@ -41,7 +41,7 @@ module type Base_quickcheck_test_helpers = sig
       values. Prints a cr if the result is inconsistent with the [~mode] argument. *)
   val test_shrinker
     :  ?config:Test.Config.t
-    -> ?mode:[`compound | `atomic] (** default: [`compound] *)
+    -> ?mode:[ `compound | `atomic ] (** default: [`compound] *)
     -> ?cr:Expect_test_helpers_kernel.CR.t
     -> 'a Shrinker.t
     -> (module With_examples with type t = 'a)
@@ -112,18 +112,12 @@ module type Base_quickcheck_test_helpers = sig
     -> (module With_examples with type t = ?x:'a -> unit -> 'b)
 
   val m_set
-    :  (module
-         Comparator.S
-         with type t = 'a
-          and type comparator_witness = 'c)
+    :  (module Comparator.S with type t = 'a and type comparator_witness = 'c)
     -> (module With_examples with type t = 'a)
     -> (module With_examples with type t = ('a, 'c) Set.t)
 
   val m_map
-    :  (module
-         Comparator.S
-         with type t = 'a
-          and type comparator_witness = 'c)
+    :  (module Comparator.S with type t = 'a and type comparator_witness = 'c)
     -> (module With_examples with type t = 'a)
     -> (module With_examples with type t = 'b)
     -> (module With_examples with type t = ('a, 'b, 'c) Map.t)

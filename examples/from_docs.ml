@@ -95,7 +95,8 @@ module Generator_examples = struct
              >>= fun key ->
              binary_subtree lower_bound (key - 1)
              >>= fun left ->
-             binary_subtree (key + 1) upper_bound >>| fun right -> `Node (left, key, right))
+             binary_subtree (key + 1) upper_bound >>| fun right -> `Node (left, key, right)
+            )
           ]
     ;;
 

@@ -14,7 +14,8 @@ module Sorted_list = struct
   ;;
 
   let custom_int_shrinker =
-    Shrinker.create (fun n -> if n = 0 then Sequence.empty else Sequence.singleton (n / 2))
+    Shrinker.create (fun n ->
+      if n = 0 then Sequence.empty else Sequence.singleton (n / 2))
   ;;
 
   let quickcheck_shrinker =

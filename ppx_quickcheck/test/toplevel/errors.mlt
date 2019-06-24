@@ -13,19 +13,19 @@ Line _, characters 12-29:
 Error: ppx_quickcheck: unsupported: GADT
 |}]
 
-type variant_gt = [> `tag] [@@deriving quickcheck]
+type variant_gt = [> `tag ] [@@deriving quickcheck]
 
 [%%expect
   {|
-Line _, characters 18-26:
+Line _, characters 18-27:
 Error: ppx_quickcheck: unsupported: polymorphic variant type with [>]
 |}]
 
-type variant_lt = [< `tag] [@@deriving quickcheck]
+type variant_lt = [< `tag ] [@@deriving quickcheck]
 
 [%%expect
   {|
-Line _, characters 18-26:
+Line _, characters 18-27:
 Error: ppx_quickcheck: unsupported: polymorphic variant type with [<]
 |}]
 

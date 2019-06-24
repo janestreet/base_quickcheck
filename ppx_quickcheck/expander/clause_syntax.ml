@@ -133,8 +133,8 @@ module Polymorphic_variant = struct
               "cannot bind a #<type> pattern to anything other than a variable")
        | _ ->
          unsupported ~loc "inherited polymorphic variant type that is not a type name")
-    | Rtag (_, _, true, _ :: _), _
-    | Rtag (_, _, false, ([] | _ :: _ :: _)), _ -> unsupported ~loc "intersection type"
+    | Rtag (_, _, true, _ :: _), _ | Rtag (_, _, false, ([] | _ :: _ :: _)), _ ->
+      unsupported ~loc "intersection type"
     | Rtag (_, _, true, []), _ :: _
     | Rtag (_, _, false, [ _ ]), []
     | Rinherit _, ([] | _ :: _ :: _) ->
@@ -149,8 +149,8 @@ module Polymorphic_variant = struct
       pexp_variant ~loc label.txt (Some (pexp_tuple ~loc expr_list))
     | Rinherit inherited_type, [ expr ] ->
       pexp_coerce ~loc expr (Some inherited_type) core_type
-    | Rtag (_, _, true, _ :: _), _
-    | Rtag (_, _, false, ([] | _ :: _ :: _)), _ -> unsupported ~loc "intersection type"
+    | Rtag (_, _, true, _ :: _), _ | Rtag (_, _, false, ([] | _ :: _ :: _)), _ ->
+      unsupported ~loc "intersection type"
     | Rtag (_, _, true, []), _ :: _
     | Rtag (_, _, false, [ _ ]), []
     | Rinherit _, ([] | _ :: _ :: _) ->

@@ -10,8 +10,7 @@ type 'a t
 (** This shrinker treats a type as atomic, never attempting to produce smaller values. *)
 val atomic : _ t
 
-(** @inline *)
-include With_basic_types.S with type 'a t := 'a t
+include With_basic_types.S with type 'a t := 'a t (** @inline *)
 
 val map_t : 'key t -> 'data t -> ('key, 'data, 'cmp) Map.t t
 val set_t : 'elt t -> ('elt, 'cmp) Set.t t

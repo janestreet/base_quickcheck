@@ -107,8 +107,7 @@ let variant
     List.partition_tf clauses ~f:(fun clause ->
       clause_is_recursive ~clause ~rec_names (module Clause))
   with
-  | [], clauses
-  | clauses, [] ->
+  | [], clauses | clauses, [] ->
     let pairs = List.map clauses ~f:make_pair in
     [%expr Base_quickcheck.Generator.weighted_union [%e elist ~loc pairs]]
   | recursive_clauses, nonrecursive_clauses ->

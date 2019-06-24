@@ -11,8 +11,7 @@ type +'a t
     designed to hit corner cases reasonably often, and also generate reasonably good
     coverage of common cases and arbitrary values. *)
 
-(** @inline *)
-include With_basic_types.S with type 'a t := 'a t
+include With_basic_types.S with type 'a t := 'a t (** @inline *)
 
 (** Generates random functions that use the given observer to perturb the pseudo-random
     state that is then used to generate the output value. The resulting functions are

@@ -278,53 +278,49 @@ module type Exhaustive = sig
 end
 
 let exhaustive (type a) (module Value : Exhaustive with type t = a) =
-  ( module struct
+  (module struct
     include Value
 
     let examples = all
-  end
-  : With_examples
-    with type t = a )
+  end : With_examples
+    with type t = a)
 ;;
 
 let m_unit = exhaustive (module Unit)
 let m_bool = exhaustive (module Bool)
 
 let m_char =
-  ( module struct
+  (module struct
     include Char
 
     (* min and max of each: uppercase, lowercase, digit, punctuation, whitespace, other *)
     let examples = String.to_list "AZaz09!~ \t\000\255"
-  end
-  : With_examples
-    with type t = char )
+  end : With_examples
+    with type t = char)
 ;;
 
 let m_biject (type a b) (module A : With_examples with type t = a) ~f ~f_inverse =
-  ( module struct
+  (module struct
     type t = b
 
     let compare = Comparable.lift A.compare ~f:f_inverse
     let sexp_of_t t = A.sexp_of_t (f_inverse t)
     let examples = List.map A.examples ~f |> List.dedup_and_sort ~compare
-  end
-  : With_examples
-    with type t = b )
+  end : With_examples
+    with type t = b)
 ;;
 
 let m_option (type value) (module Value : With_examples with type t = value) =
-  ( module struct
+  (module struct
     type t = Value.t option [@@deriving compare, sexp_of]
 
     let examples = [ None ] @ List.map Value.examples ~f:Option.return
-  end
-  : With_examples
-    with type t = value option )
+  end : With_examples
+    with type t = value option)
 ;;
 
 let m_list (type elt) (module Elt : With_examples with type t = elt) =
-  ( module struct
+  (module struct
     type t = Elt.t list [@@deriving sexp_of]
 
     let compare =
@@ -336,9 +332,8 @@ let m_list (type elt) (module Elt : With_examples with type t = elt) =
       @ List.map Elt.examples ~f:(fun x -> [ x ])
       @ List.map2_exn Elt.examples (List.rev Elt.examples) ~f:(fun x y -> [ x; y ])
     ;;
-  end
-  : With_examples
-    with type t = elt list )
+  end : With_examples
+    with type t = elt list)
 ;;
 
 let m_arrow
@@ -346,7 +341,7 @@ let m_arrow
       (module A : With_examples with type t = a)
       (module B : With_examples with type t = b)
   =
-  ( module struct
+  (module struct
     type t = A.t -> B.t
 
     let to_alist f = List.map A.examples ~f:(fun a -> a, f a)
@@ -365,16 +360,16 @@ let m_arrow
           |> Option.value ~default:(List.hd_exn B.examples))
       else List.map B.examples ~f:Fn.const
     ;;
-  end
-  : With_examples
-    with type t = a -> b )
+  end : With_examples
+    with type t = a -> b)
 ;;
 
 let m_arrow_named
       (type a b)
       (module A : With_examples with type t = a)
       (module B : With_examples with type t = b)
-  : (module With_examples with type t = x:a -> b) =
+  : (module With_examples with type t = x:a -> b)
+  =
   m_biject
     (m_arrow (module A) (module B))
     ~f:(fun f ~x -> f x)
@@ -385,7 +380,8 @@ let m_arrow_optional
       (type a b)
       (module A : With_examples with type t = a)
       (module B : With_examples with type t = b)
-  : (module With_examples with type t = ?x:a -> unit -> b) =
+  : (module With_examples with type t = ?x:a -> unit -> b)
+  =
   m_biject
     (m_arrow (m_option (module A)) (module B))
     ~f:(fun f ?x () -> f x)
@@ -397,15 +393,14 @@ let m_either
       (module A : With_examples with type t = a)
       (module B : With_examples with type t = b)
   =
-  ( module struct
+  (module struct
     type t = (A.t, B.t) Either.t [@@deriving compare, sexp_of]
 
     let examples =
       List.map A.examples ~f:Either.first @ List.map B.examples ~f:Either.second
     ;;
-  end
-  : With_examples
-    with type t = (a, b) Either.t )
+  end : With_examples
+    with type t = (a, b) Either.t)
 ;;
 
 let m_result
@@ -413,15 +408,14 @@ let m_result
       (module A : With_examples with type t = a)
       (module B : With_examples with type t = b)
   =
-  ( module struct
+  (module struct
     type t = (A.t, B.t) Result.t [@@deriving compare, sexp_of]
 
     let examples =
       List.map A.examples ~f:(fun x -> Ok x) @ List.map B.examples ~f:(fun x -> Error x)
     ;;
-  end
-  : With_examples
-    with type t = (a, b) Result.t )
+  end : With_examples
+    with type t = (a, b) Result.t)
 ;;
 
 let m_pair
@@ -429,17 +423,16 @@ let m_pair
       (module A : With_examples with type t = a)
       (module B : With_examples with type t = b)
   =
-  ( module struct
+  (module struct
     type t = A.t * B.t [@@deriving compare, sexp_of]
 
     let examples = List.cartesian_product A.examples B.examples
-  end
-  : With_examples
-    with type t = a * b )
+  end : With_examples
+    with type t = a * b)
 ;;
 
 let m_string =
-  ( module struct
+  (module struct
     type t = string [@@deriving sexp_of]
 
     let compare =
@@ -454,45 +447,41 @@ let m_string =
       @ List.map chars ~f:String.of_char
       @ List.map chars ~f:(fun char -> String.of_char char ^ String.of_char char)
     ;;
-  end
-  : With_examples
-    with type t = string )
+  end : With_examples
+    with type t = string)
 ;;
 
 let m_nat ~up_to =
-  ( module struct
+  (module struct
     type t = int [@@deriving compare, sexp_of]
 
     let examples = List.range 0 up_to ~start:`inclusive ~stop:`inclusive
-  end
-  : With_examples
-    with type t = int )
+  end : With_examples
+    with type t = int)
 ;;
 
 let m_nat' (type i) ~up_to (module I : Int.S with type t = i) =
-  ( module struct
+  (module struct
     type t = I.t [@@deriving compare, sexp_of]
 
     let examples =
       List.range 0 up_to ~start:`inclusive ~stop:`inclusive |> List.map ~f:I.of_int_exn
     ;;
-  end
-  : With_examples
-    with type t = i )
+  end : With_examples
+    with type t = i)
 ;;
 
 let m_int (type a) (module I : Int.S with type t = a) =
-  ( module struct
+  (module struct
     type t = I.t [@@deriving compare, sexp_of]
 
     let examples = [ I.min_value; I.minus_one; I.zero; I.one; I.max_value ]
-  end
-  : With_examples
-    with type t = a )
+  end : With_examples
+    with type t = a)
 ;;
 
 let m_float =
-  ( module struct
+  (module struct
     type t = float [@@deriving compare, sexp_of]
 
     let examples =
@@ -507,13 +496,12 @@ let m_float =
       |> List.concat_map ~f:(fun x -> [ Float.neg x; x ])
       |> List.dedup_and_sort ~compare:Float.compare
     ;;
-  end
-  : With_examples
-    with type t = float )
+  end : With_examples
+    with type t = float)
 ;;
 
 let m_sexp =
-  ( module struct
+  (module struct
     type t = Sexp.t [@@deriving compare, sexp_of]
 
     let examples =
@@ -523,30 +511,26 @@ let m_sexp =
       in
       atoms @ lists_of_atoms @ [ Sexp.List (atoms @ lists_of_atoms) ]
     ;;
-  end
-  : With_examples
-    with type t = Sexp.t )
+  end : With_examples
+    with type t = Sexp.t)
 ;;
 
 let m_set
       (type elt cmp)
-      (module Cmp : Comparator.S
-        with type t = elt
-         and type comparator_witness = cmp)
+      (module Cmp : Comparator.S with type t = elt and type comparator_witness = cmp)
       (module Elt : With_examples with type t = elt)
-  : (module With_examples with type t = (elt, cmp) Set.t) =
+  : (module With_examples with type t = (elt, cmp) Set.t)
+  =
   m_biject (m_list (module Elt)) ~f:(Set.of_list (module Cmp)) ~f_inverse:Set.to_list
 ;;
 
 let m_map
       (type key data cmp)
-      (module Cmp : Comparator.S
-        with type t = key
-         and type comparator_witness = cmp)
+      (module Cmp : Comparator.S with type t = key and type comparator_witness = cmp)
       (module Key : With_examples with type t = key)
       (module Data : With_examples with type t = data)
   =
-  ( module struct
+  (module struct
     type t = (key, data, cmp) Map.t
 
     let compare = Map.compare_m__t (module Key) Data.compare
@@ -559,7 +543,6 @@ let m_map
           (module Cmp)
           (List.map Key.examples ~f:(fun key -> key, data)))
     ;;
-  end
-  : With_examples
-    with type t = (key, data, cmp) Map.t )
+  end : With_examples
+    with type t = (key, data, cmp) Map.t)
 ;;

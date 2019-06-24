@@ -22,13 +22,12 @@ module Helpers = struct
   end
 
   let m_all (type a) (module M : All with type t = a) =
-    ( module struct
+    (module struct
       include M
 
       let examples = all
-    end
-    : With_examples
-      with type t = a )
+    end : With_examples
+      with type t = a)
   ;;
 end
 
@@ -91,7 +90,8 @@ let%expect_test "polymorphic variant" =
       | `C of bool
       | `D of bool
       | `E of bool * unit option
-      | `F of bool * unit option ]
+      | `F of bool * unit option
+      ]
     [@@deriving compare, enumerate, sexp_of]
   end
   in
@@ -109,7 +109,8 @@ let%expect_test "polymorphic variant" =
     type t =
       [ `X
       | Poly_variant'.t
-      | `Z of unit option ]
+      | `Z of unit option
+      ]
     [@@deriving compare, enumerate, sexp_of]
   end
   in
@@ -171,8 +172,8 @@ let%expect_test "variant type" =
     (shrinker atomic) |}];
   let module Binary_and_record_variant' = struct
     type t = Binary_and_record_variant.t =
-      | A of bool * [`X | `Y | `Z of unit]
-      | B of bool * [`X | `Y | `Z of unit]
+      | A of bool * [ `X | `Y | `Z of unit ]
+      | B of bool * [ `X | `Y | `Z of unit ]
       | C of { x : unit option; mutable y : bool }
       | D of { x : unit option; mutable y : bool }
     [@@deriving compare, enumerate, sexp_of]
@@ -342,7 +343,8 @@ let%expect_test "recursive type with indirect base case" =
     [@@deriving compare, hash, sexp_of]
 
     let examples =
-      List.init 3 ~f:(fun n -> { children = List.init n ~f:(Fn.const { children = [] }) })
+      List.init 3 ~f:(fun n ->
+        { children = List.init n ~f:(Fn.const { children = [] }) })
     ;;
   end
   in
@@ -375,7 +377,8 @@ let%expect_test "mutually recursive types" =
     and op =
       [ `plus
       | `minus
-      | `abs ]
+      | `abs
+      ]
 
     and args = expr list [@@deriving compare, hash, sexp_of]
   end
@@ -405,7 +408,8 @@ let%expect_test "extensions" =
   let module Extensions' = struct
     type t =
       [ `A
-      | `B of bool * unit option ]
+      | `B of bool * unit option
+      ]
     [@@deriving compare, enumerate, sexp_of]
   end
   in

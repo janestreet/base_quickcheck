@@ -20,4 +20,4 @@ val create_with_variance
   -> covariant:string
   -> contravariant:string
   -> (core_type * variance) list
-  -> pattern list * [`Covariant of t] * [`Contravariant of t]
+  -> pattern list * [ `Covariant of t ] * [ `Contravariant of t ]
