@@ -6,7 +6,10 @@ open Base_quickcheck
 
 type rational =
   | Integer of int
-  | Rational of { numerator : int; denominator : int }
+  | Rational of
+      { numerator : int
+      ; denominator : int
+      }
 [@@deriving compare, quickcheck, sexp_of]
 
 type real =

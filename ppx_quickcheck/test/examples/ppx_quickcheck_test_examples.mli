@@ -65,8 +65,14 @@ module Binary_and_record_variant : sig
   type t =
     | A of bool * [ `X | `Y | `Z of unit ]
     | B of bool * [ `X | `Y | `Z of unit ]
-    | C of { x : unit option; mutable y : bool }
-    | D of { x : unit option; mutable y : bool }
+    | C of
+        { x : unit option
+        ; mutable y : bool
+        }
+    | D of
+        { x : unit option
+        ; mutable y : bool
+        }
   [@@deriving quickcheck]
 end
 
