@@ -85,16 +85,12 @@ module Polymorphic_variant = struct
   let create_list = Fn.id
 
   let salt t =
-    match t with
-    | Rtag (label, _, _, _) -> Some (Ocaml_common.Btype.hash_variant label.txt)
+    match t.prf_desc with
+    | Rtag (label, _, _) -> Some (Ocaml_common.Btype.hash_variant label.txt)
     | Rinherit _ -> None
   ;;
 
-  let location t =
-    match t with
-    | Rtag (label, _, _, _) -> label.loc
-    | Rinherit core_type -> core_type.ptyp_loc
-  ;;
+  let location t = t.prf_loc
 
   let weight_attribute =
     Attribute.declare
@@ -111,16 +107,16 @@ module Polymorphic_variant = struct
   ;;
 
   let core_type_list t =
-    match t with
-    | Rtag (_, _, _, core_type_list) -> core_type_list
+    match t.prf_desc with
+    | Rtag (_, _, core_type_list) -> core_type_list
     | Rinherit core_type -> [ core_type ]
   ;;
 
   let pattern t ~loc pat_list =
-    match t, pat_list with
-    | Rtag (label, _, true, []), [] -> ppat_variant ~loc label.txt None
-    | Rtag (label, _, false, [ _ ]), [ pat ] -> ppat_variant ~loc label.txt (Some pat)
-    | Rtag (label, _, false, [ _ ]), _ :: _ :: _ ->
+    match t.prf_desc, pat_list with
+    | Rtag (label, true, []), [] -> ppat_variant ~loc label.txt None
+    | Rtag (label, false, [ _ ]), [ pat ] -> ppat_variant ~loc label.txt (Some pat)
+    | Rtag (label, false, [ _ ]), _ :: _ :: _ ->
       ppat_variant ~loc label.txt (Some (ppat_tuple ~loc pat_list))
     | Rinherit { ptyp_desc; _ }, [ { ppat_desc; _ } ] ->
       (match ptyp_desc with
@@ -133,26 +129,26 @@ module Polymorphic_variant = struct
               "cannot bind a #<type> pattern to anything other than a variable")
        | _ ->
          unsupported ~loc "inherited polymorphic variant type that is not a type name")
-    | Rtag (_, _, true, _ :: _), _ | Rtag (_, _, false, ([] | _ :: _ :: _)), _ ->
+    | Rtag (_, true, _ :: _), _ | Rtag (_, false, ([] | _ :: _ :: _)), _ ->
       unsupported ~loc "intersection type"
-    | Rtag (_, _, true, []), _ :: _
-    | Rtag (_, _, false, [ _ ]), []
+    | Rtag (_, true, []), _ :: _
+    | Rtag (_, false, [ _ ]), []
     | Rinherit _, ([] | _ :: _ :: _) ->
       internal_error ~loc "wrong number of arguments for variant clause"
   ;;
 
   let expression t ~loc core_type expr_list =
-    match t, expr_list with
-    | Rtag (label, _, true, []), [] -> pexp_variant ~loc label.txt None
-    | Rtag (label, _, false, [ _ ]), [ expr ] -> pexp_variant ~loc label.txt (Some expr)
-    | Rtag (label, _, false, [ _ ]), _ :: _ :: _ ->
+    match t.prf_desc, expr_list with
+    | Rtag (label, true, []), [] -> pexp_variant ~loc label.txt None
+    | Rtag (label, false, [ _ ]), [ expr ] -> pexp_variant ~loc label.txt (Some expr)
+    | Rtag (label, false, [ _ ]), _ :: _ :: _ ->
       pexp_variant ~loc label.txt (Some (pexp_tuple ~loc expr_list))
     | Rinherit inherited_type, [ expr ] ->
       pexp_coerce ~loc expr (Some inherited_type) core_type
-    | Rtag (_, _, true, _ :: _), _ | Rtag (_, _, false, ([] | _ :: _ :: _)), _ ->
+    | Rtag (_, true, _ :: _), _ | Rtag (_, false, ([] | _ :: _ :: _)), _ ->
       unsupported ~loc "intersection type"
-    | Rtag (_, _, true, []), _ :: _
-    | Rtag (_, _, false, [ _ ]), []
+    | Rtag (_, true, []), _ :: _
+    | Rtag (_, false, [ _ ]), []
     | Rinherit _, ([] | _ :: _ :: _) ->
       internal_error ~loc "wrong number of arguments for variant clause"
   ;;

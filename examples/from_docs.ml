@@ -261,7 +261,7 @@ module Example_2_imperative = struct
       ~f:(fun (x, t) ->
         let list1 = to_list t in
         push t x;
-        let _ = pop_exn t in
+        let (_ : string) = pop_exn t in
         let list2 = to_list t in
         [%test_result: string list] list2 ~expect:list1)
   ;;
