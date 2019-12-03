@@ -17,6 +17,12 @@ end
 include T
 
 let map t ~f ~f_inverse = create (fun x -> Sequence.map ~f (shrink t (f_inverse x)))
+let filter t ~f = create (fun x -> Sequence.filter ~f (shrink t x))
+
+let filter_map t ~f ~f_inverse =
+  create (fun x -> Sequence.filter_map ~f (shrink t (f_inverse x)))
+;;
+
 let of_lazy lazy_t = create (fun x -> Sequence.of_lazy (lazy (shrink (force lazy_t) x)))
 
 let fixed_point of_shrinker =

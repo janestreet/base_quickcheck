@@ -62,6 +62,71 @@ let%expect_test "shrinker" =
       (10 => 9))) |}]
 ;;
 
+let filter = Shrinker.filter
+
+let%expect_test "shrinker" =
+  test_shrinker
+    (Shrinker.filter (Shrinker.list natural_number_shrinker) ~f:(fun list ->
+       not (List.is_empty list)))
+    (m_list (m_nat ~up_to:3));
+  [%expect
+    {|
+    (shrinker
+     (((1) => (0))
+      ((2) => (1))
+      ((3) => (2))
+      ((0 3) => (3))
+      ((0 3) => (0))
+      ((0 3) => (0 2))
+      ((1 2) => (2))
+      ((1 2) => (0 2))
+      ((1 2) => (1))
+      ((1 2) => (1 1))
+      ((2 1) => (1))
+      ((2 1) => (1 1))
+      ((2 1) => (2))
+      ((2 1) => (2 0))
+      ((3 0) => (0))
+      ((3 0) => (2 0))
+      ((3 0) => (3)))) |}]
+;;
+
+let filter_map = Shrinker.filter_map
+
+let%expect_test "shrinker" =
+  test_shrinker
+    (Shrinker.filter_map
+       (Shrinker.list natural_number_shrinker)
+       ~f:(function
+         | [] -> None
+         | list -> Some (List.map list ~f:Int.pred))
+       ~f_inverse:(List.map ~f:Int.succ))
+    (m_list (m_nat ~up_to:3));
+  [%expect
+    {|
+    (shrinker
+     (((0) => (-1))
+      ((1) => (0))
+      ((2) => (1))
+      ((3) => (2))
+      ((0 3) => (3))
+      ((0 3) => (-1 3))
+      ((0 3) => (0))
+      ((0 3) => (0 2))
+      ((1 2) => (2))
+      ((1 2) => (0 2))
+      ((1 2) => (1))
+      ((1 2) => (1 1))
+      ((2 1) => (1))
+      ((2 1) => (1 1))
+      ((2 1) => (2))
+      ((2 1) => (2 0))
+      ((3 0) => (0))
+      ((3 0) => (2 0))
+      ((3 0) => (3))
+      ((3 0) => (3 -1)))) |}]
+;;
+
 let fixed_point = Shrinker.fixed_point
 
 let%expect_test "fixed_point" =
