@@ -1190,37 +1190,38 @@ module Recursive =
             lazy
               (let quickcheck_generator =
                  Base_quickcheck.Generator.of_lazy quickcheck_generator in
-               let _pair__203_ =
-                 (1.,
-                   (Base_quickcheck.Generator.create
-                      (fun ~size:_size__207_ ->
-                         fun ~random:_random__208_ -> Leaf)))
-               and _pair__204_ =
-                 (1.,
-                   (Base_quickcheck.Generator.bind
-                      Base_quickcheck.Generator.size
-                      ~f:(fun _size__200_ ->
-                            Base_quickcheck.Generator.with_size
-                              ~size:(Base.Int.pred _size__200_)
-                              (Base_quickcheck.Generator.create
-                                 (fun ~size:_size__205_ ->
-                                    fun ~random:_random__206_ ->
-                                      Node
-                                        ((Base_quickcheck.Generator.generate
-                                            quickcheck_generator
-                                            ~size:_size__205_
-                                            ~random:_random__206_),
-                                          (Base_quickcheck.Generator.generate
+               ignore quickcheck_generator;
+               (let _pair__203_ =
+                  (1.,
+                    (Base_quickcheck.Generator.create
+                       (fun ~size:_size__207_ ->
+                          fun ~random:_random__208_ -> Leaf)))
+                and _pair__204_ =
+                  (1.,
+                    (Base_quickcheck.Generator.bind
+                       Base_quickcheck.Generator.size
+                       ~f:(fun _size__200_ ->
+                             Base_quickcheck.Generator.with_size
+                               ~size:(Base.Int.pred _size__200_)
+                               (Base_quickcheck.Generator.create
+                                  (fun ~size:_size__205_ ->
+                                     fun ~random:_random__206_ ->
+                                       Node
+                                         ((Base_quickcheck.Generator.generate
                                              quickcheck_generator
                                              ~size:_size__205_
-                                             ~random:_random__206_))))))) in
-               let _gen__201_ =
-                 Base_quickcheck.Generator.weighted_union [_pair__203_]
-               and _gen__202_ =
-                 Base_quickcheck.Generator.weighted_union
-                   [_pair__203_; _pair__204_] in
-               Base_quickcheck.Generator.bind Base_quickcheck.Generator.size
-                 ~f:(function | 0 -> _gen__201_ | _ -> _gen__202_)) in
+                                             ~random:_random__206_),
+                                           (Base_quickcheck.Generator.generate
+                                              quickcheck_generator
+                                              ~size:_size__205_
+                                              ~random:_random__206_))))))) in
+                let _gen__201_ =
+                  Base_quickcheck.Generator.weighted_union [_pair__203_]
+                and _gen__202_ =
+                  Base_quickcheck.Generator.weighted_union
+                    [_pair__203_; _pair__204_] in
+                Base_quickcheck.Generator.bind Base_quickcheck.Generator.size
+                  ~f:(function | 0 -> _gen__201_ | _ -> _gen__202_))) in
           Base_quickcheck.Generator.of_lazy quickcheck_generator
         let _ = quickcheck_generator
         let quickcheck_observer =
@@ -1228,6 +1229,7 @@ module Recursive =
             lazy
               (let quickcheck_observer =
                  Base_quickcheck.Observer.of_lazy quickcheck_observer in
+               ignore quickcheck_observer;
                Base_quickcheck.Observer.create
                  (fun _x__195_ ->
                     fun ~size:_size__196_ ->
@@ -1256,6 +1258,7 @@ module Recursive =
             lazy
               (let quickcheck_shrinker =
                  Base_quickcheck.Shrinker.of_lazy quickcheck_shrinker in
+               ignore quickcheck_shrinker;
                Base_quickcheck.Shrinker.create
                  (function
                   | Leaf -> Base.Sequence.round_robin []
@@ -1285,6 +1288,7 @@ module Recursive_with_indirect_base_case =
             lazy
               (let quickcheck_generator =
                  Base_quickcheck.Generator.of_lazy quickcheck_generator in
+               ignore quickcheck_generator;
                Base_quickcheck.Generator.create
                  (fun ~size:_size__213_ ->
                     fun ~random:_random__214_ ->
@@ -1301,6 +1305,7 @@ module Recursive_with_indirect_base_case =
             lazy
               (let quickcheck_observer =
                  Base_quickcheck.Observer.of_lazy quickcheck_observer in
+               ignore quickcheck_observer;
                Base_quickcheck.Observer.create
                  (fun { children = _x__210_ } ->
                     fun ~size:_size__211_ ->
@@ -1317,6 +1322,7 @@ module Recursive_with_indirect_base_case =
             lazy
               (let quickcheck_shrinker =
                  Base_quickcheck.Shrinker.of_lazy quickcheck_shrinker in
+               ignore quickcheck_shrinker;
                Base_quickcheck.Shrinker.create
                  (fun { children = _x__209_ } ->
                     Base.Sequence.round_robin
@@ -1353,56 +1359,59 @@ module Mutually_recursive =
                  Base_quickcheck.Generator.of_lazy quickcheck_generator_op
                and quickcheck_generator_args =
                  Base_quickcheck.Generator.of_lazy quickcheck_generator_args in
-               let _pair__232_ =
-                 (1.,
-                   (Base_quickcheck.Generator.create
-                      (fun ~size:_size__239_ ->
-                         fun ~random:_random__240_ ->
-                           Constant
-                             (Base_quickcheck.Generator.generate
-                                quickcheck_generator_int64 ~size:_size__239_
-                                ~random:_random__240_))))
-               and _pair__233_ =
-                 (1.,
-                   (Base_quickcheck.Generator.bind
-                      Base_quickcheck.Generator.size
-                      ~f:(fun _size__229_ ->
-                            Base_quickcheck.Generator.with_size
-                              ~size:(Base.Int.pred _size__229_)
-                              (Base_quickcheck.Generator.create
-                                 (fun ~size:_size__235_ ->
-                                    fun ~random:_random__236_ ->
-                                      Operator
-                                        (Base_quickcheck.Generator.generate
-                                           quickcheck_generator_op
-                                           ~size:_size__235_
-                                           ~random:_random__236_))))))
-               and _pair__234_ =
-                 (1.,
-                   (Base_quickcheck.Generator.bind
-                      Base_quickcheck.Generator.size
-                      ~f:(fun _size__229_ ->
-                            Base_quickcheck.Generator.with_size
-                              ~size:(Base.Int.pred _size__229_)
-                              (Base_quickcheck.Generator.create
-                                 (fun ~size:_size__237_ ->
-                                    fun ~random:_random__238_ ->
-                                      Application
-                                        ((Base_quickcheck.Generator.generate
-                                            quickcheck_generator_expr
-                                            ~size:_size__237_
-                                            ~random:_random__238_),
-                                          (Base_quickcheck.Generator.generate
-                                             quickcheck_generator_args
+               ignore quickcheck_generator_args;
+               ignore quickcheck_generator_op;
+               ignore quickcheck_generator_expr;
+               (let _pair__232_ =
+                  (1.,
+                    (Base_quickcheck.Generator.create
+                       (fun ~size:_size__239_ ->
+                          fun ~random:_random__240_ ->
+                            Constant
+                              (Base_quickcheck.Generator.generate
+                                 quickcheck_generator_int64 ~size:_size__239_
+                                 ~random:_random__240_))))
+                and _pair__233_ =
+                  (1.,
+                    (Base_quickcheck.Generator.bind
+                       Base_quickcheck.Generator.size
+                       ~f:(fun _size__229_ ->
+                             Base_quickcheck.Generator.with_size
+                               ~size:(Base.Int.pred _size__229_)
+                               (Base_quickcheck.Generator.create
+                                  (fun ~size:_size__235_ ->
+                                     fun ~random:_random__236_ ->
+                                       Operator
+                                         (Base_quickcheck.Generator.generate
+                                            quickcheck_generator_op
+                                            ~size:_size__235_
+                                            ~random:_random__236_))))))
+                and _pair__234_ =
+                  (1.,
+                    (Base_quickcheck.Generator.bind
+                       Base_quickcheck.Generator.size
+                       ~f:(fun _size__229_ ->
+                             Base_quickcheck.Generator.with_size
+                               ~size:(Base.Int.pred _size__229_)
+                               (Base_quickcheck.Generator.create
+                                  (fun ~size:_size__237_ ->
+                                     fun ~random:_random__238_ ->
+                                       Application
+                                         ((Base_quickcheck.Generator.generate
+                                             quickcheck_generator_expr
                                              ~size:_size__237_
-                                             ~random:_random__238_))))))) in
-               let _gen__230_ =
-                 Base_quickcheck.Generator.weighted_union [_pair__232_]
-               and _gen__231_ =
-                 Base_quickcheck.Generator.weighted_union
-                   [_pair__232_; _pair__233_; _pair__234_] in
-               Base_quickcheck.Generator.bind Base_quickcheck.Generator.size
-                 ~f:(function | 0 -> _gen__230_ | _ -> _gen__231_))
+                                             ~random:_random__238_),
+                                           (Base_quickcheck.Generator.generate
+                                              quickcheck_generator_args
+                                              ~size:_size__237_
+                                              ~random:_random__238_))))))) in
+                let _gen__230_ =
+                  Base_quickcheck.Generator.weighted_union [_pair__232_]
+                and _gen__231_ =
+                  Base_quickcheck.Generator.weighted_union
+                    [_pair__232_; _pair__233_; _pair__234_] in
+                Base_quickcheck.Generator.bind Base_quickcheck.Generator.size
+                  ~f:(function | 0 -> _gen__230_ | _ -> _gen__231_)))
           and quickcheck_generator_op =
             lazy
               (let quickcheck_generator_expr =
@@ -1411,6 +1420,9 @@ module Mutually_recursive =
                  Base_quickcheck.Generator.of_lazy quickcheck_generator_op
                and quickcheck_generator_args =
                  Base_quickcheck.Generator.of_lazy quickcheck_generator_args in
+               ignore quickcheck_generator_args;
+               ignore quickcheck_generator_op;
+               ignore quickcheck_generator_expr;
                Base_quickcheck.Generator.weighted_union
                  [(1.,
                     (Base_quickcheck.Generator.create
@@ -1432,6 +1444,9 @@ module Mutually_recursive =
                  Base_quickcheck.Generator.of_lazy quickcheck_generator_op
                and quickcheck_generator_args =
                  Base_quickcheck.Generator.of_lazy quickcheck_generator_args in
+               ignore quickcheck_generator_args;
+               ignore quickcheck_generator_op;
+               ignore quickcheck_generator_expr;
                quickcheck_generator_list quickcheck_generator_expr) in
           ((Base_quickcheck.Generator.of_lazy quickcheck_generator_expr),
             (Base_quickcheck.Generator.of_lazy quickcheck_generator_op),
@@ -1450,6 +1465,9 @@ module Mutually_recursive =
                  Base_quickcheck.Observer.of_lazy quickcheck_observer_op
                and quickcheck_observer_args =
                  Base_quickcheck.Observer.of_lazy quickcheck_observer_args in
+               ignore quickcheck_observer_args;
+               ignore quickcheck_observer_op;
+               ignore quickcheck_observer_expr;
                Base_quickcheck.Observer.create
                  (fun _x__219_ ->
                     fun ~size:_size__220_ ->
@@ -1491,6 +1509,9 @@ module Mutually_recursive =
                  Base_quickcheck.Observer.of_lazy quickcheck_observer_op
                and quickcheck_observer_args =
                  Base_quickcheck.Observer.of_lazy quickcheck_observer_args in
+               ignore quickcheck_observer_args;
+               ignore quickcheck_observer_op;
+               ignore quickcheck_observer_expr;
                Base_quickcheck.Observer.create
                  (fun _x__226_ ->
                     fun ~size:_size__227_ ->
@@ -1516,6 +1537,9 @@ module Mutually_recursive =
                  Base_quickcheck.Observer.of_lazy quickcheck_observer_op
                and quickcheck_observer_args =
                  Base_quickcheck.Observer.of_lazy quickcheck_observer_args in
+               ignore quickcheck_observer_args;
+               ignore quickcheck_observer_op;
+               ignore quickcheck_observer_expr;
                quickcheck_observer_list quickcheck_observer_expr) in
           ((Base_quickcheck.Observer.of_lazy quickcheck_observer_expr),
             (Base_quickcheck.Observer.of_lazy quickcheck_observer_op),
@@ -1534,6 +1558,9 @@ module Mutually_recursive =
                  Base_quickcheck.Shrinker.of_lazy quickcheck_shrinker_op
                and quickcheck_shrinker_args =
                  Base_quickcheck.Shrinker.of_lazy quickcheck_shrinker_args in
+               ignore quickcheck_shrinker_args;
+               ignore quickcheck_shrinker_op;
+               ignore quickcheck_shrinker_expr;
                Base_quickcheck.Shrinker.create
                  (function
                   | Constant _x__215_ ->
@@ -1568,6 +1595,9 @@ module Mutually_recursive =
                  Base_quickcheck.Shrinker.of_lazy quickcheck_shrinker_op
                and quickcheck_shrinker_args =
                  Base_quickcheck.Shrinker.of_lazy quickcheck_shrinker_args in
+               ignore quickcheck_shrinker_args;
+               ignore quickcheck_shrinker_op;
+               ignore quickcheck_shrinker_expr;
                Base_quickcheck.Shrinker.create
                  (function
                   | `plus -> Base.Sequence.round_robin []
@@ -1581,6 +1611,9 @@ module Mutually_recursive =
                  Base_quickcheck.Shrinker.of_lazy quickcheck_shrinker_op
                and quickcheck_shrinker_args =
                  Base_quickcheck.Shrinker.of_lazy quickcheck_shrinker_args in
+               ignore quickcheck_shrinker_args;
+               ignore quickcheck_shrinker_op;
+               ignore quickcheck_shrinker_expr;
                quickcheck_shrinker_list quickcheck_shrinker_expr) in
           ((Base_quickcheck.Shrinker.of_lazy quickcheck_shrinker_expr),
             (Base_quickcheck.Shrinker.of_lazy quickcheck_shrinker_op),
@@ -1817,72 +1850,73 @@ module Attribute_override_recursive =
             lazy
               (let quickcheck_generator =
                  Base_quickcheck.Generator.of_lazy quickcheck_generator in
-               let _pair__309_ =
-                 (1.,
-                   (Base_quickcheck.Generator.create
-                      (fun ~size:_size__316_ ->
-                         fun ~random:_random__317_ -> Leaf)))
-               and _pair__310_ =
-                 (0.5,
-                   (Base_quickcheck.Generator.bind
-                      Base_quickcheck.Generator.size
-                      ~f:(fun _size__306_ ->
-                            Base_quickcheck.Generator.with_size
-                              ~size:(Base.Int.pred _size__306_)
-                              (Base_quickcheck.Generator.create
-                                 (fun ~size:_size__312_ ->
-                                    fun ~random:_random__313_ ->
-                                      Node1
-                                        ((Base_quickcheck.Generator.generate
-                                            quickcheck_generator
-                                            ~size:_size__312_
-                                            ~random:_random__313_),
-                                          (Base_quickcheck.Generator.generate
-                                             quickcheck_generator_int64
+               ignore quickcheck_generator;
+               (let _pair__309_ =
+                  (1.,
+                    (Base_quickcheck.Generator.create
+                       (fun ~size:_size__316_ ->
+                          fun ~random:_random__317_ -> Leaf)))
+                and _pair__310_ =
+                  (0.5,
+                    (Base_quickcheck.Generator.bind
+                       Base_quickcheck.Generator.size
+                       ~f:(fun _size__306_ ->
+                             Base_quickcheck.Generator.with_size
+                               ~size:(Base.Int.pred _size__306_)
+                               (Base_quickcheck.Generator.create
+                                  (fun ~size:_size__312_ ->
+                                     fun ~random:_random__313_ ->
+                                       Node1
+                                         ((Base_quickcheck.Generator.generate
+                                             quickcheck_generator
                                              ~size:_size__312_
                                              ~random:_random__313_),
-                                          (Base_quickcheck.Generator.generate
-                                             quickcheck_generator
-                                             ~size:_size__312_
-                                             ~random:_random__313_)))))))
-               and _pair__311_ =
-                 (0.25,
-                   (Base_quickcheck.Generator.bind
-                      Base_quickcheck.Generator.size
-                      ~f:(fun _size__306_ ->
-                            Base_quickcheck.Generator.with_size
-                              ~size:(Base.Int.pred _size__306_)
-                              (Base_quickcheck.Generator.create
-                                 (fun ~size:_size__314_ ->
-                                    fun ~random:_random__315_ ->
-                                      Node2
-                                        ((Base_quickcheck.Generator.generate
-                                            quickcheck_generator
-                                            ~size:_size__314_
-                                            ~random:_random__315_),
-                                          (Base_quickcheck.Generator.generate
-                                             quickcheck_generator_int64
-                                             ~size:_size__314_
-                                             ~random:_random__315_),
-                                          (Base_quickcheck.Generator.generate
+                                           (Base_quickcheck.Generator.generate
+                                              quickcheck_generator_int64
+                                              ~size:_size__312_
+                                              ~random:_random__313_),
+                                           (Base_quickcheck.Generator.generate
+                                              quickcheck_generator
+                                              ~size:_size__312_
+                                              ~random:_random__313_)))))))
+                and _pair__311_ =
+                  (0.25,
+                    (Base_quickcheck.Generator.bind
+                       Base_quickcheck.Generator.size
+                       ~f:(fun _size__306_ ->
+                             Base_quickcheck.Generator.with_size
+                               ~size:(Base.Int.pred _size__306_)
+                               (Base_quickcheck.Generator.create
+                                  (fun ~size:_size__314_ ->
+                                     fun ~random:_random__315_ ->
+                                       Node2
+                                         ((Base_quickcheck.Generator.generate
                                              quickcheck_generator
                                              ~size:_size__314_
                                              ~random:_random__315_),
-                                          (Base_quickcheck.Generator.generate
-                                             quickcheck_generator_int64
-                                             ~size:_size__314_
-                                             ~random:_random__315_),
-                                          (Base_quickcheck.Generator.generate
-                                             quickcheck_generator
-                                             ~size:_size__314_
-                                             ~random:_random__315_))))))) in
-               let _gen__307_ =
-                 Base_quickcheck.Generator.weighted_union [_pair__309_]
-               and _gen__308_ =
-                 Base_quickcheck.Generator.weighted_union
-                   [_pair__309_; _pair__310_; _pair__311_] in
-               Base_quickcheck.Generator.bind Base_quickcheck.Generator.size
-                 ~f:(function | 0 -> _gen__307_ | _ -> _gen__308_)) in
+                                           (Base_quickcheck.Generator.generate
+                                              quickcheck_generator_int64
+                                              ~size:_size__314_
+                                              ~random:_random__315_),
+                                           (Base_quickcheck.Generator.generate
+                                              quickcheck_generator
+                                              ~size:_size__314_
+                                              ~random:_random__315_),
+                                           (Base_quickcheck.Generator.generate
+                                              quickcheck_generator_int64
+                                              ~size:_size__314_
+                                              ~random:_random__315_),
+                                           (Base_quickcheck.Generator.generate
+                                              quickcheck_generator
+                                              ~size:_size__314_
+                                              ~random:_random__315_))))))) in
+                let _gen__307_ =
+                  Base_quickcheck.Generator.weighted_union [_pair__309_]
+                and _gen__308_ =
+                  Base_quickcheck.Generator.weighted_union
+                    [_pair__309_; _pair__310_; _pair__311_] in
+                Base_quickcheck.Generator.bind Base_quickcheck.Generator.size
+                  ~f:(function | 0 -> _gen__307_ | _ -> _gen__308_))) in
           Base_quickcheck.Generator.of_lazy quickcheck_generator
         let _ = quickcheck_generator
         let quickcheck_observer =
@@ -1890,6 +1924,7 @@ module Attribute_override_recursive =
             lazy
               (let quickcheck_observer =
                  Base_quickcheck.Observer.of_lazy quickcheck_observer in
+               ignore quickcheck_observer;
                Base_quickcheck.Observer.create
                  (fun _x__295_ ->
                     fun ~size:_size__296_ ->
@@ -1949,6 +1984,7 @@ module Attribute_override_recursive =
             lazy
               (let quickcheck_shrinker =
                  Base_quickcheck.Shrinker.of_lazy quickcheck_shrinker in
+               ignore quickcheck_shrinker;
                Base_quickcheck.Shrinker.create
                  (function
                   | Leaf -> Base.Sequence.round_robin []

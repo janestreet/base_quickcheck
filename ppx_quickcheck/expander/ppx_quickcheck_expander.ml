@@ -281,7 +281,12 @@ let maybe_mutually_recursive decls ~loc ~rec_flag ~of_lazy ~impl =
             ~expr:[%expr [%e of_lazy] [%e inner.var]])
       in
       List.map impls ~f:(fun impl ->
-        let body = pexp_let ~loc:impl.loc Nonrecursive inner_bindings impl.exp in
+        let exp =
+          List.fold impls ~init:impl.exp ~f:(fun acc impl ->
+            let ign = [%expr ignore [%e impl.var]] in
+            pexp_sequence ~loc ign acc)
+        in
+        let body = pexp_let ~loc:impl.loc Nonrecursive inner_bindings exp in
         let lazy_expr = [%expr lazy [%e body]] in
         value_binding ~loc:impl.loc ~pat:impl.pat ~expr:lazy_expr)
     in
