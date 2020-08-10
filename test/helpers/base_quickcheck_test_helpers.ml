@@ -113,9 +113,7 @@ let test_generator (type a) ?config ?(mode = `exhaustive) ?cr generator m =
     let generated_values = Sequence.to_list sequence in
     let distinct_generated_values = Set.of_list (module Value) generated_values in
     let distinct_known_values = Set.of_list (module Value) Value.examples in
-    let failed_to_generate =
-      Set.diff distinct_known_values distinct_generated_values
-    in
+    let failed_to_generate = Set.diff distinct_known_values distinct_generated_values in
     let message =
       if Set.equal distinct_generated_values distinct_known_values
       then [%message "exhaustive"]

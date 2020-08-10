@@ -349,8 +349,7 @@ let%expect_test "recursive type with indirect base case" =
     [@@deriving compare, hash, sexp_of]
 
     let examples =
-      List.init 3 ~f:(fun n ->
-        { children = List.init n ~f:(Fn.const { children = [] }) })
+      List.init 3 ~f:(fun n -> { children = List.init n ~f:(Fn.const { children = [] }) })
     ;;
   end
   in
@@ -603,8 +602,7 @@ let%expect_test "polymorphic wildcard" =
     (observer transparent)
     (shrinker ((a => ""))) |}];
   let module Opaque = struct
-    type t = int64 Deriving_from_wildcard.opaque
-    [@@deriving compare, quickcheck, sexp_of]
+    type t = int64 Deriving_from_wildcard.opaque [@@deriving compare, quickcheck, sexp_of]
 
     let examples = Deriving_from_wildcard.opaque_examples
   end

@@ -59,7 +59,7 @@ let bigarray1 src =
     Sequence.init dim ~f:(fun to_skip ->
       let to_skip = to_skip + offset in
       Bigarray_helpers.Array1.init kind layout (dim - 1) ~f:(fun i ->
-        src.{(if i < to_skip then i else i + 1)}))
+        src.{if i < to_skip then i else i + 1}))
 ;;
 
 let bigstring = create bigarray1
@@ -166,11 +166,7 @@ let map_tree_using_comparator ~comparator key_t data_t =
            let tree = Map.Using_comparator.Tree.remove ~comparator tree key in
            Sequence.filter_map (shrink key_t key) ~f:(fun smaller_key ->
              match
-               Map.Using_comparator.Tree.add
-                 ~comparator
-                 tree
-                 ~key:smaller_key
-                 ~data
+               Map.Using_comparator.Tree.add ~comparator tree ~key:smaller_key ~data
              with
              | `Ok tree -> Some tree
              | `Duplicate -> None)))

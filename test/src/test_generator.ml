@@ -381,18 +381,14 @@ let%expect_test "option" =
 let either = Generator.either
 
 let%expect_test "either" =
-  test_generator
-    (Generator.either Generator.bool Generator.bool)
-    (m_either m_bool m_bool);
+  test_generator (Generator.either Generator.bool Generator.bool) (m_either m_bool m_bool);
   [%expect {| (generator exhaustive) |}]
 ;;
 
 let result = Generator.result
 
 let%expect_test "result" =
-  test_generator
-    (Generator.result Generator.bool Generator.bool)
-    (m_result m_bool m_bool);
+  test_generator (Generator.result Generator.bool Generator.bool) (m_result m_bool m_bool);
   [%expect {| (generator exhaustive) |}]
 ;;
 

@@ -112,8 +112,7 @@ let variant
                           ~loc
                           ~pat:hash_pat
                           ~expr:
-                            [%expr
-                              Base.hash_fold_int [%e hash_expr] [%e eint ~loc salt]]
+                            [%expr Base.hash_fold_int [%e hash_expr] [%e eint ~loc salt]]
                       ]
                       body
                 in

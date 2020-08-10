@@ -211,9 +211,7 @@ module Escaped = struct
     [%quickcheck.observer: int * [%custom Observer.opaque] * bool option]
   ;;
 
-  let quickcheck_shrinker =
-    [%quickcheck.shrinker: int * char * [%custom Shrinker.atomic]]
-  ;;
+  let quickcheck_shrinker = [%quickcheck.shrinker: int * char * [%custom Shrinker.atomic]]
 end
 
 module Wildcard (Elt : sig
@@ -232,8 +230,7 @@ end
 module Attribute_override = struct
   type t =
     | Null [@quickcheck.weight 0.1]
-    | Text of
-        (string[@quickcheck.generator Generator.string_of Generator.char_lowercase])
+    | Text of (string[@quickcheck.generator Generator.string_of Generator.char_lowercase])
     | Number of (float[@quickcheck.generator Generator.float_strictly_positive])
   [@@deriving quickcheck]
 end

@@ -291,9 +291,7 @@ let maybe_mutually_recursive decls ~loc ~rec_flag ~of_lazy ~impl =
         value_binding ~loc:impl.loc ~pat:impl.pat ~expr:lazy_expr)
     in
     let body =
-      pexp_tuple
-        ~loc
-        (List.map impls ~f:(fun impl -> [%expr [%e of_lazy] [%e impl.var]]))
+      pexp_tuple ~loc (List.map impls ~f:(fun impl -> [%expr [%e of_lazy] [%e impl.var]]))
     in
     pstr_value_list
       ~loc
