@@ -100,16 +100,17 @@ let variant
       (List.map (Clause.core_type_list clause) ~f:generator_of_core_type)
   in
   let make_pair clause =
-    pexp_tuple
-      ~loc:{ (Clause.location clause) with loc_ghost = true }
-      [ Clause.weight clause; make_generator clause ]
+    Option.map (Clause.weight clause) ~f:(fun weight ->
+      pexp_tuple
+        ~loc:{ (Clause.location clause) with loc_ghost = true }
+        [ weight; make_generator clause ])
   in
   match
     List.partition_tf clauses ~f:(fun clause ->
       clause_is_recursive ~clause ~rec_names (module Clause))
   with
   | [], clauses | clauses, [] ->
-    let pairs = List.map clauses ~f:make_pair in
+    let pairs = List.filter_map clauses ~f:make_pair in
     [%expr Base_quickcheck.Generator.weighted_union [%e elist ~loc pairs]]
   | recursive_clauses, nonrecursive_clauses ->
     let size_pat, size_expr = gensym "size" loc in
@@ -122,24 +123,24 @@ let variant
       gensyms "pair" (List.map recursive_clauses ~f:Clause.location)
     in
     let bindings =
-      List.map2_exn nonrec_pats nonrecursive_clauses ~f:(fun pat clause ->
-        let loc = { (Clause.location clause) with loc_ghost = true } in
-        let expr = make_pair clause in
-        value_binding ~loc ~pat ~expr)
-      @ List.map2_exn rec_pats recursive_clauses ~f:(fun pat clause ->
-        let loc = { (Clause.location clause) with loc_ghost = true } in
-        let weight_expr = Clause.weight clause in
-        let gen_expr =
-          [%expr
-            Base_quickcheck.Generator.bind
-              Base_quickcheck.Generator.size
-              ~f:(fun [%p size_pat] ->
-                Base_quickcheck.Generator.with_size
-                  ~size:(Base.Int.pred [%e size_expr])
-                  [%e make_generator clause])]
-        in
-        let expr = pexp_tuple ~loc [ weight_expr; gen_expr ] in
-        value_binding ~loc ~pat ~expr)
+      List.filter_opt
+        (List.map2_exn nonrec_pats nonrecursive_clauses ~f:(fun pat clause ->
+           let loc = { (Clause.location clause) with loc_ghost = true } in
+           Option.map (make_pair clause) ~f:(fun expr -> value_binding ~loc ~pat ~expr))
+         @ List.map2_exn rec_pats recursive_clauses ~f:(fun pat clause ->
+           Option.map (Clause.weight clause) ~f:(fun weight_expr ->
+             let loc = { (Clause.location clause) with loc_ghost = true } in
+             let gen_expr =
+               [%expr
+                 Base_quickcheck.Generator.bind
+                   Base_quickcheck.Generator.size
+                   ~f:(fun [%p size_pat] ->
+                     Base_quickcheck.Generator.with_size
+                       ~size:(Base.Int.pred [%e size_expr])
+                       [%e make_generator clause])]
+             in
+             let expr = pexp_tuple ~loc [ weight_expr; gen_expr ] in
+             value_binding ~loc ~pat ~expr)))
     in
     let body =
       [%expr

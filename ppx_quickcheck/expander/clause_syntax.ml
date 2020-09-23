@@ -28,10 +28,22 @@ module Variant = struct
       (fun x -> x)
   ;;
 
+  let do_not_generate_attribute =
+    Attribute.declare
+      "quickcheck.do_not_generate"
+      Attribute.Context.constructor_declaration
+      Ast_pattern.(pstr nil)
+      ()
+  ;;
+
   let weight t =
-    match Attribute.get weight_attribute t.ast with
-    | Some expr -> expr
-    | None -> efloat ~loc:{ (location t) with loc_ghost = true } "1."
+    match Attribute.get do_not_generate_attribute t.ast with
+    | Some () -> None
+    | None ->
+      Some
+        (match Attribute.get weight_attribute t.ast with
+         | Some expr -> expr
+         | None -> efloat ~loc:{ (location t) with loc_ghost = true } "1.")
   ;;
 
   let core_type_list t =
@@ -100,10 +112,22 @@ module Polymorphic_variant = struct
       (fun x -> x)
   ;;
 
+  let do_not_generate_attribute =
+    Attribute.declare
+      "quickcheck.do_not_generate"
+      Attribute.Context.rtag
+      Ast_pattern.(pstr nil)
+      ()
+  ;;
+
   let weight t =
-    match Attribute.get weight_attribute t with
-    | Some expr -> expr
-    | None -> efloat ~loc:{ (location t) with loc_ghost = true } "1."
+    match Attribute.get do_not_generate_attribute t with
+    | Some () -> None
+    | None ->
+      Some
+        (match Attribute.get weight_attribute t with
+         | Some expr -> expr
+         | None -> efloat ~loc:{ (location t) with loc_ghost = true } "1.")
   ;;
 
   let core_type_list t =

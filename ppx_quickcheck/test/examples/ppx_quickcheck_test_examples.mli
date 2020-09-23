@@ -214,3 +214,26 @@ module Deriving_from_wildcard : sig
   val sexp_of_opaque : ('a -> Sexp.t) -> 'a opaque -> Sexp.t
   val opaque_examples : int64 opaque list
 end
+
+module Do_not_generate_clauses : sig
+  module Cannot_generate : sig
+    type t
+
+    val all : t list
+    val compare : t -> t -> int
+    val sexp_of_t : t -> Sexp.t
+  end
+
+  type t =
+    | Can_generate of bool
+    | Cannot_generate of Cannot_generate.t
+  [@@deriving quickcheck]
+
+  module Poly : sig
+    type t =
+      [ `Can_generate of bool
+      | `Cannot_generate of Cannot_generate.t
+      ]
+    [@@deriving quickcheck]
+  end
+end

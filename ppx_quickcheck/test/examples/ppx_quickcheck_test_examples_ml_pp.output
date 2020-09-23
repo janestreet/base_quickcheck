@@ -2081,3 +2081,134 @@ module Deriving_from_wildcard =
     let sexp_of_opaque = sexp_of_option
     let opaque_examples = [None; Some 0L; Some 1L]
   end
+module Do_not_generate_clauses =
+  struct
+    module Cannot_generate =
+      struct
+        type t = bool option
+        let all = None :: (List.map Bool.all ~f:Option.return)
+        let compare = Option.compare Bool.compare
+        let sexp_of_t = Option.sexp_of_t Bool.sexp_of_t
+        let quickcheck_observer =
+          quickcheck_observer_option quickcheck_observer_bool
+        let quickcheck_shrinker =
+          quickcheck_shrinker_option quickcheck_shrinker_bool
+      end
+    type t =
+      | Can_generate of bool 
+      | Cannot_generate of Cannot_generate.t [@quickcheck.do_not_generate ]
+    [@@deriving quickcheck]
+    include
+      struct
+        let _ = fun (_ : t) -> ()
+        let quickcheck_generator =
+          Base_quickcheck.Generator.weighted_union
+            [(1.,
+               (Base_quickcheck.Generator.create
+                  (fun ~size:_size__334_ ->
+                     fun ~random:_random__335_ ->
+                       Can_generate
+                         (Base_quickcheck.Generator.generate
+                            quickcheck_generator_bool ~size:_size__334_
+                            ~random:_random__335_))))]
+        let _ = quickcheck_generator
+        let quickcheck_observer =
+          Base_quickcheck.Observer.create
+            (fun _x__329_ ->
+               fun ~size:_size__330_ ->
+                 fun ~hash:_hash__331_ ->
+                   match _x__329_ with
+                   | Can_generate _x__332_ ->
+                       let _hash__331_ = Base.hash_fold_int _hash__331_ 0 in
+                       let _hash__331_ =
+                         Base_quickcheck.Observer.observe
+                           quickcheck_observer_bool _x__332_
+                           ~size:_size__330_ ~hash:_hash__331_ in
+                       _hash__331_
+                   | Cannot_generate _x__333_ ->
+                       let _hash__331_ = Base.hash_fold_int _hash__331_ 1 in
+                       let _hash__331_ =
+                         Base_quickcheck.Observer.observe
+                           Cannot_generate.quickcheck_observer _x__333_
+                           ~size:_size__330_ ~hash:_hash__331_ in
+                       _hash__331_)
+        let _ = quickcheck_observer
+        let quickcheck_shrinker =
+          Base_quickcheck.Shrinker.create
+            (function
+             | Can_generate _x__327_ ->
+                 Base.Sequence.round_robin
+                   [Base.Sequence.map
+                      (Base_quickcheck.Shrinker.shrink
+                         quickcheck_shrinker_bool _x__327_)
+                      ~f:(fun _x__327_ -> Can_generate _x__327_)]
+             | Cannot_generate _x__328_ ->
+                 Base.Sequence.round_robin
+                   [Base.Sequence.map
+                      (Base_quickcheck.Shrinker.shrink
+                         Cannot_generate.quickcheck_shrinker _x__328_)
+                      ~f:(fun _x__328_ -> Cannot_generate _x__328_)])
+        let _ = quickcheck_shrinker
+      end[@@ocaml.doc "@inline"][@@merlin.hide ]
+    module Poly =
+      struct
+        type t =
+          [ `Can_generate of bool 
+          | `Cannot_generate of Cannot_generate.t
+              [@quickcheck.do_not_generate ]][@@deriving quickcheck]
+        include
+          struct
+            let _ = fun (_ : t) -> ()
+            let quickcheck_generator =
+              Base_quickcheck.Generator.weighted_union
+                [(1.,
+                   (Base_quickcheck.Generator.create
+                      (fun ~size:_size__343_ ->
+                         fun ~random:_random__344_ ->
+                           `Can_generate
+                             (Base_quickcheck.Generator.generate
+                                quickcheck_generator_bool ~size:_size__343_
+                                ~random:_random__344_))))]
+            let _ = quickcheck_generator
+            let quickcheck_observer =
+              Base_quickcheck.Observer.create
+                (fun _x__338_ ->
+                   fun ~size:_size__339_ ->
+                     fun ~hash:_hash__340_ ->
+                       match _x__338_ with
+                       | `Can_generate _x__341_ ->
+                           let _hash__340_ =
+                             Base.hash_fold_int _hash__340_ (-895996764) in
+                           let _hash__340_ =
+                             Base_quickcheck.Observer.observe
+                               quickcheck_observer_bool _x__341_
+                               ~size:_size__339_ ~hash:_hash__340_ in
+                           _hash__340_
+                       | `Cannot_generate _x__342_ ->
+                           let _hash__340_ =
+                             Base.hash_fold_int _hash__340_ 501585681 in
+                           let _hash__340_ =
+                             Base_quickcheck.Observer.observe
+                               Cannot_generate.quickcheck_observer _x__342_
+                               ~size:_size__339_ ~hash:_hash__340_ in
+                           _hash__340_)
+            let _ = quickcheck_observer
+            let quickcheck_shrinker =
+              Base_quickcheck.Shrinker.create
+                (function
+                 | `Can_generate _x__336_ ->
+                     Base.Sequence.round_robin
+                       [Base.Sequence.map
+                          (Base_quickcheck.Shrinker.shrink
+                             quickcheck_shrinker_bool _x__336_)
+                          ~f:(fun _x__336_ -> `Can_generate _x__336_)]
+                 | `Cannot_generate _x__337_ ->
+                     Base.Sequence.round_robin
+                       [Base.Sequence.map
+                          (Base_quickcheck.Shrinker.shrink
+                             Cannot_generate.quickcheck_shrinker _x__337_)
+                          ~f:(fun _x__337_ -> `Cannot_generate _x__337_)])
+            let _ = quickcheck_shrinker
+          end[@@ocaml.doc "@inline"][@@merlin.hide ]
+      end
+  end

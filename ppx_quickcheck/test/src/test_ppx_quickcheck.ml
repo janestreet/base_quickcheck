@@ -614,3 +614,51 @@ let%expect_test "polymorphic wildcard" =
     (observer transparent)
     (shrinker (((0) => ()) ((1) => ()))) |}]
 ;;
+
+module Do_not_generate_clauses = Do_not_generate_clauses
+
+let%expect_test "variant with clauses excluded from generator" =
+  let module Do_not_generate_clauses' = struct
+    type t = Do_not_generate_clauses.t =
+      | Can_generate of bool
+      | Cannot_generate of Do_not_generate_clauses.Cannot_generate.t
+    [@@deriving compare, enumerate, sexp_of]
+  end
+  in
+  test
+    ~generator:`inexhaustive
+    (module Do_not_generate_clauses)
+    (m_all (module Do_not_generate_clauses'));
+  [%expect
+    {|
+    (generator
+     ("generated 2 distinct values in 10_000 iterations"
+      ("did not generate these values"
+       ((Cannot_generate ()) (Cannot_generate (false)) (Cannot_generate (true))))))
+    (observer transparent)
+    (shrinker
+     (((Cannot_generate (false)) => (Cannot_generate ()))
+      ((Cannot_generate (true)) => (Cannot_generate ())))) |}];
+  let module Poly' = struct
+    type t =
+      [ `Can_generate of bool
+      | `Cannot_generate of Do_not_generate_clauses.Cannot_generate.t
+      ]
+    [@@deriving compare, enumerate, sexp_of]
+  end
+  in
+  test
+    ~generator:`inexhaustive
+    (module Do_not_generate_clauses.Poly)
+    (m_all (module Poly'));
+  [%expect
+    {|
+    (generator
+     ("generated 2 distinct values in 10_000 iterations"
+      ("did not generate these values"
+       ((Cannot_generate ()) (Cannot_generate (false)) (Cannot_generate (true))))))
+    (observer transparent)
+    (shrinker
+     (((Cannot_generate (false)) => (Cannot_generate ()))
+      ((Cannot_generate (true)) => (Cannot_generate ())))) |}]
+;;

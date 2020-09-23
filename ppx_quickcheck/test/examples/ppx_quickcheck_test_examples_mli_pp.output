@@ -456,3 +456,36 @@ sig
   val sexp_of_opaque : ('a -> Sexp.t) -> 'a opaque -> Sexp.t
   val opaque_examples : int64 opaque list
 end
+module Do_not_generate_clauses :
+sig
+  module Cannot_generate :
+  sig
+    type t
+    val all : t list
+    val compare : t -> t -> int
+    val sexp_of_t : t -> Sexp.t
+  end
+  type t =
+    | Can_generate of bool 
+    | Cannot_generate of Cannot_generate.t [@@deriving quickcheck]
+  include
+    sig
+      [@@@ocaml.warning "-32"]
+      val quickcheck_generator : t Base_quickcheck.Generator.t
+      val quickcheck_observer : t Base_quickcheck.Observer.t
+      val quickcheck_shrinker : t Base_quickcheck.Shrinker.t
+    end[@@ocaml.doc "@inline"][@@merlin.hide ]
+  module Poly :
+  sig
+    type t =
+      [ `Can_generate of bool  | `Cannot_generate of Cannot_generate.t ]
+    [@@deriving quickcheck]
+    include
+      sig
+        [@@@ocaml.warning "-32"]
+        val quickcheck_generator : t Base_quickcheck.Generator.t
+        val quickcheck_observer : t Base_quickcheck.Observer.t
+        val quickcheck_shrinker : t Base_quickcheck.Shrinker.t
+      end[@@ocaml.doc "@inline"][@@merlin.hide ]
+  end
+end

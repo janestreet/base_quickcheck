@@ -81,6 +81,18 @@ type tree =
 [@@deriving quickcheck]
 ```
 
+The `@quickcheck.do_not_generate` attribute leaves a variant out of
+the generator entirely. This is similar to `[@quickcheck.weight 0.]`,
+but it does not require generators for the variant arguments to exist.
+Observers and shrinkers are not altered by this attribute.
+
+```ocaml
+type v =
+  | A
+  | B of Something_that_cannot_be_generated.t [@quickcheck.do_not_generate]
+[@@deriving quickcheck]
+```
+
 Escaping
 --------
 

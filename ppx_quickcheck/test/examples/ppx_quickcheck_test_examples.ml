@@ -251,3 +251,28 @@ module Deriving_from_wildcard = struct
   let sexp_of_opaque = sexp_of_option
   let opaque_examples = [ None; Some 0L; Some 1L ]
 end
+
+module Do_not_generate_clauses = struct
+  module Cannot_generate = struct
+    type t = bool option
+
+    let all = None :: List.map Bool.all ~f:Option.return
+    let compare = Option.compare Bool.compare
+    let sexp_of_t = Option.sexp_of_t Bool.sexp_of_t
+    let quickcheck_observer = quickcheck_observer_option quickcheck_observer_bool
+    let quickcheck_shrinker = quickcheck_shrinker_option quickcheck_shrinker_bool
+  end
+
+  type t =
+    | Can_generate of bool
+    | Cannot_generate of Cannot_generate.t [@quickcheck.do_not_generate]
+  [@@deriving quickcheck]
+
+  module Poly = struct
+    type t =
+      [ `Can_generate of bool
+      | `Cannot_generate of Cannot_generate.t [@quickcheck.do_not_generate]
+      ]
+    [@@deriving quickcheck]
+  end
+end
