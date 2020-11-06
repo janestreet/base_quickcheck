@@ -368,6 +368,33 @@ sig
       val quickcheck_shrinker_args : args Base_quickcheck.Shrinker.t
     end[@@ocaml.doc "@inline"][@@merlin.hide ]
 end
+module Poly_recursive :
+sig
+  type 'a t =
+    | Zero 
+    | Succ of 'a * 'a t [@@deriving quickcheck]
+  include
+    sig
+      [@@@ocaml.warning "-32"]
+      val quickcheck_generator :
+        'a Base_quickcheck.Generator.t -> 'a t Base_quickcheck.Generator.t
+      val quickcheck_observer :
+        'a Base_quickcheck.Observer.t -> 'a t Base_quickcheck.Observer.t
+      val quickcheck_shrinker :
+        'a Base_quickcheck.Shrinker.t -> 'a t Base_quickcheck.Shrinker.t
+    end[@@ocaml.doc "@inline"][@@merlin.hide ]
+end
+module Instance_of_recursive :
+sig
+  type t = bool Poly_recursive.t[@@deriving quickcheck]
+  include
+    sig
+      [@@@ocaml.warning "-32"]
+      val quickcheck_generator : t Base_quickcheck.Generator.t
+      val quickcheck_observer : t Base_quickcheck.Observer.t
+      val quickcheck_shrinker : t Base_quickcheck.Shrinker.t
+    end[@@ocaml.doc "@inline"][@@merlin.hide ]
+end
 module Extensions :
 sig
   type t = [ `A  | `B of (bool * unit option) ]

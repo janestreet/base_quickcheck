@@ -188,6 +188,17 @@ module Mutually_recursive = struct
   and args = expr list [@@deriving quickcheck]
 end
 
+module Poly_recursive = struct
+  type 'a t =
+    | Zero
+    | Succ of 'a * 'a t
+  [@@deriving quickcheck]
+end
+
+module Instance_of_recursive = struct
+  type t = bool Poly_recursive.t [@@deriving quickcheck]
+end
+
 module Extensions = struct
   type t =
     [ `A

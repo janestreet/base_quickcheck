@@ -163,6 +163,17 @@ module Mutually_recursive : sig
   and args = expr list [@@deriving quickcheck]
 end
 
+module Poly_recursive : sig
+  type 'a t =
+    | Zero
+    | Succ of 'a * 'a t
+  [@@deriving quickcheck]
+end
+
+module Instance_of_recursive : sig
+  type t = bool Poly_recursive.t [@@deriving quickcheck]
+end
+
 module Extensions : sig
   type t =
     [ `A

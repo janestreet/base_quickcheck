@@ -407,6 +407,41 @@ let%expect_test "mutually recursive types" =
     (shrinker atomic) |}]
 ;;
 
+module Poly_recursive = Poly_recursive
+module Instance_of_recursive = Instance_of_recursive
+
+let%expect_test "polymorphic recursive type" =
+  let module Poly_recursive' = struct
+    type 'a t = 'a Poly_recursive.t =
+      | Zero
+      | Succ of 'a * 'a t
+    [@@deriving compare, sexp_of]
+
+    let rec of_list = function
+      | [] -> Zero
+      | head :: tail -> Succ (head, of_list tail)
+    ;;
+
+    let examples (type a) (m_elt : (module With_examples with type t = a)) =
+      let module M = (val m_list m_elt) in
+      List.map M.examples ~f:of_list
+    ;;
+  end
+  in
+  let module Instance_of_recursive' = struct
+    type t = bool Poly_recursive'.t [@@deriving compare, sexp_of]
+
+    let examples = Poly_recursive'.examples m_bool
+  end
+  in
+  test ~shrinker:`atomic (module Instance_of_recursive) (module Instance_of_recursive');
+  [%expect
+    {|
+    (generator "generated 154 distinct values in 10_000 iterations")
+    (observer transparent)
+    (shrinker atomic) |}]
+;;
+
 module Extensions = Extensions
 
 let%expect_test "extensions" =

@@ -254,6 +254,26 @@ let shrinker_impl type_decl ~rec_names:_ =
   { loc; pat; var; exp }
 ;;
 
+let close_the_loop ~of_lazy decl impl =
+  let loc = impl.loc in
+  let exp = impl.var in
+  match decl.ptype_params with
+  | [] -> eapply ~loc of_lazy [ exp ]
+  | params ->
+    let pats, exps =
+      gensyms "recur" (List.map params ~f:(fun (core_type, _) -> core_type.ptyp_loc))
+    in
+    eabstract
+      ~loc
+      pats
+      (eapply
+         ~loc
+         of_lazy
+         [ [%expr
+           lazy [%e eapply ~loc (eapply ~loc [%expr Base.Lazy.force] [ exp ]) exps]]
+         ])
+;;
+
 let maybe_mutually_recursive decls ~loc ~rec_flag ~of_lazy ~impl =
   let decls = List.map decls ~f:name_type_params_in_td in
   let rec_names =
@@ -274,11 +294,11 @@ let maybe_mutually_recursive decls ~loc ~rec_flag ~of_lazy ~impl =
     let pats = List.map impls ~f:(fun impl -> impl.pat) in
     let bindings =
       let inner_bindings =
-        List.map impls ~f:(fun inner ->
+        List.map2_exn decls impls ~f:(fun decl inner ->
           value_binding
             ~loc:inner.loc
             ~pat:inner.pat
-            ~expr:[%expr [%e of_lazy] [%e inner.var]])
+            ~expr:(close_the_loop ~of_lazy decl inner))
       in
       List.map impls ~f:(fun impl ->
         let exp =
@@ -291,7 +311,9 @@ let maybe_mutually_recursive decls ~loc ~rec_flag ~of_lazy ~impl =
         value_binding ~loc:impl.loc ~pat:impl.pat ~expr:lazy_expr)
     in
     let body =
-      pexp_tuple ~loc (List.map impls ~f:(fun impl -> [%expr [%e of_lazy] [%e impl.var]]))
+      pexp_tuple
+        ~loc
+        (List.map2_exn decls impls ~f:(fun decl impl -> close_the_loop ~of_lazy decl impl))
     in
     pstr_value_list
       ~loc
