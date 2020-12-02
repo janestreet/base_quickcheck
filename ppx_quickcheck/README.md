@@ -1,4 +1,8 @@
-# ppx_quickcheck
+---
+title: ppx_quickcheck
+parent: ../README.md
+uuid: e6710c5d-a8fc-37ec-1b67-69d9d5b616b9
+---
 
 Generation of Base_quickcheck generators, observers, and shrinkers from types.
 
