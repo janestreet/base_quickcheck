@@ -276,6 +276,10 @@ let list_permutations list =
     Array.to_list array)
 ;;
 
+let array t = map (list t) ~f:Array.of_list
+let ref t = map t ~f:Ref.create
+let lazy_t t = map t ~f:Lazy.from_val
+
 let char_uniform_inclusive lo hi =
   create (fun ~size:_ ~random ->
     Splittable_random.int random ~lo:(Char.to_int lo) ~hi:(Char.to_int hi)
@@ -626,6 +630,7 @@ let string_non_empty_of char_gen =
 let string = string_of char
 let string_non_empty = string_non_empty_of char
 let string_with_length ~length = string_with_length_of char ~length
+let bytes = map string ~f:Bytes.of_string
 
 let sexp_of atom =
   fixed_point (fun self ->

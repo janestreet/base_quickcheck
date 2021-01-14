@@ -1,7 +1,7 @@
 open! Import
 open Ppx_quickcheck_test_examples
 
-module Helpers = struct
+open struct
   module type S = sig
     type t
 
@@ -31,7 +31,11 @@ module Helpers = struct
   ;;
 end
 
-open Helpers
+include struct
+  module Base = struct end
+  module Base_quickcheck = struct end
+end
+
 module Simple_reference = Simple_reference
 module Dotted_reference = Dotted_reference
 module Nonrec_reference = Nonrec_reference

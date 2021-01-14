@@ -1,0 +1,31 @@
+type 'a t =
+  | Zero
+  | Succ of 'a t
+[@@deriving quickcheck]
+
+[%%expect {|
+|}]
+
+module With_base_shadowed = struct
+  module Base = struct end
+
+  type t =
+    | A
+    | B
+  [@@deriving quickcheck]
+end
+
+[%%expect {|
+|}]
+
+module With_base_quickcheck_shadowed = struct
+  module Base_quickcheck = struct end
+
+  type t =
+    | X
+    | Y
+  [@@deriving quickcheck]
+end
+
+[%%expect {|
+|}]

@@ -122,6 +122,10 @@ let list elt_t =
 ;;
 
 let string = map (list char) ~f:String.of_char_list ~f_inverse:String.to_list
+let bytes = map string ~f:Bytes.of_string ~f_inverse:Bytes.to_string
+let array t = map (list t) ~f:Array.of_list ~f_inverse:Array.to_list
+let ref t = map t ~f:Ref.create ~f_inverse:Ref.( ! )
+let lazy_t t = map t ~f:Lazy.from_val ~f_inverse:Lazy.force
 
 let sexp =
   fixed_point (fun shrinker ->

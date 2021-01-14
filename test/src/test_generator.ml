@@ -1352,6 +1352,17 @@ let%expect_test "string_with_length_of" =
        ("" "\000" " " 0 A _ z "\000\000" "  " 00 AA __)))) |}]
 ;;
 
+let bytes = Generator.bytes
+
+let%expect_test "bytes" =
+  test_generator ~mode:`inexhaustive Generator.bytes m_bytes;
+  [%expect
+    {|
+    (generator
+     ("generated 8_583 distinct values in 10_000 iterations"
+      ("did not generate these values" (" " "\000\000" "  " 00 AA __ zz)))) |}]
+;;
+
 let sexp = Generator.sexp
 
 let%expect_test "sexp" =
@@ -1440,6 +1451,27 @@ let%expect_test "list_permutations" =
       let examples = [ original_list; List.rev original_list ]
     end);
   [%expect {| (generator "generated 24 distinct values in 10_000 iterations") |}]
+;;
+
+let array = Generator.array
+
+let%expect_test "array" =
+  test_generator (Generator.array Generator.bool) (m_array m_bool);
+  [%expect {| (generator "generated 2_248 distinct values in 10_000 iterations") |}]
+;;
+
+let ref = Generator.ref
+
+let%expect_test "ref" =
+  test_generator (Generator.ref Generator.bool) (m_ref m_bool);
+  [%expect {| (generator exhaustive) |}]
+;;
+
+let lazy_t = Generator.lazy_t
+
+let%expect_test "lazy_t" =
+  test_generator (Generator.lazy_t Generator.bool) (m_lazy_t m_bool);
+  [%expect {| (generator exhaustive) |}]
 ;;
 
 let of_lazy = Generator.of_lazy

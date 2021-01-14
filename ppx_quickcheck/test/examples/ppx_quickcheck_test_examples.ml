@@ -1,6 +1,12 @@
 open Base
 open Base_quickcheck
 
+(* ensure that shadowing doesn't break anything *)
+include struct
+  module Base = struct end
+  module Base_quickcheck = struct end
+end
+
 module Simple_reference = struct
   type t = bool [@@deriving quickcheck]
 end

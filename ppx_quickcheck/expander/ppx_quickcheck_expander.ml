@@ -270,7 +270,12 @@ let close_the_loop ~of_lazy decl impl =
          ~loc
          of_lazy
          [ [%expr
-           lazy [%e eapply ~loc (eapply ~loc [%expr Base.Lazy.force] [ exp ]) exps]]
+           lazy
+             [%e
+               eapply
+                 ~loc
+                 (eapply ~loc [%expr Ppx_quickcheck_runtime.Base.Lazy.force] [ exp ])
+                 exps]]
          ])
 ;;
 
@@ -330,7 +335,7 @@ let generator_impl_list decls ~loc ~rec_flag =
     decls
     ~loc
     ~rec_flag
-    ~of_lazy:[%expr Base_quickcheck.Generator.of_lazy]
+    ~of_lazy:[%expr Ppx_quickcheck_runtime.Base_quickcheck.Generator.of_lazy]
     ~impl:generator_impl
 ;;
 
@@ -339,7 +344,7 @@ let observer_impl_list decls ~loc ~rec_flag =
     decls
     ~loc
     ~rec_flag
-    ~of_lazy:[%expr Base_quickcheck.Observer.of_lazy]
+    ~of_lazy:[%expr Ppx_quickcheck_runtime.Base_quickcheck.Observer.of_lazy]
     ~impl:observer_impl
 ;;
 
@@ -348,13 +353,17 @@ let shrinker_impl_list decls ~loc ~rec_flag =
     decls
     ~loc
     ~rec_flag
-    ~of_lazy:[%expr Base_quickcheck.Shrinker.of_lazy]
+    ~of_lazy:[%expr Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.of_lazy]
     ~impl:shrinker_impl
 ;;
 
 let intf type_decl ~f ~covar ~contravar =
-  let covar = Longident.parse ("Base_quickcheck." ^ covar ^ ".t") in
-  let contravar = Longident.parse ("Base_quickcheck." ^ contravar ^ ".t") in
+  let covar =
+    Longident.parse ("Ppx_quickcheck_runtime.Base_quickcheck." ^ covar ^ ".t")
+  in
+  let contravar =
+    Longident.parse ("Ppx_quickcheck_runtime.Base_quickcheck." ^ contravar ^ ".t")
+  in
   let type_decl = name_type_params_in_td type_decl in
   let loc = type_decl.ptype_loc in
   let name = loc_map type_decl.ptype_name ~f in

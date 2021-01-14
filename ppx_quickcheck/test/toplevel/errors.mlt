@@ -85,11 +85,3 @@ let _ = [%quickcheck.generator: _ list]
 Line _, characters _-_:
 Error: ppx_quickcheck: unsupported: wildcard type
 |}]
-
-type 'a t =
-  | Zero
-  | Succ of 'a t
-[@@deriving quickcheck]
-
-[%%expect {|
-|}]

@@ -124,6 +124,13 @@ let%expect_test "string" =
   [%expect {| (observer transparent) |}]
 ;;
 
+let bytes = Observer.bytes
+
+let%expect_test "bytes" =
+  test_observer Observer.bytes m_bytes;
+  [%expect {| (observer transparent) |}]
+;;
+
 let int = Observer.int
 
 let%expect_test "int" =
@@ -190,6 +197,27 @@ let%expect_test "list" =
   [%expect {| (observer transparent) |}]
 ;;
 
+let array = Observer.array
+
+let%expect_test "array" =
+  test_observer (Observer.array Observer.bool) (m_array m_bool);
+  [%expect {| (observer transparent) |}]
+;;
+
+let ref = Observer.ref
+
+let%expect_test "ref" =
+  test_observer (Observer.ref Observer.bool) (m_ref m_bool);
+  [%expect {| (observer transparent) |}]
+;;
+
+let lazy_t = Observer.lazy_t
+
+let%expect_test "lazy_t" =
+  test_observer (Observer.lazy_t Observer.bool) (m_lazy_t m_bool);
+  [%expect {| (observer transparent) |}]
+;;
+
 let either = Observer.either
 
 let%expect_test "either" =
@@ -237,7 +265,7 @@ let%expect_test "of_lazy, unforced" =
        ~f:(fun string -> Either.First string)
        ~f_inverse:(function
          | Either.First string -> string
-         | Either.Second (_ : (int, string) Type_equal.t) -> .));
+         | Either.Second (_ : Nothing.t) -> .));
   [%expect {| (observer transparent) |}]
 ;;
 

@@ -334,6 +334,10 @@ let m_list (type elt) (module Elt : With_examples with type t = elt) =
     with type t = elt list)
 ;;
 
+let m_array m = m_biject (m_list m) ~f:Array.of_list ~f_inverse:Array.to_list
+let m_ref m = m_biject m ~f:Ref.create ~f_inverse:Ref.( ! )
+let m_lazy_t m = m_biject m ~f:Lazy.from_val ~f_inverse:Lazy.force
+
 let m_arrow
       (type a b)
       (module A : With_examples with type t = a)
@@ -448,6 +452,8 @@ let m_string =
   end : With_examples
     with type t = string)
 ;;
+
+let m_bytes = m_biject m_string ~f:Bytes.of_string ~f_inverse:Bytes.to_string
 
 let m_nat ~up_to =
   (module struct
