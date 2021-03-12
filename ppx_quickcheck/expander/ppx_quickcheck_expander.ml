@@ -381,10 +381,10 @@ let intf type_decl ~f ~covar ~contravar =
     List.fold_right
       type_decl.ptype_params
       ~init:result
-      ~f:(fun (core_type, variance) result ->
+      ~f:(fun (core_type, (variance, _)) result ->
         let id =
           match variance with
-          | Invariant | Covariant -> covar
+          | NoVariance | Covariant -> covar
           | Contravariant -> contravar
         in
         let arg = ptyp_constr ~loc { loc; txt = id } [ core_type ] in
