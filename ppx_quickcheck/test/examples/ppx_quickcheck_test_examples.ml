@@ -292,4 +292,11 @@ module Do_not_generate_clauses = struct
       ]
     [@@deriving quickcheck]
   end
+
+  module Recursive = struct
+    type t =
+      | A
+      | B of t [@quickcheck.do_not_generate]
+    [@@deriving quickcheck]
+  end
 end

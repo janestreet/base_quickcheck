@@ -111,6 +111,11 @@ let variant
         ~loc:{ (Clause.location clause) with loc_ghost = true }
         [ weight; make_generator clause ])
   in
+  (* We filter out clauses with weight None now. If we don't, then we can get code in
+     [body] below that relies on bindings that don't get generated. *)
+  let clauses =
+    List.filter clauses ~f:(fun clause -> Option.is_some (Clause.weight clause))
+  in
   match
     List.partition_tf clauses ~f:(fun clause ->
       clause_is_recursive ~clause ~rec_names (module Clause))

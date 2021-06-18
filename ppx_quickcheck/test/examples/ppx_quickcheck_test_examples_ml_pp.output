@@ -2531,4 +2531,78 @@ module Do_not_generate_clauses =
             let _ = quickcheck_shrinker
           end[@@ocaml.doc "@inline"][@@merlin.hide ]
       end
+    module Recursive =
+      struct
+        type t =
+          | A 
+          | B of t [@quickcheck.do_not_generate ][@@deriving quickcheck]
+        include
+          struct
+            let _ = fun (_ : t) -> ()
+            let quickcheck_generator =
+              let rec quickcheck_generator =
+                lazy
+                  (let quickcheck_generator =
+                     Ppx_quickcheck_runtime.Base_quickcheck.Generator.of_lazy
+                       quickcheck_generator in
+                   ignore quickcheck_generator;
+                   Ppx_quickcheck_runtime.Base_quickcheck.Generator.weighted_union
+                     [(1.,
+                        (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
+                           (fun ~size:_size__375_ ->
+                              fun ~random:_random__376_ -> A)))]) in
+              Ppx_quickcheck_runtime.Base_quickcheck.Generator.of_lazy
+                quickcheck_generator
+            let _ = quickcheck_generator
+            let quickcheck_observer =
+              let rec quickcheck_observer =
+                lazy
+                  (let quickcheck_observer =
+                     Ppx_quickcheck_runtime.Base_quickcheck.Observer.of_lazy
+                       quickcheck_observer in
+                   ignore quickcheck_observer;
+                   Ppx_quickcheck_runtime.Base_quickcheck.Observer.create
+                     (fun _x__371_ ->
+                        fun ~size:_size__372_ ->
+                          fun ~hash:_hash__373_ ->
+                            match _x__371_ with
+                            | A ->
+                                let _hash__373_ =
+                                  Ppx_quickcheck_runtime.Base.hash_fold_int
+                                    _hash__373_ 0 in
+                                _hash__373_
+                            | B _x__374_ ->
+                                let _hash__373_ =
+                                  Ppx_quickcheck_runtime.Base.hash_fold_int
+                                    _hash__373_ 1 in
+                                let _hash__373_ =
+                                  Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                                    quickcheck_observer _x__374_
+                                    ~size:_size__372_ ~hash:_hash__373_ in
+                                _hash__373_)) in
+              Ppx_quickcheck_runtime.Base_quickcheck.Observer.of_lazy
+                quickcheck_observer
+            let _ = quickcheck_observer
+            let quickcheck_shrinker =
+              let rec quickcheck_shrinker =
+                lazy
+                  (let quickcheck_shrinker =
+                     Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.of_lazy
+                       quickcheck_shrinker in
+                   ignore quickcheck_shrinker;
+                   Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.create
+                     (function
+                      | A ->
+                          Ppx_quickcheck_runtime.Base.Sequence.round_robin []
+                      | B _x__370_ ->
+                          Ppx_quickcheck_runtime.Base.Sequence.round_robin
+                            [Ppx_quickcheck_runtime.Base.Sequence.map
+                               (Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.shrink
+                                  quickcheck_shrinker _x__370_)
+                               ~f:(fun _x__370_ -> B _x__370_)])) in
+              Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.of_lazy
+                quickcheck_shrinker
+            let _ = quickcheck_shrinker
+          end[@@ocaml.doc "@inline"][@@merlin.hide ]
+      end
   end

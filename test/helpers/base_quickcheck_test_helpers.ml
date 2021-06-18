@@ -240,9 +240,7 @@ let test_shrinker (type a) ?config:_ ?(mode = `compound) ?cr shrinker m =
       ~if_false_then_print_s:(lazy [%message "compound shrinker should shrink values"])
 ;;
 
-let percent ~count ~total =
-  Core_kernel.Percent.of_mult (Float.of_int count /. Float.of_int total)
-;;
+let percent ~count ~total = Core.Percent.of_mult (Float.of_int count /. Float.of_int total)
 
 let show_distribution (type a) ?config ?(show = 20) generator m =
   let (module Value : Value with type t = a) = m in
@@ -266,7 +264,7 @@ let show_distribution (type a) ?config ?(show = 20) generator m =
       |> List.rev
       |> fun list -> List.take list show
     in
-    print_s [%sexp (value_by_count : (Core_kernel.Percent.t * Value.t) list)])
+    print_s [%sexp (value_by_count : (Core.Percent.t * Value.t) list)])
 ;;
 
 module type Exhaustive = sig
