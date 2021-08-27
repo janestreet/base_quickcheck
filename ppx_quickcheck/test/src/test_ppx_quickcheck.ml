@@ -241,7 +241,7 @@ module Simple_higher_order = Simple_higher_order
 module Named_higher_order = Named_higher_order
 module Optional_higher_order = Optional_higher_order
 
-let%expect_test ("higher order arrow type"[@tags "64-bits-only"]) =
+let%expect_test ("higher order arrow type" [@tags "64-bits-only"]) =
   let config = { Test.default_config with test_count = 100 } in
   let test m = test ~config ~shrinker:`atomic m in
   test

@@ -435,14 +435,14 @@ let%expect_test "small_strictly_positive_int" =
 
 let int = Generator.int
 
-let%expect_test ("int"[@tags "64-bits-only"]) =
+let%expect_test ("int" [@tags "64-bits-only"]) =
   test_generator Generator.int (m_int (module Int));
   [%expect {| (generator "generated 8_006 distinct values in 10_000 iterations") |}]
 ;;
 
 let int_uniform = Generator.int_uniform
 
-let%expect_test ("int_uniform"[@tags "64-bits-only"]) =
+let%expect_test ("int_uniform" [@tags "64-bits-only"]) =
   test_generator ~mode:`inexhaustive Generator.int_uniform (m_int (module Int));
   [%expect
     {|
@@ -870,14 +870,14 @@ let%expect_test "int64_log_uniform_inclusive" =
 
 let nativeint = Generator.nativeint
 
-let%expect_test ("nativeint"[@tags "64-bits-only"]) =
+let%expect_test ("nativeint" [@tags "64-bits-only"]) =
   test_generator Generator.nativeint (m_int (module Nativeint));
   [%expect {| (generator "generated 8_047 distinct values in 10_000 iterations") |}]
 ;;
 
 let nativeint_uniform = Generator.nativeint_uniform
 
-let%expect_test ("nativeint_uniform"[@tags "64-bits-only"]) =
+let%expect_test ("nativeint_uniform" [@tags "64-bits-only"]) =
   test_generator
     ~mode:`inexhaustive
     Generator.nativeint_uniform
