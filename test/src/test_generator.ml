@@ -1,3 +1,4 @@
+open! Base
 open! Import
 
 type 'a t = 'a Generator.t
@@ -1543,3 +1544,69 @@ let%expect_test "[float32_mat], [float64_mat]" =
   test float64_mat [%sexp_of: float];
   [%expect {| (generator "generated 7_022 distinct values in 10_000 iterations") |}]
 ;;
+
+module Debug = struct
+  let coverage = Generator.Debug.coverage
+
+  let%expect_test "[coverage]" =
+    let test config =
+      Generator.string_of (Generator.return '.')
+      |> Test.with_sample_exn ~config ~f:(fun sample ->
+        let counts = coverage (module Int) (Sequence.map sample ~f:String.length) in
+        counts |> [%sexp_of: int Map.M(Int).t] |> print_s)
+    in
+    (* small sample size *)
+    test { Test.default_config with test_count = 3 };
+    [%expect {| ((0 1) (1 1) (3 1)) |}];
+    (* larger sample size *)
+    test { Test.default_config with test_count = 10 };
+    [%expect {| ((0 2) (1 2) (2 1) (3 1) (4 2) (6 1) (10 1)) |}];
+    (* nonstandard sizes *)
+    test { Test.default_config with sizes = Sequence.cycle_list_exn [ 1; 2 ] };
+    [%expect {| ((0 2466) (1 2534) (2 3304) (3 1696)) |}];
+    (* not enough sizes *)
+    require_does_raise [%here] (fun () ->
+      test { Test.default_config with sizes = Sequence.init 10 ~f:Fn.id });
+    [%expect
+      {|
+      ("Base_quickcheck.Test.run: insufficient size values for test count"
+       (test_count 10000)
+       (number_of_size_values 10)) |}]
+  ;;
+
+  let monitor = Generator.Debug.monitor
+
+  let%expect_test "[iter]" =
+    let before = Base.ref 0 in
+    let after = Base.ref 0 in
+    let test n ~f =
+      let t =
+        bool
+        |> monitor ~f:(fun _ -> Int.incr before)
+        |> Generator.filter ~f
+        |> monitor ~f:(fun _ -> Int.incr after)
+      in
+      Test.with_sample_exn
+        t
+        ~config:{ Test.default_config with test_count = n }
+        ~f:(Sequence.iter ~f:ignore);
+      print_s [%message "counts" (before : int ref) (after : int ref)]
+    in
+    let all (_ : bool) = true in
+    let half bool = bool in
+    test 10 ~f:all;
+    [%expect {| (counts (before 10) (after 10)) |}];
+    (* state must be reset manually *)
+    test 10 ~f:all;
+    [%expect {| (counts (before 20) (after 20)) |}];
+    before := 0;
+    test 0 ~f:all;
+    [%expect {| (counts (before 0) (after 20)) |}];
+    after := 0;
+    test 0 ~f:all;
+    [%expect {| (counts (before 0) (after 0)) |}];
+    (* [iter] reflects internal behavior such as filtering *)
+    test 10 ~f:half;
+    [%expect {| (counts (before 16) (after 10)) |}]
+  ;;
+end

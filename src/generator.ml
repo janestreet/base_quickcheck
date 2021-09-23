@@ -723,3 +723,25 @@ let bigarray2 t kind layout =
 
 let float32_mat = bigarray2 float Float32 Fortran_layout
 let float64_mat = bigarray2 float Float64 Fortran_layout
+
+module Debug = struct
+  let coverage
+        (type k cmp)
+        (module Cmp : Comparator.S with type t = k and type comparator_witness = cmp)
+        sample
+    =
+    Sequence.fold
+      sample
+      ~init:(Map.empty (module Cmp))
+      ~f:(fun counts value ->
+        Map.update counts value ~f:(function
+          | None -> 1
+          | Some prev -> prev + 1))
+  ;;
+
+  let monitor t ~f =
+    map t ~f:(fun value ->
+      f value;
+      value)
+  ;;
+end
