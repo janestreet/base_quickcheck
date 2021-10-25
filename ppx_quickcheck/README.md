@@ -57,6 +57,8 @@ let observer = [%quickcheck.observer: float * int * [`A | `B | `C]]
 let shrinker = [%quickcheck.shrinker: float * int * [`A | `B | `C]]
 ```
 
+For maps, the syntax that works is [%quickcheck.generator: bool Map.M(String).t].
+
 Attributes
 ----------
 
