@@ -81,7 +81,7 @@ let%expect_test "fn" =
      ((false true) (true false))
      ((false true) (true true))) |}];
   let higher_order = m_arrow first_order m_bool in
-  let (module Higher_order) = higher_order in
+  let (module _) = higher_order in
   test_observer
     ~config
     (Observer.fn (Generator.fn Observer.bool Generator.bool) Observer.bool)

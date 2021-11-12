@@ -2531,7 +2531,7 @@ module Do_not_generate_clauses =
             let _ = quickcheck_shrinker
           end[@@ocaml.doc "@inline"][@@merlin.hide ]
       end
-    module Recursive =
+    module _ =
       struct
         type t =
           | A 
