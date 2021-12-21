@@ -109,6 +109,12 @@ module type Base_quickcheck_test_helpers = sig
     -> (module With_examples with type t = 'b)
     -> (module With_examples with type t = 'a * 'b)
 
+  val m_triple
+    :  (module With_examples with type t = 'a)
+    -> (module With_examples with type t = 'b)
+    -> (module With_examples with type t = 'c)
+    -> (module With_examples with type t = 'a * 'b * 'c)
+
   val m_arrow
     :  (module With_examples with type t = 'a)
     -> (module With_examples with type t = 'b)

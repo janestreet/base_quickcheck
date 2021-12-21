@@ -5,6 +5,7 @@ open Base_quickcheck
 include struct
   module Base = struct end
   module Base_quickcheck = struct end
+  module Quickcheckable = struct end
 end
 
 module Simple_reference = struct
@@ -126,6 +127,15 @@ end
 
 module Instance_of_binary = struct
   type t = (bool, unit option) Poly_binary.t [@@deriving quickcheck]
+end
+
+module Poly_ternary = struct
+  type ('a, 'b, 'c) t = 'a * 'b * 'c [@@deriving quickcheck]
+end
+
+module Instance_of_ternary = struct
+  type t = (bool, unit option, (unit option, bool) Poly_binary.t) Poly_ternary.t
+  [@@deriving quickcheck]
 end
 
 module Poly_with_variance = struct

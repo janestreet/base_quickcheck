@@ -34,6 +34,7 @@ end
 include struct
   module Base = struct end
   module Base_quickcheck = struct end
+  module Quickcheckable = struct end
 end
 
 module Simple_reference = Simple_reference
@@ -274,6 +275,8 @@ module Poly_unary = Poly_unary
 module Instance_of_unary = Instance_of_unary
 module Poly_binary = Poly_binary
 module Instance_of_binary = Instance_of_binary
+module Poly_ternary = Poly_ternary
+module Instance_of_ternary = Instance_of_ternary
 module Poly_with_variance = Poly_with_variance
 module Instance_with_variance = Instance_with_variance
 module Poly_with_phantom = Poly_with_phantom
@@ -298,6 +301,30 @@ let%expect_test "polymorphic type" =
     (generator exhaustive)
     (observer transparent)
     (shrinker (((false (())) => (false ())) ((true (())) => (true ())))) |}];
+  test
+    (module Instance_of_ternary)
+    (m_triple m_bool (m_option m_unit) (m_pair (m_option m_unit) m_bool));
+  [%expect
+    {|
+    (generator exhaustive)
+    (observer transparent)
+    (shrinker
+     (((false () ((()) false)) => (false () (() false)))
+      ((false () ((()) true)) => (false () (() true)))
+      ((false (()) (() false)) => (false () (() false)))
+      ((false (()) (() true)) => (false () (() true)))
+      ((false (()) ((()) false)) => (false () ((()) false)))
+      ((false (()) ((()) false)) => (false (()) (() false)))
+      ((false (()) ((()) true)) => (false () ((()) true)))
+      ((false (()) ((()) true)) => (false (()) (() true)))
+      ((true () ((()) false)) => (true () (() false)))
+      ((true () ((()) true)) => (true () (() true)))
+      ((true (()) (() false)) => (true () (() false)))
+      ((true (()) (() true)) => (true () (() true)))
+      ((true (()) ((()) false)) => (true () ((()) false)))
+      ((true (()) ((()) false)) => (true (()) (() false)))
+      ((true (()) ((()) true)) => (true () ((()) true)))
+      ((true (()) ((()) true)) => (true (()) (() true))))) |}];
   test
     (module Instance_with_variance)
     (m_pair (m_option m_unit) (m_arrow m_bool (m_option m_unit)));

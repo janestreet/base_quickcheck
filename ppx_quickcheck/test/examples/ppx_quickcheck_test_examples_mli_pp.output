@@ -1,21 +1,18 @@
 open Base
-open Base_quickcheck
 include
   module type of
-    struct module Base = struct  end
-           module Base_quickcheck = struct  end end
+    struct
+      module Base = struct  end
+      module Base_quickcheck = struct  end
+      module Quickcheckable = struct  end
+    end
 module Simple_reference :
 sig
   type t = bool[@@deriving quickcheck]
   include
     sig
       [@@@ocaml.warning "-32"]
-      val quickcheck_generator :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
-      val quickcheck_observer :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
-      val quickcheck_shrinker :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      include Ppx_quickcheck_runtime.Quickcheckable.S with type  t :=  t
     end[@@ocaml.doc "@inline"][@@merlin.hide ]
 end
 module Dotted_reference :
@@ -24,12 +21,7 @@ sig
   include
     sig
       [@@@ocaml.warning "-32"]
-      val quickcheck_generator :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
-      val quickcheck_observer :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
-      val quickcheck_shrinker :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      include Ppx_quickcheck_runtime.Quickcheckable.S with type  t :=  t
     end[@@ocaml.doc "@inline"][@@merlin.hide ]
 end
 module Nonrec_reference :
@@ -39,12 +31,7 @@ sig
   include
     sig
       [@@@ocaml.warning "-32"]
-      val quickcheck_generator :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
-      val quickcheck_observer :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
-      val quickcheck_shrinker :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      include Ppx_quickcheck_runtime.Quickcheckable.S with type  t :=  t
     end[@@ocaml.doc "@inline"][@@merlin.hide ]
 end
 module Application_of_polymorphic_type :
@@ -53,12 +40,7 @@ sig
   include
     sig
       [@@@ocaml.warning "-32"]
-      val quickcheck_generator :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
-      val quickcheck_observer :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
-      val quickcheck_shrinker :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      include Ppx_quickcheck_runtime.Quickcheckable.S with type  t :=  t
     end[@@ocaml.doc "@inline"][@@merlin.hide ]
 end
 module Tuple :
@@ -67,12 +49,7 @@ sig
   include
     sig
       [@@@ocaml.warning "-32"]
-      val quickcheck_generator :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
-      val quickcheck_observer :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
-      val quickcheck_shrinker :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      include Ppx_quickcheck_runtime.Quickcheckable.S with type  t :=  t
     end[@@ocaml.doc "@inline"][@@merlin.hide ]
 end
 module Poly_variant :
@@ -83,12 +60,7 @@ sig
   include
     sig
       [@@@ocaml.warning "-32"]
-      val quickcheck_generator :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
-      val quickcheck_observer :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
-      val quickcheck_shrinker :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      include Ppx_quickcheck_runtime.Quickcheckable.S with type  t :=  t
     end[@@ocaml.doc "@inline"][@@merlin.hide ]
 end
 module Inherit_poly_variant :
@@ -98,12 +70,7 @@ sig
   include
     sig
       [@@@ocaml.warning "-32"]
-      val quickcheck_generator :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
-      val quickcheck_observer :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
-      val quickcheck_shrinker :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      include Ppx_quickcheck_runtime.Quickcheckable.S with type  t :=  t
     end[@@ocaml.doc "@inline"][@@merlin.hide ]
 end
 module Record_type :
@@ -114,12 +81,7 @@ sig
   include
     sig
       [@@@ocaml.warning "-32"]
-      val quickcheck_generator :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
-      val quickcheck_observer :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
-      val quickcheck_shrinker :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      include Ppx_quickcheck_runtime.Quickcheckable.S with type  t :=  t
     end[@@ocaml.doc "@inline"][@@merlin.hide ]
 end
 module Nullary_and_unary_variant :
@@ -132,12 +94,7 @@ sig
   include
     sig
       [@@@ocaml.warning "-32"]
-      val quickcheck_generator :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
-      val quickcheck_observer :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
-      val quickcheck_shrinker :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      include Ppx_quickcheck_runtime.Quickcheckable.S with type  t :=  t
     end[@@ocaml.doc "@inline"][@@merlin.hide ]
 end
 module Binary_and_record_variant :
@@ -154,12 +111,7 @@ sig
   include
     sig
       [@@@ocaml.warning "-32"]
-      val quickcheck_generator :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
-      val quickcheck_observer :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
-      val quickcheck_shrinker :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      include Ppx_quickcheck_runtime.Quickcheckable.S with type  t :=  t
     end[@@ocaml.doc "@inline"][@@merlin.hide ]
 end
 module Simple_arrow :
@@ -168,12 +120,7 @@ sig
   include
     sig
       [@@@ocaml.warning "-32"]
-      val quickcheck_generator :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
-      val quickcheck_observer :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
-      val quickcheck_shrinker :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      include Ppx_quickcheck_runtime.Quickcheckable.S with type  t :=  t
     end[@@ocaml.doc "@inline"][@@merlin.hide ]
 end
 module Named_arrow :
@@ -182,12 +129,7 @@ sig
   include
     sig
       [@@@ocaml.warning "-32"]
-      val quickcheck_generator :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
-      val quickcheck_observer :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
-      val quickcheck_shrinker :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      include Ppx_quickcheck_runtime.Quickcheckable.S with type  t :=  t
     end[@@ocaml.doc "@inline"][@@merlin.hide ]
 end
 module Optional_arrow :
@@ -196,12 +138,7 @@ sig
   include
     sig
       [@@@ocaml.warning "-32"]
-      val quickcheck_generator :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
-      val quickcheck_observer :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
-      val quickcheck_shrinker :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      include Ppx_quickcheck_runtime.Quickcheckable.S with type  t :=  t
     end[@@ocaml.doc "@inline"][@@merlin.hide ]
 end
 module Curried_arrow :
@@ -210,12 +147,7 @@ sig
   include
     sig
       [@@@ocaml.warning "-32"]
-      val quickcheck_generator :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
-      val quickcheck_observer :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
-      val quickcheck_shrinker :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      include Ppx_quickcheck_runtime.Quickcheckable.S with type  t :=  t
     end[@@ocaml.doc "@inline"][@@merlin.hide ]
 end
 module Simple_higher_order :
@@ -224,12 +156,7 @@ sig
   include
     sig
       [@@@ocaml.warning "-32"]
-      val quickcheck_generator :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
-      val quickcheck_observer :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
-      val quickcheck_shrinker :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      include Ppx_quickcheck_runtime.Quickcheckable.S with type  t :=  t
     end[@@ocaml.doc "@inline"][@@merlin.hide ]
 end
 module Named_higher_order :
@@ -238,12 +165,7 @@ sig
   include
     sig
       [@@@ocaml.warning "-32"]
-      val quickcheck_generator :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
-      val quickcheck_observer :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
-      val quickcheck_shrinker :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      include Ppx_quickcheck_runtime.Quickcheckable.S with type  t :=  t
     end[@@ocaml.doc "@inline"][@@merlin.hide ]
 end
 module Optional_higher_order :
@@ -253,12 +175,7 @@ sig
   include
     sig
       [@@@ocaml.warning "-32"]
-      val quickcheck_generator :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
-      val quickcheck_observer :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
-      val quickcheck_shrinker :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      include Ppx_quickcheck_runtime.Quickcheckable.S with type  t :=  t
     end[@@ocaml.doc "@inline"][@@merlin.hide ]
 end
 module Poly_unary :
@@ -267,15 +184,8 @@ sig
   include
     sig
       [@@@ocaml.warning "-32"]
-      val quickcheck_generator :
-        'a Ppx_quickcheck_runtime.Base_quickcheck.Generator.t ->
-          'a t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
-      val quickcheck_observer :
-        'a Ppx_quickcheck_runtime.Base_quickcheck.Observer.t ->
-          'a t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
-      val quickcheck_shrinker :
-        'a Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t ->
-          'a t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      include
+        Ppx_quickcheck_runtime.Quickcheckable.S1 with type 'a t :=  'a t
     end[@@ocaml.doc "@inline"][@@merlin.hide ]
 end
 module Instance_of_unary :
@@ -284,12 +194,7 @@ sig
   include
     sig
       [@@@ocaml.warning "-32"]
-      val quickcheck_generator :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
-      val quickcheck_observer :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
-      val quickcheck_shrinker :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      include Ppx_quickcheck_runtime.Quickcheckable.S with type  t :=  t
     end[@@ocaml.doc "@inline"][@@merlin.hide ]
 end
 module Poly_binary :
@@ -298,18 +203,9 @@ sig
   include
     sig
       [@@@ocaml.warning "-32"]
-      val quickcheck_generator :
-        'a Ppx_quickcheck_runtime.Base_quickcheck.Generator.t ->
-          'b Ppx_quickcheck_runtime.Base_quickcheck.Generator.t ->
-            ('a, 'b) t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
-      val quickcheck_observer :
-        'a Ppx_quickcheck_runtime.Base_quickcheck.Observer.t ->
-          'b Ppx_quickcheck_runtime.Base_quickcheck.Observer.t ->
-            ('a, 'b) t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
-      val quickcheck_shrinker :
-        'a Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t ->
-          'b Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t ->
-            ('a, 'b) t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      include
+        Ppx_quickcheck_runtime.Quickcheckable.S2 with type ('a,'b) t := 
+          ('a, 'b) t
     end[@@ocaml.doc "@inline"][@@merlin.hide ]
 end
 module Instance_of_binary :
@@ -318,12 +214,29 @@ sig
   include
     sig
       [@@@ocaml.warning "-32"]
-      val quickcheck_generator :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
-      val quickcheck_observer :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
-      val quickcheck_shrinker :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      include Ppx_quickcheck_runtime.Quickcheckable.S with type  t :=  t
+    end[@@ocaml.doc "@inline"][@@merlin.hide ]
+end
+module Poly_ternary :
+sig
+  type ('a, 'b, 'c) t = ('a * 'b * 'c)[@@deriving quickcheck]
+  include
+    sig
+      [@@@ocaml.warning "-32"]
+      include
+        Ppx_quickcheck_runtime.Quickcheckable.S3 with type ('a,'b,'c) t := 
+          ('a, 'b, 'c) t
+    end[@@ocaml.doc "@inline"][@@merlin.hide ]
+end
+module Instance_of_ternary :
+sig
+  type t =
+    (bool, unit option, (unit option, bool) Poly_binary.t) Poly_ternary.t
+  [@@deriving quickcheck]
+  include
+    sig
+      [@@@ocaml.warning "-32"]
+      include Ppx_quickcheck_runtime.Quickcheckable.S with type  t :=  t
     end[@@ocaml.doc "@inline"][@@merlin.hide ]
 end
 module Poly_with_variance :
@@ -352,12 +265,7 @@ sig
   include
     sig
       [@@@ocaml.warning "-32"]
-      val quickcheck_generator :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
-      val quickcheck_observer :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
-      val quickcheck_shrinker :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      include Ppx_quickcheck_runtime.Quickcheckable.S with type  t :=  t
     end[@@ocaml.doc "@inline"][@@merlin.hide ]
 end
 module Poly_with_phantom :
@@ -366,15 +274,9 @@ sig
   include
     sig
       [@@@ocaml.warning "-32"]
-      val quickcheck_generator :
-        'v_x__003_ Ppx_quickcheck_runtime.Base_quickcheck.Generator.t ->
-          'v_x__003_ t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
-      val quickcheck_observer :
-        'v_x__002_ Ppx_quickcheck_runtime.Base_quickcheck.Observer.t ->
-          'v_x__002_ t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
-      val quickcheck_shrinker :
-        'v_x__001_ Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t ->
-          'v_x__001_ t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      include
+        Ppx_quickcheck_runtime.Quickcheckable.S1 with type 'v_x__001_ t := 
+          'v_x__001_ t
     end[@@ocaml.doc "@inline"][@@merlin.hide ]
 end with type _ t =  unit option
 module Instance_with_phantom :
@@ -383,12 +285,7 @@ sig
   include
     sig
       [@@@ocaml.warning "-32"]
-      val quickcheck_generator :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
-      val quickcheck_observer :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
-      val quickcheck_shrinker :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      include Ppx_quickcheck_runtime.Quickcheckable.S with type  t :=  t
     end[@@ocaml.doc "@inline"][@@merlin.hide ]
 end
 module Recursive :
@@ -399,12 +296,7 @@ sig
   include
     sig
       [@@@ocaml.warning "-32"]
-      val quickcheck_generator :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
-      val quickcheck_observer :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
-      val quickcheck_shrinker :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      include Ppx_quickcheck_runtime.Quickcheckable.S with type  t :=  t
     end[@@ocaml.doc "@inline"][@@merlin.hide ]
 end
 module Recursive_with_indirect_base_case :
@@ -414,12 +306,7 @@ sig
   include
     sig
       [@@@ocaml.warning "-32"]
-      val quickcheck_generator :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
-      val quickcheck_observer :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
-      val quickcheck_shrinker :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      include Ppx_quickcheck_runtime.Quickcheckable.S with type  t :=  t
     end[@@ocaml.doc "@inline"][@@merlin.hide ]
 end
 module Mutually_recursive :
@@ -461,15 +348,8 @@ sig
   include
     sig
       [@@@ocaml.warning "-32"]
-      val quickcheck_generator :
-        'a Ppx_quickcheck_runtime.Base_quickcheck.Generator.t ->
-          'a t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
-      val quickcheck_observer :
-        'a Ppx_quickcheck_runtime.Base_quickcheck.Observer.t ->
-          'a t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
-      val quickcheck_shrinker :
-        'a Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t ->
-          'a t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      include
+        Ppx_quickcheck_runtime.Quickcheckable.S1 with type 'a t :=  'a t
     end[@@ocaml.doc "@inline"][@@merlin.hide ]
 end
 module Instance_of_recursive :
@@ -478,27 +358,26 @@ sig
   include
     sig
       [@@@ocaml.warning "-32"]
-      val quickcheck_generator :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
-      val quickcheck_observer :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
-      val quickcheck_shrinker :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      include Ppx_quickcheck_runtime.Quickcheckable.S with type  t :=  t
     end[@@ocaml.doc "@inline"][@@merlin.hide ]
 end
 module Extensions :
 sig
-  type t = [ `A  | `B of (bool * unit option) ]
-  val quickcheck_generator : t Generator.t
-  val quickcheck_observer : t Observer.t
-  val quickcheck_shrinker : t Shrinker.t
+  type t = [ `A  | `B of (bool * unit option) ][@@deriving quickcheck]
+  include
+    sig
+      [@@@ocaml.warning "-32"]
+      include Ppx_quickcheck_runtime.Quickcheckable.S with type  t :=  t
+    end[@@ocaml.doc "@inline"][@@merlin.hide ]
 end
 module Escaped :
 sig
-  type t = (int * char * bool option)
-  val quickcheck_generator : t Generator.t
-  val quickcheck_observer : t Observer.t
-  val quickcheck_shrinker : t Shrinker.t
+  type t = (int * char * bool option)[@@deriving quickcheck]
+  include
+    sig
+      [@@@ocaml.warning "-32"]
+      include Ppx_quickcheck_runtime.Quickcheckable.S with type  t :=  t
+    end[@@ocaml.doc "@inline"][@@merlin.hide ]
 end
 module Wildcard :
 functor (Elt : sig type t val examples : t list end) ->
@@ -507,12 +386,7 @@ functor (Elt : sig type t val examples : t list end) ->
     include
       sig
         [@@@ocaml.warning "-32"]
-        val quickcheck_generator :
-          t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
-        val quickcheck_observer :
-          t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
-        val quickcheck_shrinker :
-          t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+        include Ppx_quickcheck_runtime.Quickcheckable.S with type  t :=  t
       end[@@ocaml.doc "@inline"][@@merlin.hide ]
   end
 module Attribute_override :
@@ -524,12 +398,7 @@ sig
   include
     sig
       [@@@ocaml.warning "-32"]
-      val quickcheck_generator :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
-      val quickcheck_observer :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
-      val quickcheck_shrinker :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      include Ppx_quickcheck_runtime.Quickcheckable.S with type  t :=  t
     end[@@ocaml.doc "@inline"][@@merlin.hide ]
 end
 module Attribute_override_recursive :
@@ -541,12 +410,7 @@ sig
   include
     sig
       [@@@ocaml.warning "-32"]
-      val quickcheck_generator :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
-      val quickcheck_observer :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
-      val quickcheck_shrinker :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      include Ppx_quickcheck_runtime.Quickcheckable.S with type  t :=  t
     end[@@ocaml.doc "@inline"][@@merlin.hide ]
 end
 module Deriving_from_wildcard :
@@ -556,16 +420,16 @@ sig
     sig
       [@@@ocaml.warning "-32"]
       val quickcheck_generator_transparent :
-        'v_x__006_ Ppx_quickcheck_runtime.Base_quickcheck.Generator.t ->
-          'v_x__006_ transparent
+        'v_x__004_ Ppx_quickcheck_runtime.Base_quickcheck.Generator.t ->
+          'v_x__004_ transparent
             Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
       val quickcheck_observer_transparent :
-        'v_x__005_ Ppx_quickcheck_runtime.Base_quickcheck.Observer.t ->
-          'v_x__005_ transparent
+        'v_x__003_ Ppx_quickcheck_runtime.Base_quickcheck.Observer.t ->
+          'v_x__003_ transparent
             Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
       val quickcheck_shrinker_transparent :
-        'v_x__004_ Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t ->
-          'v_x__004_ transparent
+        'v_x__002_ Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t ->
+          'v_x__002_ transparent
             Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
     end[@@ocaml.doc "@inline"][@@merlin.hide ]
   type _ opaque[@@deriving quickcheck]
@@ -573,15 +437,15 @@ sig
     sig
       [@@@ocaml.warning "-32"]
       val quickcheck_generator_opaque :
-        'v_x__009_ Ppx_quickcheck_runtime.Base_quickcheck.Generator.t ->
-          'v_x__009_ opaque
+        'v_x__007_ Ppx_quickcheck_runtime.Base_quickcheck.Generator.t ->
+          'v_x__007_ opaque
             Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
       val quickcheck_observer_opaque :
-        'v_x__008_ Ppx_quickcheck_runtime.Base_quickcheck.Observer.t ->
-          'v_x__008_ opaque Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
+        'v_x__006_ Ppx_quickcheck_runtime.Base_quickcheck.Observer.t ->
+          'v_x__006_ opaque Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
       val quickcheck_shrinker_opaque :
-        'v_x__007_ Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t ->
-          'v_x__007_ opaque Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+        'v_x__005_ Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t ->
+          'v_x__005_ opaque Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
     end[@@ocaml.doc "@inline"][@@merlin.hide ]
   val compare_opaque : ('a -> 'a -> int) -> 'a opaque -> 'a opaque -> int
   val sexp_of_opaque : ('a -> Sexp.t) -> 'a opaque -> Sexp.t
@@ -602,12 +466,7 @@ sig
   include
     sig
       [@@@ocaml.warning "-32"]
-      val quickcheck_generator :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
-      val quickcheck_observer :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
-      val quickcheck_shrinker :
-        t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      include Ppx_quickcheck_runtime.Quickcheckable.S with type  t :=  t
     end[@@ocaml.doc "@inline"][@@merlin.hide ]
   module Poly :
   sig
@@ -617,12 +476,7 @@ sig
     include
       sig
         [@@@ocaml.warning "-32"]
-        val quickcheck_generator :
-          t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
-        val quickcheck_observer :
-          t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
-        val quickcheck_shrinker :
-          t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+        include Ppx_quickcheck_runtime.Quickcheckable.S with type  t :=  t
       end[@@ocaml.doc "@inline"][@@merlin.hide ]
   end
 end

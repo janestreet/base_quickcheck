@@ -431,6 +431,23 @@ let m_pair
     with type t = a * b)
 ;;
 
+let m_triple
+      (type a b c)
+      (module A : With_examples with type t = a)
+      (module B : With_examples with type t = b)
+      (module C : With_examples with type t = c)
+  =
+  (module struct
+    type t = A.t * B.t * C.t [@@deriving compare, sexp_of]
+
+    let examples =
+      List.cartesian_product (List.cartesian_product A.examples B.examples) C.examples
+      |> List.map ~f:(fun ((a, b), c) -> a, b, c)
+    ;;
+  end : With_examples
+    with type t = a * b * c)
+;;
+
 let m_string =
   (module struct
     type t = string [@@deriving sexp_of]

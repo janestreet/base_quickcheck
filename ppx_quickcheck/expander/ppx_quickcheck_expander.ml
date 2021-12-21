@@ -400,9 +400,33 @@ let generator_intf_list type_decl_list = List.map type_decl_list ~f:generator_in
 let observer_intf_list type_decl_list = List.map type_decl_list ~f:observer_intf
 let shrinker_intf_list type_decl_list = List.map type_decl_list ~f:shrinker_intf
 
+let try_include_decl type_decl_list ~loc =
+  match type_decl_list with
+  | [ type_decl ] ->
+    let has_contravariant_arg =
+      List.exists type_decl.ptype_params ~f:(fun (_type, (variance, _inj)) ->
+        match variance with
+        | Contravariant -> true
+        | NoVariance | Covariant -> false)
+    in
+    if has_contravariant_arg
+    then None
+    else (
+      let sg_name = "Ppx_quickcheck_runtime.Quickcheckable.S" in
+      mk_named_sig ~loc ~sg_name ~handle_polymorphic_variant:true type_decl_list
+      |> Option.map ~f:(fun include_info -> psig_include ~loc include_info))
+  | _ ->
+    (* Don't bother testing anything since [mk_named_sig] will definitely return
+       [None] anyway *)
+    None
+;;
+
 let sig_type_decl =
-  Deriving.Generator.make_noarg (fun ~loc:_ ~path:_ (_, decls) ->
-    generator_intf_list decls @ observer_intf_list decls @ shrinker_intf_list decls)
+  Deriving.Generator.make_noarg (fun ~loc ~path:_ (_, decls) ->
+    match try_include_decl ~loc decls with
+    | Some decl -> [ decl ]
+    | None ->
+      generator_intf_list decls @ observer_intf_list decls @ shrinker_intf_list decls)
 ;;
 
 let str_type_decl =
