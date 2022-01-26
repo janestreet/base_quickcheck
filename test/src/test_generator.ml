@@ -1120,6 +1120,53 @@ let%expect_test "float_inclusive" =
         INF)))) |}]
 ;;
 
+let%expect_test "float_inclusive singular range edge case" =
+  test_generator ~mode:`inexhaustive (Generator.float_inclusive 1. 1.) m_float;
+  [%expect
+    {|
+    (generator
+     ("generated 1 distinct values in 10_000 iterations"
+      ("did not generate these values"
+       (NAN
+        -INF
+        -1.7976931348623157E+308
+        -2.2250738585072014E-308
+        -2.2250738585072009E-308
+        -4.94065645841247E-324
+        0
+        4.94065645841247E-324
+        2.2250738585072009E-308
+        2.2250738585072014E-308
+        1.7976931348623157E+308
+        INF)))) |}]
+;;
+
+let%expect_test "float_inclusive two-value range edge case" =
+  show_raise (fun () ->
+    test_generator
+      ~mode:`inexhaustive
+      (Generator.float_inclusive 5000000000000000. 5000000000000001.)
+      m_float);
+  [%expect
+    {|
+    (generator
+     ("generated 2 distinct values in 10_000 iterations"
+      ("did not generate these values"
+       (NAN
+        -INF
+        -1.7976931348623157E+308
+        -2.2250738585072014E-308
+        -2.2250738585072009E-308
+        -4.94065645841247E-324
+        0
+        4.94065645841247E-324
+        2.2250738585072009E-308
+        2.2250738585072014E-308
+        1.7976931348623157E+308
+        INF))))
+    "did not raise" |}]
+;;
+
 let float_uniform_exclusive = Generator.float_uniform_exclusive
 
 let%expect_test "float_uniform_exclusive" =

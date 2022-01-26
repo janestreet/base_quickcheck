@@ -275,8 +275,8 @@ sig
     sig
       [@@@ocaml.warning "-32"]
       include
-        Ppx_quickcheck_runtime.Quickcheckable.S1 with type 'v_x__001_ t := 
-          'v_x__001_ t
+        Ppx_quickcheck_runtime.Quickcheckable.S1 with type 'a__001_ t := 
+          'a__001_ t
     end[@@ocaml.doc "@inline"][@@merlin.hide ]
 end with type _ t =  unit option
 module Instance_with_phantom :
@@ -420,16 +420,16 @@ sig
     sig
       [@@@ocaml.warning "-32"]
       val quickcheck_generator_transparent :
-        'v_x__004_ Ppx_quickcheck_runtime.Base_quickcheck.Generator.t ->
-          'v_x__004_ transparent
+        'a__004_ Ppx_quickcheck_runtime.Base_quickcheck.Generator.t ->
+          'a__004_ transparent
             Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
       val quickcheck_observer_transparent :
-        'v_x__003_ Ppx_quickcheck_runtime.Base_quickcheck.Observer.t ->
-          'v_x__003_ transparent
+        'a__003_ Ppx_quickcheck_runtime.Base_quickcheck.Observer.t ->
+          'a__003_ transparent
             Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
       val quickcheck_shrinker_transparent :
-        'v_x__002_ Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t ->
-          'v_x__002_ transparent
+        'a__002_ Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t ->
+          'a__002_ transparent
             Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
     end[@@ocaml.doc "@inline"][@@merlin.hide ]
   type _ opaque[@@deriving quickcheck]
@@ -437,15 +437,14 @@ sig
     sig
       [@@@ocaml.warning "-32"]
       val quickcheck_generator_opaque :
-        'v_x__007_ Ppx_quickcheck_runtime.Base_quickcheck.Generator.t ->
-          'v_x__007_ opaque
-            Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
+        'a__007_ Ppx_quickcheck_runtime.Base_quickcheck.Generator.t ->
+          'a__007_ opaque Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
       val quickcheck_observer_opaque :
-        'v_x__006_ Ppx_quickcheck_runtime.Base_quickcheck.Observer.t ->
-          'v_x__006_ opaque Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
+        'a__006_ Ppx_quickcheck_runtime.Base_quickcheck.Observer.t ->
+          'a__006_ opaque Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
       val quickcheck_shrinker_opaque :
-        'v_x__005_ Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t ->
-          'v_x__005_ opaque Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+        'a__005_ Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t ->
+          'a__005_ opaque Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
     end[@@ocaml.doc "@inline"][@@merlin.hide ]
   val compare_opaque : ('a -> 'a -> int) -> 'a opaque -> 'a opaque -> int
   val sexp_of_opaque : ('a -> Sexp.t) -> 'a opaque -> Sexp.t

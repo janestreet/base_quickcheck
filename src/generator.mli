@@ -19,12 +19,12 @@ include With_basic_types.S with type 'a t := 'a t (** @inline *)
 val fn : 'a Observer0.t -> 'b t -> ('a -> 'b) t
 
 val map_t_m
-  :  ('key, 'cmp) Set.comparator
+  :  ('key, 'cmp) Comparator.Module.t
   -> 'key t
   -> 'data t
   -> ('key, 'data, 'cmp) Map.t t
 
-val set_t_m : ('elt, 'cmp) Set.comparator -> 'elt t -> ('elt, 'cmp) Set.t t
+val set_t_m : ('elt, 'cmp) Comparator.Module.t -> 'elt t -> ('elt, 'cmp) Set.t t
 
 val map_tree_using_comparator
   :  comparator:('key, 'cmp) Comparator.t

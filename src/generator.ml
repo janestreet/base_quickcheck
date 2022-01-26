@@ -606,11 +606,16 @@ let float_uniform_exclusive lower_bound upper_bound =
 ;;
 
 let float_inclusive lower_bound upper_bound =
-  weighted_union
-    [ 0.05, return lower_bound
-    ; 0.05, return upper_bound
-    ; 0.9, float_uniform_exclusive lower_bound upper_bound
-    ]
+  if Float.equal lower_bound upper_bound
+  then return lower_bound
+  else if Float.( = ) (Float.one_ulp `Up lower_bound) upper_bound
+  then union [ return lower_bound; return upper_bound ]
+  else
+    weighted_union
+      [ 0.05, return lower_bound
+      ; 0.05, return upper_bound
+      ; 0.9, float_uniform_exclusive lower_bound upper_bound
+      ]
 ;;
 
 let string_with_length_of char_gen ~length =
