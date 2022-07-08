@@ -144,7 +144,7 @@ module Polymorphic_variant = struct
       ppat_variant ~loc label.txt (Some (ppat_tuple ~loc pat_list))
     | Rinherit { ptyp_desc; _ }, [ { ppat_desc; _ } ] ->
       (match ptyp_desc with
-       | Ptyp_constr (id, []) ->
+       | Ptyp_constr (id, _) ->
          (match ppat_desc with
           | Ppat_var var -> ppat_alias ~loc (ppat_type ~loc id) var
           | _ ->

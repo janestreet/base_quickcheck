@@ -22,8 +22,10 @@ let list_gen elt_gen =
   (* Rely on [Generator.recursive_union] to reduce the size on recursive calls. This
      generator skews toward larger elements near the head of the list. *)
   Generator.(
-    recursive_union [ return [] ] ~f:(fun self ->
-      [ (elt_gen >>= fun head -> self >>= fun tail -> return (head :: tail)) ]))
+    recursive_union
+      [ return [] ]
+      ~f:(fun self ->
+        [ (elt_gen >>= fun head -> self >>= fun tail -> return (head :: tail)) ]))
 ;;
 
 let sexp_gen =

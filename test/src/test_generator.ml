@@ -342,9 +342,11 @@ let%expect_test "weighted_recursive_union" =
   let values_generated = ref 0 in
   Test.with_sample_exn
     ~f:(Sequence.iter ~f:(fun () -> Int.incr values_generated))
-    (Generator.weighted_recursive_union [ 1., Generator.unit ] ~f:(fun _ ->
-       Int.incr recursive_calls;
-       [ 2., Generator.unit ]));
+    (Generator.weighted_recursive_union
+       [ 1., Generator.unit ]
+       ~f:(fun _ ->
+         Int.incr recursive_calls;
+         [ 2., Generator.unit ]));
   print_s [%message "" (recursive_calls : int ref) (values_generated : int ref)];
   require_equal [%here] (module Int) !recursive_calls 1;
   require_equal [%here] (module Int) !values_generated 10_000;

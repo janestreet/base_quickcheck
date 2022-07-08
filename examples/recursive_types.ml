@@ -14,11 +14,13 @@ end = struct
 
   let quickcheck_generator =
     let open Generator.Let_syntax in
-    Generator.recursive_union [ Generator.return Leaf ] ~f:(fun self ->
-      [ (let%map l = self
-         and r = self in
-         Node (l, r))
-      ])
+    Generator.recursive_union
+      [ Generator.return Leaf ]
+      ~f:(fun self ->
+        [ (let%map l = self
+           and r = self in
+           Node (l, r))
+        ])
   ;;
 
   (* Observers can be derived from hash functions for most types. *)

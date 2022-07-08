@@ -48,3 +48,15 @@ type recursive_with_do_not_generate2 =
 
 [%%expect {|
 |}]
+
+module _ = struct
+  open Base_quickcheck.Export
+
+  type 'a polyvar_with_param = [ `A of 'a ] [@@deriving quickcheck]
+
+  type inheriting_polyvar_with_param = [ | int polyvar_with_param ]
+  [@@deriving quickcheck]
+end
+
+[%%expect {|
+|}]
