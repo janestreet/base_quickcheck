@@ -53,7 +53,7 @@ let _ = [%quickcheck.generator: [%arbitrary.tag? ()]]
 [%%expect
   {|
 Line _, characters _-_:
-Error: ppx_quickcheck: unsupported: uknown extension: arbitrary.tag
+Error: ppx_quickcheck: unsupported: unknown extension: arbitrary.tag
 |}]
 
 let _ =
@@ -82,4 +82,32 @@ let _ = [%quickcheck.generator: _ list]
 [%%expect {|
 Line _, characters _-_:
 Error: ppx_quickcheck: unsupported: wildcard type
+|}]
+
+type t = | [@@deriving quickcheck]
+
+[%%expect
+  {|
+Line _, characters _-_:
+Error: ppx_quickcheck: invalid syntax: variant had no (generated) cases
+|}]
+
+type t = A [@quickcheck.do_not_generate] [@@deriving quickcheck]
+
+[%%expect
+  {|
+Line _, characters _-_:
+Error: ppx_quickcheck: invalid syntax: variant had no (generated) cases
+|}]
+
+(* While the following might look like the above, there's an important distinction
+   which is that to quickcheck, "0." is just an expression when doing the ppx
+   expansion (as opposed to being a float).  So, the following gives a runtime
+   error where the above gives a compile-time error.
+*)
+type t = A [@quickcheck.weight 0.] [@@deriving quickcheck]
+
+[%%expect
+  {|
+Exception: "Base_quickcheck.Generator.of_weighted_list: total weight is zero"
 |}]

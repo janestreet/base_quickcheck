@@ -335,7 +335,7 @@ module Example_3_asynchronous = struct
         Deferred.return x
     ;;
 
-    let iter t ~f = Deferred.List.iter t.elts ~f
+    let iter t ~f = Deferred.List.iter ~how:`Sequential t.elts ~f
   end
 
   let stack elt =

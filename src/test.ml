@@ -35,7 +35,13 @@ end
 
 let default_config : Config.t =
   { seed = Deterministic "an arbitrary but deterministic string"
-  ; test_count = 10_000
+  ; test_count =
+      (* [Splittable_random] is based on 64-bit arithmetic, and so tests run much slower
+         on 32-bit targets. We run an order of magnitude fewer trials so as not to
+         completely bog down continuous integration systems. *)
+      (match Word_size.word_size with
+       | W64 -> 10_000
+       | W32 -> 1_000)
   ; shrink_count = 10_000
   ; sizes = Sequence.cycle_list_exn (List.range 0 ~start:`inclusive 30 ~stop:`inclusive)
   }

@@ -10,11 +10,14 @@ open struct
     val quickcheck_shrinker : t Shrinker.t
   end
 
-  let test (type a) ?config ?cr ?generator ?observer ?shrinker q m =
+  (* consistent trial count on 32- and 64-bit systems *)
+  let config = { Test.default_config with test_count = 10_000 }
+
+  let test (type a) ?(config = config) ?cr ?generator ?observer ?shrinker q m =
     let (module Q : S with type t = a) = q in
-    test_generator ?config ?cr ?mode:generator Q.quickcheck_generator m;
-    test_observer ?config ?cr ?mode:observer Q.quickcheck_observer m;
-    test_shrinker ?config ?cr ?mode:shrinker Q.quickcheck_shrinker m
+    test_generator ~config ?cr ?mode:generator Q.quickcheck_generator m;
+    test_observer ~config ?cr ?mode:observer Q.quickcheck_observer m;
+    test_shrinker ~config ?cr ?mode:shrinker Q.quickcheck_shrinker m
   ;;
 
   module type All = sig
@@ -576,7 +579,10 @@ let%expect_test "attributes" =
     (generator "generated 8_470 distinct values in 10_000 iterations")
     (observer transparent)
     (shrinker (((Text a) => (Text "")))) |}];
-  show_distribution Attribute_override.quickcheck_generator (module Attribute_override');
+  show_distribution
+    ~config
+    Attribute_override.quickcheck_generator
+    (module Attribute_override');
   [%expect
     {|
     ((4.35% Null)
@@ -624,6 +630,7 @@ let%expect_test "attributes for recursive types" =
     (observer transparent)
     (shrinker atomic) |}];
   show_distribution
+    ~config
     Attribute_override_recursive.quickcheck_generator
     (module Attribute_override_recursive');
   [%expect

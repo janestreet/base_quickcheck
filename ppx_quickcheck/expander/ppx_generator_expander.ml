@@ -120,6 +120,7 @@ let variant
     List.partition_tf clauses ~f:(fun clause ->
       clause_is_recursive ~clause ~rec_names (module Clause))
   with
+  | [], [] -> invalid ~loc "variant had no (generated) cases"
   | [], clauses | clauses, [] ->
     let pairs = List.filter_map clauses ~f:make_pair in
     [%expr

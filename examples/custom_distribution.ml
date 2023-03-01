@@ -103,9 +103,8 @@ end = struct
         sequence
         |> Sequence.to_list
         |> List.sort ~compare
-        |> List.stable_sort
-             ~compare:
-               (Comparable.lift Int.ascending ~f:(fun t -> List.length t.rationals))
+        |> List.stable_sort ~compare:(fun a b ->
+          Comparable.lift Int.ascending ~f:(fun t -> List.length t.rationals) a b)
         |> List.map ~f:sexp_of_t
         |> List.iter ~f:print_s);
     [%expect

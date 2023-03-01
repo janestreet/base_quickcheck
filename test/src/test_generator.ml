@@ -26,6 +26,14 @@ let%expect_test "create & generate" =
 include (Generator : Applicative.S with type 'a t := 'a t)
 include (Generator : Monad.S with type 'a t := 'a t)
 
+open struct
+  (* We want to use a consistent test count on 32- and 64-bit targets since these tests
+     reflect on the actual trials and distributions. *)
+  let config = { Test.default_config with test_count = 10_000 }
+  let test_generator ?mode ?cr t m = test_generator ~config ?mode ?cr t m
+  let show_distribution ?show t m = show_distribution ~config ?show t m
+end
+
 let%expect_test "return" =
   test_generator (Generator.return ()) m_unit;
   [%expect {| (generator exhaustive) |}];
@@ -278,6 +286,7 @@ let%expect_test "fixed_point" =
   let recursive_calls = ref 0 in
   let values_generated = ref 0 in
   Test.with_sample_exn
+    ~config
     ~f:(Sequence.iter ~f:(fun () -> Int.incr values_generated))
     (Generator.fixed_point (fun _ ->
        Int.incr recursive_calls;
@@ -309,6 +318,7 @@ let%expect_test "recursive_union" =
   let recursive_calls = ref 0 in
   let values_generated = ref 0 in
   Test.with_sample_exn
+    ~config
     ~f:(Sequence.iter ~f:(fun () -> Int.incr values_generated))
     (Generator.recursive_union [ Generator.unit ] ~f:(fun _ ->
        Int.incr recursive_calls;
@@ -341,6 +351,7 @@ let%expect_test "weighted_recursive_union" =
   let recursive_calls = ref 0 in
   let values_generated = ref 0 in
   Test.with_sample_exn
+    ~config
     ~f:(Sequence.iter ~f:(fun () -> Int.incr values_generated))
     (Generator.weighted_recursive_union
        [ 1., Generator.unit ]
@@ -1605,17 +1616,17 @@ module Debug = struct
         counts |> [%sexp_of: int Map.M(Int).t] |> print_s)
     in
     (* small sample size *)
-    test { Test.default_config with test_count = 3 };
+    test { config with test_count = 3 };
     [%expect {| ((0 1) (1 1) (3 1)) |}];
     (* larger sample size *)
-    test { Test.default_config with test_count = 10 };
+    test { config with test_count = 10 };
     [%expect {| ((0 2) (1 2) (2 1) (3 1) (4 2) (6 1) (10 1)) |}];
     (* nonstandard sizes *)
-    test { Test.default_config with sizes = Sequence.cycle_list_exn [ 1; 2 ] };
+    test { config with sizes = Sequence.cycle_list_exn [ 1; 2 ] };
     [%expect {| ((0 2466) (1 2534) (2 3304) (3 1696)) |}];
     (* not enough sizes *)
     require_does_raise [%here] (fun () ->
-      test { Test.default_config with sizes = Sequence.init 10 ~f:Fn.id });
+      test { config with sizes = Sequence.init 10 ~f:Fn.id });
     [%expect
       {|
       ("Base_quickcheck.Test.run: insufficient size values for test count"
@@ -1637,7 +1648,7 @@ module Debug = struct
       in
       Test.with_sample_exn
         t
-        ~config:{ Test.default_config with test_count = n }
+        ~config:{ config with test_count = n }
         ~f:(Sequence.iter ~f:ignore);
       print_s [%message "counts" (before : int ref) (after : int ref)]
     in

@@ -6,13 +6,27 @@ module Config = Test.Config
 
 let default_config = Test.default_config
 
-let%expect_test "default_config" =
+let%expect_test ("default_config" [@tags "64-bits-only"]) =
   Ref.set_temporarily sexp_style To_string_hum ~f:(fun () ->
     print_s [%sexp (default_config : Config.t)]);
   [%expect
     {|
     ((seed (Deterministic "an arbitrary but deterministic string"))
      (test_count 10000) (shrink_count 10000)
+     (sizes
+      (0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27
+       28 29 30 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24
+       25 26 27 28 29 30 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21
+       22 23 24 25 26 27 28 29 30 0 1 2 3 4 5 6 ...))) |}]
+;;
+
+let%expect_test ("default_config" [@tags "32-bits-only"]) =
+  Ref.set_temporarily sexp_style To_string_hum ~f:(fun () ->
+    print_s [%sexp (default_config : Config.t)]);
+  [%expect
+    {|
+    ((seed (Deterministic "an arbitrary but deterministic string"))
+     (test_count 1000) (shrink_count 10000)
      (sizes
       (0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27
        28 29 30 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24

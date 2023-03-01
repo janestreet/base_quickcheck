@@ -2,7 +2,7 @@ open! Import
 
 let custom_extension ~loc tag payload =
   match String.equal tag.txt "custom" with
-  | false -> unsupported ~loc "uknown extension: %s" tag.txt
+  | false -> unsupported ~loc "unknown extension: %s" tag.txt
   | true ->
     (match payload with
      | PStr [ { pstr_desc = Pstr_eval (expr, attributes); _ } ] ->
