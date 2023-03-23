@@ -267,6 +267,22 @@ val int63_log_inclusive : Int63.t -> Int63.t -> Int63.t t
 val int64_log_inclusive : int64 -> int64 -> int64 t
 val nativeint_log_inclusive : nativeint -> nativeint -> nativeint t
 
+(** {4 Geometric Distributions}
+
+    These generators produce a geometric distribution with a given minimum and probabilty
+    [p]. In other words, with probability [p], the minimum is produced. Otherwise, a value
+    is effectively produced from a geometric distribution with the same [p] and a minimum
+    one higher, although the implementation can be more efficent than this. If the result
+    overflows, the function returns [max_value] for the integer type.
+
+    Raises if [p <. 0. || 1. <. p.]. *)
+
+val int_geometric : int -> p:float -> int t
+val int32_geometric : int32 -> p:float -> int32 t
+val int63_geometric : Int63.t -> p:float -> Int63.t t
+val int64_geometric : int64 -> p:float -> int64 t
+val nativeint_geometric : nativeint -> p:float -> nativeint t
+
 (** {3 Floating Point Distributions} *)
 
 (** Generates values between the given bounds, inclusive, which must be finite and in
@@ -304,6 +320,9 @@ val string_with_length : length:int -> string t
 val string_of : char t -> string t
 val string_non_empty_of : char t -> string t
 val string_with_length_of : char t -> length:int -> string t
+
+(** Produces strings similar to the input, with some number of edits. *)
+val string_like : string -> string t
 
 (** {3 Sexp Distributions} *)
 

@@ -198,8 +198,7 @@ let set_tree_using_comparator ~comparator elt_t =
            Sequence.filter_map (shrink elt_t elt) ~f:(fun smaller_elt ->
              match Set.Using_comparator.Tree.mem ~comparator tree smaller_elt with
              | true -> None
-             | false ->
-               Some (Set.Using_comparator.Tree.add tree ~comparator smaller_elt))))
+             | false -> Some (Set.Using_comparator.Tree.add tree ~comparator smaller_elt))))
     in
     Sequence.round_robin [ drop_elts; shrink_elts ])
 ;;

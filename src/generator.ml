@@ -337,6 +337,30 @@ module type Int_with_random = sig
 end
 
 module For_integer (Integer : Int_with_random) = struct
+  let geometric lo ~p =
+    if Float.equal p 1.
+    then return lo
+    else if Float.equal p 0.
+    then return Integer.max_value
+    else if Float.( < ) p 0. || Float.( > ) p 1. || Float.is_nan p
+    then
+      raise_s [%message "geometric distribution: p must be between 0 and 1" (p : float)]
+    else (
+      (* We start with a uniform distribution. We convert to exponential distribution
+         using [log]. We convert to geometric with [round_down]. Then we bounds check and
+         return. *)
+      let denominator = Float.log1p (-.p) in
+      create (fun ~size:_ ~random ->
+        let uniform = Splittable_random.unit_float random in
+        let exponential = Float.log uniform /. denominator in
+        let float = Float.round_down exponential in
+        match Integer.of_float float with
+        | exception Invalid_argument _ -> Integer.max_value
+        | int ->
+          let int = Integer.( + ) lo int in
+          if Integer.( < ) int lo then Integer.max_value else int))
+  ;;
+
   let uniform_inclusive lo hi =
     create (fun ~size:_ ~random -> Integer.uniform random ~lo ~hi)
   ;;
@@ -374,6 +398,7 @@ let int_inclusive = For_int.inclusive
 let int_uniform_inclusive = For_int.uniform_inclusive
 let int_log_inclusive = For_int.log_inclusive
 let int_log_uniform_inclusive = For_int.log_uniform_inclusive
+let int_geometric = For_int.geometric
 
 module For_int32 = For_integer (struct
     include Int32
@@ -388,6 +413,7 @@ let int32_inclusive = For_int32.inclusive
 let int32_uniform_inclusive = For_int32.uniform_inclusive
 let int32_log_inclusive = For_int32.log_inclusive
 let int32_log_uniform_inclusive = For_int32.log_uniform_inclusive
+let int32_geometric = For_int32.geometric
 
 module For_int63 = For_integer (struct
     include Int63
@@ -402,6 +428,7 @@ let int63_inclusive = For_int63.inclusive
 let int63_uniform_inclusive = For_int63.uniform_inclusive
 let int63_log_inclusive = For_int63.log_inclusive
 let int63_log_uniform_inclusive = For_int63.log_uniform_inclusive
+let int63_geometric = For_int63.geometric
 
 module For_int64 = For_integer (struct
     include Int64
@@ -416,6 +443,7 @@ let int64_inclusive = For_int64.inclusive
 let int64_uniform_inclusive = For_int64.uniform_inclusive
 let int64_log_inclusive = For_int64.log_inclusive
 let int64_log_uniform_inclusive = For_int64.log_uniform_inclusive
+let int64_geometric = For_int64.geometric
 
 module For_nativeint = For_integer (struct
     include Nativeint
@@ -430,6 +458,7 @@ let nativeint_inclusive = For_nativeint.inclusive
 let nativeint_uniform_inclusive = For_nativeint.uniform_inclusive
 let nativeint_log_inclusive = For_nativeint.log_inclusive
 let nativeint_log_uniform_inclusive = For_nativeint.log_uniform_inclusive
+let nativeint_geometric = For_nativeint.geometric
 let float_zero_exponent = Float.ieee_exponent 0.
 let float_zero_mantissa = Float.ieee_mantissa 0.
 
@@ -635,6 +664,63 @@ let string_non_empty_of char_gen =
 let string = string_of char
 let string_non_empty = string_non_empty_of char
 let string_with_length ~length = string_with_length_of char ~length
+
+module Edit_string = struct
+  let edit_insert string =
+    let%bind pos = int_uniform_inclusive 0 (String.length string) in
+    let%bind len = int_geometric 1 ~p:0.5 in
+    let%bind str = string_with_length ~length:len in
+    [ String.prefix string pos; str; String.drop_prefix string pos ]
+    |> String.concat
+    |> return
+  ;;
+
+  let edit_remove string =
+    let%bind len = int_log_uniform_inclusive 1 (String.length string) in
+    let%bind pos = int_uniform_inclusive 0 (String.length string - len) in
+    [ String.prefix string pos; String.drop_prefix string (pos + len) ]
+    |> String.concat
+    |> return
+  ;;
+
+  let edit_replace string =
+    let%bind len = int_log_uniform_inclusive 1 (String.length string) in
+    let%bind pos = int_uniform_inclusive 0 (String.length string - len) in
+    let%bind str = string_with_length ~length:len in
+    [ String.prefix string pos; str; String.drop_prefix string (pos + len) ]
+    |> String.concat
+    |> return
+  ;;
+
+  let edit_double string =
+    let%bind len = int_log_uniform_inclusive 1 (String.length string) in
+    let%bind pos = int_uniform_inclusive 0 (String.length string - len) in
+    [ String.prefix string (pos + len); String.drop_prefix string pos ]
+    |> String.concat
+    |> return
+  ;;
+
+  let edit_nonempty string =
+    [ edit_insert string; edit_remove string; edit_replace string; edit_double string ]
+    |> union
+  ;;
+
+  let rec edit string n_times =
+    if n_times <= 0
+    then return string
+    else (
+      let%bind string =
+        if String.is_empty string then edit_insert string else edit_nonempty string
+      in
+      edit string (n_times - 1))
+  ;;
+end
+
+let string_like string =
+  let%bind n_times = int_geometric 0 ~p:0.5 in
+  Edit_string.edit string n_times
+;;
+
 let bytes = map string ~f:Bytes.of_string
 
 let sexp_of atom =

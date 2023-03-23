@@ -104,6 +104,6 @@ arbitrary expression.
 
 ```ocaml
 let generator = [%quickcheck.generator: [%custom Generator.int_uniform] * char * string]
-let observer = [%quickcheck.observer: int * [%custom Observer.opaque] * string]
+let observer = [%quickcheck.observer: int *  [%custom Observer.opaque] * string]
 let shrinker = [%quickcheck.shrinker: int * char * [%custom Shrinker.atomic]]
 ```

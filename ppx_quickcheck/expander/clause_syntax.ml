@@ -151,7 +151,8 @@ module Polymorphic_variant = struct
             internal_error
               ~loc
               "cannot bind a #<type> pattern to anything other than a variable")
-       | _ -> unsupported ~loc "inherited polymorphic variant type that is not a type name")
+       | _ ->
+         unsupported ~loc "inherited polymorphic variant type that is not a type name")
     | Rtag (_, true, _ :: _), _ | Rtag (_, false, ([] | _ :: _ :: _)), _ ->
       unsupported ~loc "intersection type"
     | Rtag (_, true, []), _ :: _

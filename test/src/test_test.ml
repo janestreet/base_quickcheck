@@ -118,8 +118,7 @@ let%expect_test "with_sample_exn" =
     generator
     ~config:{ Test.default_config with test_count = 20 }
     ~f:(fun sample ->
-      Sequence.iter sample ~f:(fun value ->
-        Core.print_s [%sexp (value : bool option list)]));
+      Sequence.iter sample ~f:(fun value -> Core.print_s [%sexp (value : bool option list)]));
   [%expect
     {|
     ()

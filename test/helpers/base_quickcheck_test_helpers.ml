@@ -149,8 +149,7 @@ let test_generator (type a) ?config ?(mode = `exhaustive) ?cr generator m =
         ?cr
         (not (Set.is_empty failed_to_generate))
         ~if_false_then_print_s:
-          (lazy
-            [%message "generated all known values even though we did not expect to"]))
+          (lazy [%message "generated all known values even though we did not expect to"]))
 ;;
 
 let test_observer (type a) ?config ?(mode = `transparent) ?cr observer m =
@@ -561,9 +560,7 @@ let m_map
     let examples =
       [ Map.empty (module Cmp) ]
       @ List.map Data.examples ~f:(fun data ->
-        Map.of_alist_exn
-          (module Cmp)
-          (List.map Key.examples ~f:(fun key -> key, data)))
+        Map.of_alist_exn (module Cmp) (List.map Key.examples ~f:(fun key -> key, data)))
     ;;
   end : With_examples
     with type t = (key, data, cmp) Map.t)

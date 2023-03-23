@@ -66,8 +66,7 @@ let compound
   [%expr
     Ppx_quickcheck_runtime.Base_quickcheck.Observer.create
       (fun [%p pat] ~size:[%p size_pat] ~hash:[%p hash_pat] ->
-         [%e
-           compound_hash ~loc ~size_expr ~hash_expr ~hash_pat ~observer_exprs ~field_exprs])]
+         [%e compound_hash ~loc ~size_expr ~hash_expr ~hash_pat ~observer_exprs ~field_exprs])]
 ;;
 
 let variant
