@@ -16,16 +16,7 @@ module Record = struct
   type ast = label_declaration
   type t = ast
 
-  let create ast =
-    match ast.pld_mutable with
-    | Immutable -> ast
-    | Mutable ->
-      (* We intend to support mutable fields and values shortly, but we leave it to a
-         separate feature. Integrating mutable values with replayability and shrinking is
-         tricky, and we at least have to figure out what caveats to document. *)
-      unsupported ~loc:ast.pld_loc "mutable record field"
-  ;;
-
+  let create ast = ast
   let location t = t.pld_loc
   let core_type t = t.pld_type
 

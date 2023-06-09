@@ -55,9 +55,10 @@ let compound
       ~fields
       (module Field : Field_syntax.S with type ast = field)
   =
+  let pat, exp = gensym "x" loc in
   let fields = List.map fields ~f:Field.create in
   let field_pats, field_exprs = gensyms "x" (List.map fields ~f:Field.location) in
-  let pat = Field.pattern fields ~loc field_pats in
+  let record_pat = Field.pattern fields ~loc field_pats in
   let observer_exprs =
     List.map fields ~f:(fun field -> observer_of_core_type (Field.core_type field))
   in
@@ -66,6 +67,7 @@ let compound
   [%expr
     Ppx_quickcheck_runtime.Base_quickcheck.Observer.create
       (fun [%p pat] ~size:[%p size_pat] ~hash:[%p hash_pat] ->
+         let [%p record_pat] = [%e exp] in
          [%e compound_hash ~loc ~size_expr ~hash_expr ~hash_pat ~observer_exprs ~field_exprs])]
 ;;
 

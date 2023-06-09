@@ -141,7 +141,9 @@ let%expect_test "sizes" =
      (59bp (11))
      (58bp (13))) |}];
   (* The most common lengths of a size list: *)
-  show_distribution (Generator.sizes () |> Generator.map ~f:List.length) (module Int);
+  show_distribution
+    (Generator.sizes () |> Generator.map ~f:(List.length :> _ -> _))
+    (module Int);
   [%expect
     {|
     ((24.63% 0)

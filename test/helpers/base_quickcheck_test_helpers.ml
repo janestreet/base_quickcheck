@@ -255,7 +255,7 @@ let show_distribution (type a) ?config ?(show = 20) generator m =
       sample
       |> List.map ~f:(fun value -> value, value)
       |> Map.of_alist_multi (module Value)
-      |> Map.map ~f:List.length
+      |> Map.map ~f:(List.length :> _ -> _)
       |> Map.to_alist
       |> List.map ~f:(fun (value, count) -> count, value)
       |> List.sort ~compare:[%compare: int * Value.t]

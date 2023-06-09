@@ -136,6 +136,7 @@ let rec shrinker_of_core_type core_type ~env =
 
 type impl =
   { loc : location
+  ; typ : core_type
   ; pat : pattern
   ; var : expression
   ; exp : expression
@@ -143,6 +144,10 @@ type impl =
 
 let generator_impl type_decl ~rec_names =
   let loc = type_decl.ptype_loc in
+  let typ =
+    combinator_type_of_type_declaration type_decl ~f:(fun ~loc ty ->
+      [%type: [%t ty] Ppx_quickcheck_runtime.Base_quickcheck.Generator.t])
+  in
   let pat = pgenerator type_decl.ptype_name in
   let var = egenerator type_decl.ptype_name in
   let exp =
@@ -178,11 +183,15 @@ let generator_impl type_decl ~rec_names =
     List.fold_right pat_list ~init:body ~f:(fun pat body ->
       [%expr fun [%p pat] -> [%e body]])
   in
-  { loc; pat; var; exp }
+  { loc; typ; pat; var; exp }
 ;;
 
 let observer_impl type_decl ~rec_names:_ =
   let loc = type_decl.ptype_loc in
+  let typ =
+    combinator_type_of_type_declaration type_decl ~f:(fun ~loc ty ->
+      [%type: [%t ty] Ppx_quickcheck_runtime.Base_quickcheck.Observer.t])
+  in
   let pat = pobserver type_decl.ptype_name in
   let var = eobserver type_decl.ptype_name in
   let exp =
@@ -216,11 +225,15 @@ let observer_impl type_decl ~rec_names:_ =
     List.fold_right pat_list ~init:body ~f:(fun pat body ->
       [%expr fun [%p pat] -> [%e body]])
   in
-  { loc; pat; var; exp }
+  { loc; typ; pat; var; exp }
 ;;
 
 let shrinker_impl type_decl ~rec_names:_ =
   let loc = type_decl.ptype_loc in
+  let typ =
+    combinator_type_of_type_declaration type_decl ~f:(fun ~loc ty ->
+      [%type: [%t ty] Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t])
+  in
   let pat = pshrinker type_decl.ptype_name in
   let var = eshrinker type_decl.ptype_name in
   let exp =
@@ -251,7 +264,7 @@ let shrinker_impl type_decl ~rec_names:_ =
     List.fold_right pat_list ~init:body ~f:(fun pat body ->
       [%expr fun [%p pat] -> [%e body]])
   in
-  { loc; pat; var; exp }
+  { loc; typ; pat; var; exp }
 ;;
 
 let close_the_loop ~of_lazy decl impl =
@@ -296,8 +309,7 @@ let maybe_mutually_recursive decls ~loc ~rec_flag ~of_lazy ~impl =
       (List.map impls ~f:(fun impl ->
          value_binding ~loc:impl.loc ~pat:impl.pat ~expr:impl.exp))
   | Recursive ->
-    let pats = List.map impls ~f:(fun impl -> impl.pat) in
-    let bindings =
+    let recursive_bindings =
       let inner_bindings =
         List.map2_exn decls impls ~f:(fun decl inner ->
           value_binding
@@ -305,29 +317,37 @@ let maybe_mutually_recursive decls ~loc ~rec_flag ~of_lazy ~impl =
             ~pat:inner.pat
             ~expr:(close_the_loop ~of_lazy decl inner))
       in
-      List.map impls ~f:(fun impl ->
-        let exp =
-          List.fold impls ~init:impl.exp ~f:(fun acc impl ->
+      let rec wrap exp =
+        match exp.pexp_desc with
+        | Pexp_fun (arg_label, default, pat, body) ->
+          { exp with pexp_desc = Pexp_fun (arg_label, default, pat, wrap body) }
+        | _ ->
+          List.fold impls ~init:exp ~f:(fun acc impl ->
             let ign = [%expr ignore [%e impl.var]] in
             pexp_sequence ~loc ign acc)
-        in
-        let body = pexp_let ~loc:impl.loc Nonrecursive inner_bindings exp in
+          |> pexp_let ~loc Nonrecursive inner_bindings
+      in
+      List.map2_exn decls impls ~f:(fun decl impl ->
+        let body = wrap impl.exp in
         let lazy_expr = [%expr lazy [%e body]] in
-        value_binding ~loc:impl.loc ~pat:impl.pat ~expr:lazy_expr)
+        let typed_pat =
+          [%type: [%t impl.typ] Ppx_quickcheck_runtime.Base.Lazy.t]
+          |> ptyp_poly ~loc (List.map decl.ptype_params ~f:get_type_param_name)
+          |> ppat_constraint ~loc impl.pat
+        in
+        value_binding ~loc:impl.loc ~pat:typed_pat ~expr:lazy_expr)
     in
-    let body =
-      pexp_tuple
-        ~loc
-        (List.map2_exn decls impls ~f:(fun decl impl -> close_the_loop ~of_lazy decl impl))
-    in
-    pstr_value_list
-      ~loc
-      Nonrecursive
-      [ value_binding
-          ~loc
-          ~pat:(ppat_tuple ~loc pats)
-          ~expr:(pexp_let ~loc Recursive bindings body)
-      ]
+    [%str
+      include struct
+        open [%m pmod_structure ~loc (pstr_value_list ~loc Recursive recursive_bindings)]
+
+        [%%i
+          pstr_value
+            ~loc
+            Nonrecursive
+            (List.map2_exn decls impls ~f:(fun decl impl ->
+               value_binding ~loc ~pat:impl.pat ~expr:(close_the_loop ~of_lazy decl impl)))]
+      end]
 ;;
 
 let generator_impl_list decls ~loc ~rec_flag =

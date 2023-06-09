@@ -76,7 +76,7 @@ end
 module Record_type :
 sig
   type t = {
-    x: bool ;
+    mutable x: bool ;
     y: unit option }[@@deriving quickcheck]
   include
     sig
@@ -359,6 +359,44 @@ sig
     sig
       [@@@ocaml.warning "-32"]
       include Ppx_quickcheck_runtime.Quickcheckable.S with type  t :=  t
+    end[@@ocaml.doc "@inline"][@@merlin.hide ]
+end
+module Murec_poly_mono :
+sig
+  type t =
+    | Leaf of bool 
+    | Node of t node 
+  and 'a node = 'a list[@@deriving quickcheck]
+  include
+    sig
+      [@@@ocaml.warning "-32"]
+      val quickcheck_generator :
+        t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
+      val quickcheck_generator_node :
+        'a Ppx_quickcheck_runtime.Base_quickcheck.Generator.t ->
+          'a node Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
+      val quickcheck_observer :
+        t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
+      val quickcheck_observer_node :
+        'a Ppx_quickcheck_runtime.Base_quickcheck.Observer.t ->
+          'a node Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
+      val quickcheck_shrinker :
+        t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      val quickcheck_shrinker_node :
+        'a Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t ->
+          'a node Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+    end[@@ocaml.doc "@inline"][@@merlin.hide ]
+end
+module Polymorphic_recursion :
+sig
+  type 'a t =
+    | Single of 'a 
+    | Double of ('a * 'a) t [@@deriving quickcheck]
+  include
+    sig
+      [@@@ocaml.warning "-32"]
+      include
+        Ppx_quickcheck_runtime.Quickcheckable.S1 with type 'a t :=  'a t
     end[@@ocaml.doc "@inline"][@@merlin.hide ]
 end
 module Extensions :

@@ -52,7 +52,7 @@ end
 
 module Record_type : sig
   type t =
-    { x : bool
+    { mutable x : bool
     ; y : unit option
     }
   [@@deriving quickcheck]
@@ -187,6 +187,21 @@ end
 
 module Instance_of_recursive : sig
   type t = bool Poly_recursive.t [@@deriving quickcheck]
+end
+
+module Murec_poly_mono : sig
+  type t =
+    | Leaf of bool
+    | Node of t node
+
+  and 'a node = 'a list [@@deriving quickcheck]
+end
+
+module Polymorphic_recursion : sig
+  type 'a t =
+    | Single of 'a
+    | Double of ('a * 'a) t
+  [@@deriving quickcheck]
 end
 
 module Extensions : sig

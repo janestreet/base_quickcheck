@@ -140,7 +140,7 @@ module Record_type = Record_type
 let%expect_test "record type" =
   let module Record_type' = struct
     type t = Record_type.t =
-      { x : bool
+      { mutable x : bool
       ; y : unit option
       }
     [@@deriving compare, enumerate, sexp_of]
@@ -444,7 +444,7 @@ let%expect_test "mutually recursive types" =
 module Poly_recursive = Poly_recursive
 module Instance_of_recursive = Instance_of_recursive
 
-let%expect_test "polymorphic recursive type" =
+let%expect_test "polymorphic, recursive type" =
   let module Poly_recursive' = struct
     type 'a t = 'a Poly_recursive.t =
       | Zero
@@ -474,6 +474,74 @@ let%expect_test "polymorphic recursive type" =
     (generator "generated 154 distinct values in 10_000 iterations")
     (observer transparent)
     (shrinker atomic) |}]
+;;
+
+module Murec_poly_mono = Murec_poly_mono
+
+let%expect_test "mutually recursive polymorphic and monomorphic types" =
+  let module Murec_poly_mono' = struct
+    type t = Murec_poly_mono.t =
+      | Leaf of bool
+      | Node of t node
+
+    and 'a node = 'a list [@@deriving compare, sexp_of]
+
+    let examples = [ Leaf false; Node []; Node [ Leaf true ] ]
+  end
+  in
+  test (module Murec_poly_mono) (module Murec_poly_mono');
+  [%expect
+    {|
+    (generator "generated 2_343 distinct values in 10_000 iterations")
+    (observer transparent)
+    (shrinker (((Node ((Leaf true))) => (Node ())))) |}]
+;;
+
+module Polymorphic_recursion = Polymorphic_recursion
+
+let%expect_test "type using polymorphic recursion" =
+  let module Instance = struct
+    type t = bool option Polymorphic_recursion.t [@@deriving quickcheck]
+  end
+  in
+  let module Polymorphic_recursion' = struct
+    type 'a t = 'a Polymorphic_recursion.t =
+      | Single of 'a
+      | Double of ('a * 'a) t
+    [@@deriving compare, sexp_of]
+  end
+  in
+  let module Instance' = struct
+    type t = bool option Polymorphic_recursion'.t [@@deriving compare, sexp_of]
+
+    let examples : t list =
+      [ Single None
+      ; Double (Single (Some true, Some false))
+      ; Double (Double (Single ((Some true, Some false), (Some true, Some false))))
+      ]
+    ;;
+  end
+  in
+  test (module Instance) (module Instance');
+  [%expect
+    {|
+    (generator "generated 1_170 distinct values in 10_000 iterations")
+    (observer transparent)
+    (shrinker
+     (((Double (Single ((true) (false)))) => (Double (Single (() (false)))))
+      ((Double (Single ((true) (false)))) => (Double (Single ((true) ()))))
+      ((Double (Double (Single (((true) (false)) ((true) (false))))))
+       =>
+       (Double (Double (Single ((() (false)) ((true) (false)))))))
+      ((Double (Double (Single (((true) (false)) ((true) (false))))))
+       =>
+       (Double (Double (Single (((true) (false)) (() (false)))))))
+      ((Double (Double (Single (((true) (false)) ((true) (false))))))
+       =>
+       (Double (Double (Single (((true) ()) ((true) (false)))))))
+      ((Double (Double (Single (((true) (false)) ((true) (false))))))
+       =>
+       (Double (Double (Single (((true) (false)) ((true) ())))))))) |}]
 ;;
 
 module Extensions = Extensions

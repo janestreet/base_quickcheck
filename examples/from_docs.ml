@@ -312,7 +312,7 @@ module Example_3_asynchronous = struct
       match t.pops with
       | ivar :: rest ->
         t.pops <- rest;
-        Ivar.fill ivar x
+        Ivar.fill_exn ivar x
       | [] ->
         if Ivar.is_full t.push then t.push <- Ivar.create ();
         t.elts <- x :: t.elts
@@ -331,7 +331,7 @@ module Example_3_asynchronous = struct
         Ivar.read ivar
       | x :: rest ->
         t.elts <- rest;
-        if List.is_empty rest then Ivar.fill t.push ();
+        if List.is_empty rest then Ivar.fill_exn t.push ();
         Deferred.return x
     ;;
 

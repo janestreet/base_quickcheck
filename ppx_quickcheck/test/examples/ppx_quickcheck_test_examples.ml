@@ -54,7 +54,7 @@ end
 
 module Record_type = struct
   type t =
-    { x : bool
+    { mutable x : bool
     ; y : unit option
     }
   [@@deriving quickcheck]
@@ -213,6 +213,21 @@ end
 
 module Instance_of_recursive = struct
   type t = bool Poly_recursive.t [@@deriving quickcheck]
+end
+
+module Murec_poly_mono = struct
+  type t =
+    | Leaf of bool
+    | Node of t node
+
+  and 'a node = 'a list [@@deriving quickcheck]
+end
+
+module Polymorphic_recursion = struct
+  type 'a t =
+    | Single of 'a
+    | Double of ('a * 'a) t
+  [@@deriving quickcheck]
 end
 
 module Extensions = struct

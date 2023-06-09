@@ -29,16 +29,12 @@ Error: ppx_quickcheck: unsupported: polymorphic variant type with [<]
 |}]
 
 type record_mutable =
-  { pure : int
-  ; mutable impure : int
+  { pure : [ `a | `b ]
+  ; mutable impure : [ `a | `b ]
   }
 [@@deriving quickcheck]
 
-[%%expect
-  {|
-Line _, characters _-_:
-Error: ppx_quickcheck: unsupported: mutable record field
-|}]
+[%%expect {||}]
 
 type ('a, 'b) fn = 'a -> 'b [@@deriving quickcheck]
 
