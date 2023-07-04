@@ -1876,6 +1876,38 @@ let%expect_test "[bigstring], [float32_vec], [float64_vec]" =
   [%expect {| (generator "generated 7_520 distinct values in 10_000 iterations") |}]
 ;;
 
+let bigstring_with_length = Generator.bigstring_with_length
+let float32_vec_with_length = Generator.float32_vec_with_length
+let float64_vec_with_length = Generator.float64_vec_with_length
+
+let%expect_test "[bigstring_with_length], [float32_vec_with_length], \
+                 [float64_vec_with_length]"
+  =
+  let test t =
+    let with_length =
+      let open Generator.Let_syntax in
+      let%bind length = Generator.small_positive_or_zero_int in
+      let%map arr = t ~length in
+      arr, length
+    in
+    Test.with_sample_exn
+      with_length
+      ~f:
+        (Sequence.iter ~f:(fun (sample, expected_length) ->
+           Expect_test_helpers_base.require_equal
+             [%here]
+             (module Int)
+             (Bigarray.Array1.dim sample)
+             expected_length))
+  in
+  test bigstring_with_length;
+  [%expect {| |}];
+  test float32_vec_with_length;
+  [%expect {| |}];
+  test float64_vec_with_length;
+  [%expect {| |}]
+;;
+
 let float32_mat = Generator.float32_mat
 let float64_mat = Generator.float64_mat
 

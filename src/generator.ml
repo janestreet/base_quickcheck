@@ -771,17 +771,27 @@ let set_t_m m elt_gen =
   |> map ~f:(Set.Using_comparator.of_tree ~comparator)
 ;;
 
-let bigarray1 t kind layout =
-  let%map elts = list t in
+let bigarray1 t kind layout ~length =
+  let%map elts =
+    match length with
+    | None -> list t
+    | Some length -> list_with_length t ~length
+  in
   let elts = Array.of_list elts in
   let dim = Array.length elts in
   let offset = Bigarray_helpers.Layout.offset layout in
   Bigarray_helpers.Array1.init kind layout dim ~f:(fun i -> elts.(i - offset))
 ;;
 
-let bigstring = bigarray1 char Char C_layout
-let float32_vec = bigarray1 float Float32 Fortran_layout
-let float64_vec = bigarray1 float Float64 Fortran_layout
+let bigstring_gen = bigarray1 char Char C_layout
+let float32_vec_gen = bigarray1 float Float32 Fortran_layout
+let float64_vec_gen = bigarray1 float Float64 Fortran_layout
+let bigstring = bigstring_gen ~length:None
+let float32_vec = float32_vec_gen ~length:None
+let float64_vec = float64_vec_gen ~length:None
+let bigstring_with_length ~length = bigstring_gen ~length:(Some length)
+let float32_vec_with_length ~length = float32_vec_gen ~length:(Some length)
+let float64_vec_with_length ~length = float64_vec_gen ~length:(Some length)
 
 let bigarray2_dim =
   match%bind size with

@@ -341,6 +341,22 @@ val list_filtered : 'a list -> 'a list t
 (** Produces permutations of the given list, weighted uniformly. *)
 val list_permutations : 'a list -> 'a list t
 
+(** {3 Bigarray Distributions} *)
+include sig
+  open Bigarray
+
+  val bigstring_with_length : length:int -> (char, int8_unsigned_elt, c_layout) Array1.t t
+
+  val float32_vec_with_length
+    :  length:int
+    -> (float, float32_elt, fortran_layout) Array1.t t
+
+  val float64_vec_with_length
+    :  length:int
+    -> (float, float64_elt, fortran_layout) Array1.t t
+end
+(** @inline *)
+
 (** {2 Low-Level Interface}
 
     These functions provide direct access to the pseudo-random state threaded through
