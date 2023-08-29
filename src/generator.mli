@@ -345,6 +345,13 @@ val list_permutations : 'a list -> 'a list t
 include sig
   open Bigarray
 
+  val bigarray1
+    :  'a t
+    -> ('a, 'b) kind
+    -> 'c layout
+    -> length:int option
+    -> ('a, 'b, 'c) Array1.t t
+
   val bigstring_with_length : length:int -> (char, int8_unsigned_elt, c_layout) Array1.t t
 
   val float32_vec_with_length

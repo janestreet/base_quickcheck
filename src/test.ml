@@ -30,7 +30,7 @@ module Config = struct
     ; shrink_count : int
     ; sizes : int Potentially_infinite_sequence.t
     }
-  [@@deriving fields, sexp_of]
+  [@@deriving fields ~getters, sexp_of]
 end
 
 let default_config : Config.t =

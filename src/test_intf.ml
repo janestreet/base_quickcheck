@@ -31,7 +31,7 @@ module type Test = sig
       (** [sizes] determines the progression of value sizes to generate while testing.
           Testing fails if [sizes] is not of length at least [test_count]. *)
       }
-    [@@deriving fields, sexp_of]
+    [@@deriving sexp_of]
   end
 
   (** Defaults to a deterministic seed, [shrink_count] and [test_count] of 10_000 each,

@@ -1848,11 +1848,12 @@ let%expect_test "of_lazy, unforced" =
   [%expect {| (generator exhaustive) |}]
 ;;
 
+let bigarray1 = Generator.bigarray1
 let bigstring = Generator.bigstring
 let float32_vec = Generator.float32_vec
 let float64_vec = Generator.float64_vec
 
-let%expect_test "[bigstring], [float32_vec], [float64_vec]" =
+let%expect_test "[bigarray1], [bigstring], [float32_vec], [float64_vec]" =
   let test
         (type elt pack layout)
         (t : (elt, pack, layout) Bigarray.Array1.t Generator.t)
@@ -1868,6 +1869,12 @@ let%expect_test "[bigstring], [float32_vec], [float64_vec]" =
     in
     test_generator t (module M)
   in
+  test (bigarray1 float Bigarray.float64 Bigarray.c_layout ~length:None) [%sexp_of: float];
+  [%expect {| (generator "generated 7_520 distinct values in 10_000 iterations") |}];
+  test
+    (bigarray1 float Bigarray.float32 Bigarray.fortran_layout ~length:(Some 3))
+    [%sexp_of: float];
+  [%expect {| (generator "generated 9_525 distinct values in 10_000 iterations") |}];
   test bigstring [%sexp_of: char];
   [%expect {| (generator "generated 5_751 distinct values in 10_000 iterations") |}];
   test float32_vec [%sexp_of: float];

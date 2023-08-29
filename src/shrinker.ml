@@ -72,7 +72,7 @@ let bigarray2 =
       { dim1 : int
       ; dim2 : int
       }
-    [@@deriving fields]
+    [@@deriving fields ~fields]
 
     let create a = Bigarray.Array2.{ dim1 = dim1 a; dim2 = dim2 a }
   end

@@ -74,30 +74,27 @@ module Tuple =
         let _ = fun (_ : t) -> ()
         let quickcheck_generator =
           Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-            (fun ~size:_size__008_ ->
-               fun ~random:_random__009_ ->
-                 ((Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                     quickcheck_generator_bool ~size:_size__008_
-                     ~random:_random__009_),
-                   (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                      (quickcheck_generator_option quickcheck_generator_unit)
-                      ~size:_size__008_ ~random:_random__009_)))
+            (fun ~size:_size__008_ ~random:_random__009_ ->
+               ((Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                   quickcheck_generator_bool ~size:_size__008_
+                   ~random:_random__009_),
+                 (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                    (quickcheck_generator_option quickcheck_generator_unit)
+                    ~size:_size__008_ ~random:_random__009_)))
         let _ = quickcheck_generator
         let quickcheck_observer =
           Ppx_quickcheck_runtime.Base_quickcheck.Observer.create
-            (fun _x__003_ ->
-               fun ~size:_size__006_ ->
-                 fun ~hash:_hash__007_ ->
-                   let (_x__004_, _x__005_) = _x__003_ in
-                   let _hash__007_ =
-                     Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                       quickcheck_observer_bool _x__004_ ~size:_size__006_
-                       ~hash:_hash__007_ in
-                   let _hash__007_ =
-                     Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                       (quickcheck_observer_option quickcheck_observer_unit)
-                       _x__005_ ~size:_size__006_ ~hash:_hash__007_ in
-                   _hash__007_)
+            (fun _x__003_ ~size:_size__006_ ~hash:_hash__007_ ->
+               let (_x__004_, _x__005_) = _x__003_ in
+               let _hash__007_ =
+                 Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                   quickcheck_observer_bool _x__004_ ~size:_size__006_
+                   ~hash:_hash__007_ in
+               let _hash__007_ =
+                 Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                   (quickcheck_observer_option quickcheck_observer_unit)
+                   _x__005_ ~size:_size__006_ ~hash:_hash__007_ in
+               _hash__007_)
         let _ = quickcheck_observer
         let quickcheck_shrinker =
           Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.create
@@ -126,147 +123,125 @@ module Poly_variant =
           Ppx_quickcheck_runtime.Base_quickcheck.Generator.weighted_union
             [(1.,
                (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                  (fun ~size:_size__035_ -> fun ~random:_random__036_ -> `A)));
+                  (fun ~size:_size__035_ ~random:_random__036_ -> `A)));
             (1.,
               (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                 (fun ~size:_size__037_ -> fun ~random:_random__038_ -> `B)));
+                 (fun ~size:_size__037_ ~random:_random__038_ -> `B)));
             (1.,
               (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                 (fun ~size:_size__039_ ->
-                    fun ~random:_random__040_ ->
-                      `C
-                        (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                           quickcheck_generator_bool ~size:_size__039_
-                           ~random:_random__040_))));
+                 (fun ~size:_size__039_ ~random:_random__040_ ->
+                    `C
+                      (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                         quickcheck_generator_bool ~size:_size__039_
+                         ~random:_random__040_))));
             (1.,
               (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                 (fun ~size:_size__041_ ->
-                    fun ~random:_random__042_ ->
-                      `D
-                        (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                           quickcheck_generator_bool ~size:_size__041_
-                           ~random:_random__042_))));
+                 (fun ~size:_size__041_ ~random:_random__042_ ->
+                    `D
+                      (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                         quickcheck_generator_bool ~size:_size__041_
+                         ~random:_random__042_))));
             (1.,
               (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                 (fun ~size:_size__045_ ->
-                    fun ~random:_random__046_ ->
-                      `E
-                        (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                           (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                              (fun ~size:_size__043_ ->
-                                 fun ~random:_random__044_ ->
-                                   ((Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                                       quickcheck_generator_bool
-                                       ~size:_size__043_
-                                       ~random:_random__044_),
-                                     (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                                        (quickcheck_generator_option
-                                           quickcheck_generator_unit)
-                                        ~size:_size__043_
-                                        ~random:_random__044_))))
-                           ~size:_size__045_ ~random:_random__046_))));
+                 (fun ~size:_size__045_ ~random:_random__046_ ->
+                    `E
+                      (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                         (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
+                            (fun ~size:_size__043_ ~random:_random__044_ ->
+                               ((Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                                   quickcheck_generator_bool
+                                   ~size:_size__043_ ~random:_random__044_),
+                                 (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                                    (quickcheck_generator_option
+                                       quickcheck_generator_unit)
+                                    ~size:_size__043_ ~random:_random__044_))))
+                         ~size:_size__045_ ~random:_random__046_))));
             (1.,
               (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                 (fun ~size:_size__049_ ->
-                    fun ~random:_random__050_ ->
-                      `F
-                        (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                           (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                              (fun ~size:_size__047_ ->
-                                 fun ~random:_random__048_ ->
-                                   ((Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                                       quickcheck_generator_bool
-                                       ~size:_size__047_
-                                       ~random:_random__048_),
-                                     (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                                        (quickcheck_generator_option
-                                           quickcheck_generator_unit)
-                                        ~size:_size__047_
-                                        ~random:_random__048_))))
-                           ~size:_size__049_ ~random:_random__050_))))]
+                 (fun ~size:_size__049_ ~random:_random__050_ ->
+                    `F
+                      (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                         (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
+                            (fun ~size:_size__047_ ~random:_random__048_ ->
+                               ((Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                                   quickcheck_generator_bool
+                                   ~size:_size__047_ ~random:_random__048_),
+                                 (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                                    (quickcheck_generator_option
+                                       quickcheck_generator_unit)
+                                    ~size:_size__047_ ~random:_random__048_))))
+                         ~size:_size__049_ ~random:_random__050_))))]
         let _ = quickcheck_generator
         let quickcheck_observer =
           Ppx_quickcheck_runtime.Base_quickcheck.Observer.create
-            (fun _x__018_ ->
-               fun ~size:_size__019_ ->
-                 fun ~hash:_hash__020_ ->
-                   match _x__018_ with
-                   | `A ->
-                       let _hash__020_ =
-                         Ppx_quickcheck_runtime.Base.hash_fold_int
-                           _hash__020_ 65 in
-                       _hash__020_
-                   | `B ->
-                       let _hash__020_ =
-                         Ppx_quickcheck_runtime.Base.hash_fold_int
-                           _hash__020_ 66 in
-                       _hash__020_
-                   | `C _x__021_ ->
-                       let _hash__020_ =
-                         Ppx_quickcheck_runtime.Base.hash_fold_int
-                           _hash__020_ 67 in
-                       let _hash__020_ =
-                         Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                           quickcheck_observer_bool _x__021_
-                           ~size:_size__019_ ~hash:_hash__020_ in
-                       _hash__020_
-                   | `D _x__022_ ->
-                       let _hash__020_ =
-                         Ppx_quickcheck_runtime.Base.hash_fold_int
-                           _hash__020_ 68 in
-                       let _hash__020_ =
-                         Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                           quickcheck_observer_bool _x__022_
-                           ~size:_size__019_ ~hash:_hash__020_ in
-                       _hash__020_
-                   | `E _x__028_ ->
-                       let _hash__020_ =
-                         Ppx_quickcheck_runtime.Base.hash_fold_int
-                           _hash__020_ 69 in
-                       let _hash__020_ =
-                         Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                           (Ppx_quickcheck_runtime.Base_quickcheck.Observer.create
-                              (fun _x__023_ ->
-                                 fun ~size:_size__026_ ->
-                                   fun ~hash:_hash__027_ ->
-                                     let (_x__024_, _x__025_) = _x__023_ in
-                                     let _hash__027_ =
-                                       Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                                         quickcheck_observer_bool _x__024_
-                                         ~size:_size__026_ ~hash:_hash__027_ in
-                                     let _hash__027_ =
-                                       Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                                         (quickcheck_observer_option
-                                            quickcheck_observer_unit)
-                                         _x__025_ ~size:_size__026_
-                                         ~hash:_hash__027_ in
-                                     _hash__027_)) _x__028_ ~size:_size__019_
-                           ~hash:_hash__020_ in
-                       _hash__020_
-                   | `F _x__034_ ->
-                       let _hash__020_ =
-                         Ppx_quickcheck_runtime.Base.hash_fold_int
-                           _hash__020_ 70 in
-                       let _hash__020_ =
-                         Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                           (Ppx_quickcheck_runtime.Base_quickcheck.Observer.create
-                              (fun _x__029_ ->
-                                 fun ~size:_size__032_ ->
-                                   fun ~hash:_hash__033_ ->
-                                     let (_x__030_, _x__031_) = _x__029_ in
-                                     let _hash__033_ =
-                                       Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                                         quickcheck_observer_bool _x__030_
-                                         ~size:_size__032_ ~hash:_hash__033_ in
-                                     let _hash__033_ =
-                                       Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                                         (quickcheck_observer_option
-                                            quickcheck_observer_unit)
-                                         _x__031_ ~size:_size__032_
-                                         ~hash:_hash__033_ in
-                                     _hash__033_)) _x__034_ ~size:_size__019_
-                           ~hash:_hash__020_ in
-                       _hash__020_)
+            (fun _x__018_ ~size:_size__019_ ~hash:_hash__020_ ->
+               match _x__018_ with
+               | `A ->
+                   let _hash__020_ =
+                     Ppx_quickcheck_runtime.Base.hash_fold_int _hash__020_ 65 in
+                   _hash__020_
+               | `B ->
+                   let _hash__020_ =
+                     Ppx_quickcheck_runtime.Base.hash_fold_int _hash__020_ 66 in
+                   _hash__020_
+               | `C _x__021_ ->
+                   let _hash__020_ =
+                     Ppx_quickcheck_runtime.Base.hash_fold_int _hash__020_ 67 in
+                   let _hash__020_ =
+                     Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                       quickcheck_observer_bool _x__021_ ~size:_size__019_
+                       ~hash:_hash__020_ in
+                   _hash__020_
+               | `D _x__022_ ->
+                   let _hash__020_ =
+                     Ppx_quickcheck_runtime.Base.hash_fold_int _hash__020_ 68 in
+                   let _hash__020_ =
+                     Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                       quickcheck_observer_bool _x__022_ ~size:_size__019_
+                       ~hash:_hash__020_ in
+                   _hash__020_
+               | `E _x__028_ ->
+                   let _hash__020_ =
+                     Ppx_quickcheck_runtime.Base.hash_fold_int _hash__020_ 69 in
+                   let _hash__020_ =
+                     Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                       (Ppx_quickcheck_runtime.Base_quickcheck.Observer.create
+                          (fun _x__023_ ~size:_size__026_ ~hash:_hash__027_
+                             ->
+                             let (_x__024_, _x__025_) = _x__023_ in
+                             let _hash__027_ =
+                               Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                                 quickcheck_observer_bool _x__024_
+                                 ~size:_size__026_ ~hash:_hash__027_ in
+                             let _hash__027_ =
+                               Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                                 (quickcheck_observer_option
+                                    quickcheck_observer_unit) _x__025_
+                                 ~size:_size__026_ ~hash:_hash__027_ in
+                             _hash__027_)) _x__028_ ~size:_size__019_
+                       ~hash:_hash__020_ in
+                   _hash__020_
+               | `F _x__034_ ->
+                   let _hash__020_ =
+                     Ppx_quickcheck_runtime.Base.hash_fold_int _hash__020_ 70 in
+                   let _hash__020_ =
+                     Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                       (Ppx_quickcheck_runtime.Base_quickcheck.Observer.create
+                          (fun _x__029_ ~size:_size__032_ ~hash:_hash__033_
+                             ->
+                             let (_x__030_, _x__031_) = _x__029_ in
+                             let _hash__033_ =
+                               Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                                 quickcheck_observer_bool _x__030_
+                                 ~size:_size__032_ ~hash:_hash__033_ in
+                             let _hash__033_ =
+                               Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                                 (quickcheck_observer_option
+                                    quickcheck_observer_unit) _x__031_
+                                 ~size:_size__032_ ~hash:_hash__033_ in
+                             _hash__033_)) _x__034_ ~size:_size__019_
+                       ~hash:_hash__020_ in
+                   _hash__020_)
         let _ = quickcheck_observer
         let quickcheck_shrinker =
           Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.create
@@ -333,55 +308,48 @@ module Inherit_poly_variant =
           Ppx_quickcheck_runtime.Base_quickcheck.Generator.weighted_union
             [(1.,
                (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                  (fun ~size:_size__058_ -> fun ~random:_random__059_ -> `X)));
+                  (fun ~size:_size__058_ ~random:_random__059_ -> `X)));
             (1.,
               (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                 (fun ~size:_size__060_ ->
-                    fun ~random:_random__061_ ->
-                      (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                         Poly_variant.quickcheck_generator ~size:_size__060_
-                         ~random:_random__061_ : Poly_variant.t  :> [ `X 
-                                                                    | Poly_variant.t
-                                                                    | `Z of
+                 (fun ~size:_size__060_ ~random:_random__061_ ->
+                    (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                       Poly_variant.quickcheck_generator ~size:_size__060_
+                       ~random:_random__061_ : Poly_variant.t  :> [ `X 
+                                                                  | Poly_variant.t
+                                                                  | `Z of
                                                                     unit
                                                                     option ]))));
             (1.,
               (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                 (fun ~size:_size__062_ ->
-                    fun ~random:_random__063_ ->
-                      `Z
-                        (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                           (quickcheck_generator_option
-                              quickcheck_generator_unit) ~size:_size__062_
-                           ~random:_random__063_))))]
+                 (fun ~size:_size__062_ ~random:_random__063_ ->
+                    `Z
+                      (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                         (quickcheck_generator_option
+                            quickcheck_generator_unit) ~size:_size__062_
+                         ~random:_random__063_))))]
         let _ = quickcheck_generator
         let quickcheck_observer =
           Ppx_quickcheck_runtime.Base_quickcheck.Observer.create
-            (fun _x__053_ ->
-               fun ~size:_size__054_ ->
-                 fun ~hash:_hash__055_ ->
-                   match _x__053_ with
-                   | `X ->
-                       let _hash__055_ =
-                         Ppx_quickcheck_runtime.Base.hash_fold_int
-                           _hash__055_ 88 in
-                       _hash__055_
-                   | #Poly_variant.t as _x__056_ ->
-                       let _hash__055_ =
-                         Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                           Poly_variant.quickcheck_observer _x__056_
-                           ~size:_size__054_ ~hash:_hash__055_ in
-                       _hash__055_
-                   | `Z _x__057_ ->
-                       let _hash__055_ =
-                         Ppx_quickcheck_runtime.Base.hash_fold_int
-                           _hash__055_ 90 in
-                       let _hash__055_ =
-                         Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                           (quickcheck_observer_option
-                              quickcheck_observer_unit) _x__057_
-                           ~size:_size__054_ ~hash:_hash__055_ in
-                       _hash__055_)
+            (fun _x__053_ ~size:_size__054_ ~hash:_hash__055_ ->
+               match _x__053_ with
+               | `X ->
+                   let _hash__055_ =
+                     Ppx_quickcheck_runtime.Base.hash_fold_int _hash__055_ 88 in
+                   _hash__055_
+               | #Poly_variant.t as _x__056_ ->
+                   let _hash__055_ =
+                     Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                       Poly_variant.quickcheck_observer _x__056_
+                       ~size:_size__054_ ~hash:_hash__055_ in
+                   _hash__055_
+               | `Z _x__057_ ->
+                   let _hash__055_ =
+                     Ppx_quickcheck_runtime.Base.hash_fold_int _hash__055_ 90 in
+                   let _hash__055_ =
+                     Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                       (quickcheck_observer_option quickcheck_observer_unit)
+                       _x__057_ ~size:_size__054_ ~hash:_hash__055_ in
+                   _hash__055_)
         let _ = quickcheck_observer
         let quickcheck_shrinker =
           Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.create
@@ -416,35 +384,31 @@ module Record_type =
         let _ = fun (_ : t) -> ()
         let quickcheck_generator =
           Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-            (fun ~size:_size__071_ ->
-               fun ~random:_random__072_ ->
-                 {
-                   x =
-                     (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                        quickcheck_generator_bool ~size:_size__071_
-                        ~random:_random__072_);
-                   y =
-                     (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                        (quickcheck_generator_option
-                           quickcheck_generator_unit) ~size:_size__071_
-                        ~random:_random__072_)
-                 })
+            (fun ~size:_size__071_ ~random:_random__072_ ->
+               {
+                 x =
+                   (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                      quickcheck_generator_bool ~size:_size__071_
+                      ~random:_random__072_);
+                 y =
+                   (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                      (quickcheck_generator_option quickcheck_generator_unit)
+                      ~size:_size__071_ ~random:_random__072_)
+               })
         let _ = quickcheck_generator
         let quickcheck_observer =
           Ppx_quickcheck_runtime.Base_quickcheck.Observer.create
-            (fun _x__066_ ->
-               fun ~size:_size__069_ ->
-                 fun ~hash:_hash__070_ ->
-                   let { x = _x__067_; y = _x__068_ } = _x__066_ in
-                   let _hash__070_ =
-                     Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                       quickcheck_observer_bool _x__067_ ~size:_size__069_
-                       ~hash:_hash__070_ in
-                   let _hash__070_ =
-                     Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                       (quickcheck_observer_option quickcheck_observer_unit)
-                       _x__068_ ~size:_size__069_ ~hash:_hash__070_ in
-                   _hash__070_)
+            (fun _x__066_ ~size:_size__069_ ~hash:_hash__070_ ->
+               let { x = _x__067_; y = _x__068_ } = _x__066_ in
+               let _hash__070_ =
+                 Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                   quickcheck_observer_bool _x__067_ ~size:_size__069_
+                   ~hash:_hash__070_ in
+               let _hash__070_ =
+                 Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                   (quickcheck_observer_option quickcheck_observer_unit)
+                   _x__068_ ~size:_size__069_ ~hash:_hash__070_ in
+               _hash__070_)
         let _ = quickcheck_observer
         let quickcheck_shrinker =
           Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.create
@@ -476,61 +440,53 @@ module Nullary_and_unary_variant =
           Ppx_quickcheck_runtime.Base_quickcheck.Generator.weighted_union
             [(1.,
                (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                  (fun ~size:_size__080_ -> fun ~random:_random__081_ -> A)));
+                  (fun ~size:_size__080_ ~random:_random__081_ -> A)));
             (1.,
               (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                 (fun ~size:_size__082_ -> fun ~random:_random__083_ -> B)));
+                 (fun ~size:_size__082_ ~random:_random__083_ -> B)));
             (1.,
               (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                 (fun ~size:_size__084_ ->
-                    fun ~random:_random__085_ ->
-                      C
-                        (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                           quickcheck_generator_unit ~size:_size__084_
-                           ~random:_random__085_))));
+                 (fun ~size:_size__084_ ~random:_random__085_ ->
+                    C
+                      (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                         quickcheck_generator_unit ~size:_size__084_
+                         ~random:_random__085_))));
             (1.,
               (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                 (fun ~size:_size__086_ ->
-                    fun ~random:_random__087_ ->
-                      D
-                        (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                           quickcheck_generator_unit ~size:_size__086_
-                           ~random:_random__087_))))]
+                 (fun ~size:_size__086_ ~random:_random__087_ ->
+                    D
+                      (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                         quickcheck_generator_unit ~size:_size__086_
+                         ~random:_random__087_))))]
         let _ = quickcheck_generator
         let quickcheck_observer =
           Ppx_quickcheck_runtime.Base_quickcheck.Observer.create
-            (fun _x__075_ ->
-               fun ~size:_size__076_ ->
-                 fun ~hash:_hash__077_ ->
-                   match _x__075_ with
-                   | A ->
-                       let _hash__077_ =
-                         Ppx_quickcheck_runtime.Base.hash_fold_int
-                           _hash__077_ 0 in
-                       _hash__077_
-                   | B ->
-                       let _hash__077_ =
-                         Ppx_quickcheck_runtime.Base.hash_fold_int
-                           _hash__077_ 1 in
-                       _hash__077_
-                   | C _x__078_ ->
-                       let _hash__077_ =
-                         Ppx_quickcheck_runtime.Base.hash_fold_int
-                           _hash__077_ 2 in
-                       let _hash__077_ =
-                         Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                           quickcheck_observer_unit _x__078_
-                           ~size:_size__076_ ~hash:_hash__077_ in
-                       _hash__077_
-                   | D _x__079_ ->
-                       let _hash__077_ =
-                         Ppx_quickcheck_runtime.Base.hash_fold_int
-                           _hash__077_ 3 in
-                       let _hash__077_ =
-                         Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                           quickcheck_observer_unit _x__079_
-                           ~size:_size__076_ ~hash:_hash__077_ in
-                       _hash__077_)
+            (fun _x__075_ ~size:_size__076_ ~hash:_hash__077_ ->
+               match _x__075_ with
+               | A ->
+                   let _hash__077_ =
+                     Ppx_quickcheck_runtime.Base.hash_fold_int _hash__077_ 0 in
+                   _hash__077_
+               | B ->
+                   let _hash__077_ =
+                     Ppx_quickcheck_runtime.Base.hash_fold_int _hash__077_ 1 in
+                   _hash__077_
+               | C _x__078_ ->
+                   let _hash__077_ =
+                     Ppx_quickcheck_runtime.Base.hash_fold_int _hash__077_ 2 in
+                   let _hash__077_ =
+                     Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                       quickcheck_observer_unit _x__078_ ~size:_size__076_
+                       ~hash:_hash__077_ in
+                   _hash__077_
+               | D _x__079_ ->
+                   let _hash__077_ =
+                     Ppx_quickcheck_runtime.Base.hash_fold_int _hash__077_ 3 in
+                   let _hash__077_ =
+                     Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                       quickcheck_observer_unit _x__079_ ~size:_size__076_
+                       ~hash:_hash__077_ in
+                   _hash__077_)
         let _ = quickcheck_observer
         let quickcheck_shrinker =
           Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.create
@@ -570,201 +526,185 @@ module Binary_and_record_variant =
           Ppx_quickcheck_runtime.Base_quickcheck.Generator.weighted_union
             [(1.,
                (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                  (fun ~size:_size__123_ ->
-                     fun ~random:_random__124_ ->
-                       A
-                         ((Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                             quickcheck_generator_bool ~size:_size__123_
-                             ~random:_random__124_),
-                           (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                              (Ppx_quickcheck_runtime.Base_quickcheck.Generator.weighted_union
-                                 [(1.,
-                                    (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                                       (fun ~size:_size__117_ ->
-                                          fun ~random:_random__118_ -> `X)));
-                                 (1.,
-                                   (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                                      (fun ~size:_size__119_ ->
-                                         fun ~random:_random__120_ -> `Y)));
-                                 (1.,
-                                   (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                                      (fun ~size:_size__121_ ->
-                                         fun ~random:_random__122_ ->
-                                           `Z
-                                             (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                                                quickcheck_generator_unit
-                                                ~size:_size__121_
-                                                ~random:_random__122_))))])
-                              ~size:_size__123_ ~random:_random__124_)))));
+                  (fun ~size:_size__123_ ~random:_random__124_ ->
+                     A
+                       ((Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                           quickcheck_generator_bool ~size:_size__123_
+                           ~random:_random__124_),
+                         (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                            (Ppx_quickcheck_runtime.Base_quickcheck.Generator.weighted_union
+                               [(1.,
+                                  (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
+                                     (fun ~size:_size__117_
+                                        ~random:_random__118_ -> `X)));
+                               (1.,
+                                 (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
+                                    (fun ~size:_size__119_
+                                       ~random:_random__120_ -> `Y)));
+                               (1.,
+                                 (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
+                                    (fun ~size:_size__121_
+                                       ~random:_random__122_ ->
+                                       `Z
+                                         (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                                            quickcheck_generator_unit
+                                            ~size:_size__121_
+                                            ~random:_random__122_))))])
+                            ~size:_size__123_ ~random:_random__124_)))));
             (1.,
               (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                 (fun ~size:_size__131_ ->
-                    fun ~random:_random__132_ ->
-                      B
-                        ((Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                            quickcheck_generator_bool ~size:_size__131_
-                            ~random:_random__132_),
+                 (fun ~size:_size__131_ ~random:_random__132_ ->
+                    B
+                      ((Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                          quickcheck_generator_bool ~size:_size__131_
+                          ~random:_random__132_),
+                        (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                           (Ppx_quickcheck_runtime.Base_quickcheck.Generator.weighted_union
+                              [(1.,
+                                 (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
+                                    (fun ~size:_size__125_
+                                       ~random:_random__126_ -> `X)));
+                              (1.,
+                                (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
+                                   (fun ~size:_size__127_
+                                      ~random:_random__128_ -> `Y)));
+                              (1.,
+                                (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
+                                   (fun ~size:_size__129_
+                                      ~random:_random__130_ ->
+                                      `Z
+                                        (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                                           quickcheck_generator_unit
+                                           ~size:_size__129_
+                                           ~random:_random__130_))))])
+                           ~size:_size__131_ ~random:_random__132_)))));
+            (1.,
+              (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
+                 (fun ~size:_size__133_ ~random:_random__134_ ->
+                    C
+                      {
+                        x =
                           (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                             (Ppx_quickcheck_runtime.Base_quickcheck.Generator.weighted_union
-                                [(1.,
-                                   (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                                      (fun ~size:_size__125_ ->
-                                         fun ~random:_random__126_ -> `X)));
-                                (1.,
-                                  (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                                     (fun ~size:_size__127_ ->
-                                        fun ~random:_random__128_ -> `Y)));
-                                (1.,
-                                  (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                                     (fun ~size:_size__129_ ->
-                                        fun ~random:_random__130_ ->
-                                          `Z
-                                            (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                                               quickcheck_generator_unit
-                                               ~size:_size__129_
-                                               ~random:_random__130_))))])
-                             ~size:_size__131_ ~random:_random__132_)))));
+                             (quickcheck_generator_option
+                                quickcheck_generator_unit) ~size:_size__133_
+                             ~random:_random__134_);
+                        y =
+                          (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                             quickcheck_generator_bool ~size:_size__133_
+                             ~random:_random__134_)
+                      })));
             (1.,
               (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                 (fun ~size:_size__133_ ->
-                    fun ~random:_random__134_ ->
-                      C
-                        {
-                          x =
-                            (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                               (quickcheck_generator_option
-                                  quickcheck_generator_unit)
-                               ~size:_size__133_ ~random:_random__134_);
-                          y =
-                            (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                               quickcheck_generator_bool ~size:_size__133_
-                               ~random:_random__134_)
-                        })));
-            (1.,
-              (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                 (fun ~size:_size__135_ ->
-                    fun ~random:_random__136_ ->
-                      D
-                        {
-                          x =
-                            (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                               (quickcheck_generator_option
-                                  quickcheck_generator_unit)
-                               ~size:_size__135_ ~random:_random__136_);
-                          y =
-                            (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                               quickcheck_generator_bool ~size:_size__135_
-                               ~random:_random__136_)
-                        })))]
+                 (fun ~size:_size__135_ ~random:_random__136_ ->
+                    D
+                      {
+                        x =
+                          (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                             (quickcheck_generator_option
+                                quickcheck_generator_unit) ~size:_size__135_
+                             ~random:_random__136_);
+                        y =
+                          (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                             quickcheck_generator_bool ~size:_size__135_
+                             ~random:_random__136_)
+                      })))]
         let _ = quickcheck_generator
         let quickcheck_observer =
           Ppx_quickcheck_runtime.Base_quickcheck.Observer.create
-            (fun _x__098_ ->
-               fun ~size:_size__099_ ->
-                 fun ~hash:_hash__100_ ->
-                   match _x__098_ with
-                   | A (_x__105_, _x__106_) ->
-                       let _hash__100_ =
-                         Ppx_quickcheck_runtime.Base.hash_fold_int
-                           _hash__100_ 0 in
-                       let _hash__100_ =
-                         Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                           quickcheck_observer_bool _x__105_
-                           ~size:_size__099_ ~hash:_hash__100_ in
-                       let _hash__100_ =
-                         Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                           (Ppx_quickcheck_runtime.Base_quickcheck.Observer.create
-                              (fun _x__101_ ->
-                                 fun ~size:_size__102_ ->
-                                   fun ~hash:_hash__103_ ->
-                                     match _x__101_ with
-                                     | `X ->
-                                         let _hash__103_ =
-                                           Ppx_quickcheck_runtime.Base.hash_fold_int
-                                             _hash__103_ 88 in
-                                         _hash__103_
-                                     | `Y ->
-                                         let _hash__103_ =
-                                           Ppx_quickcheck_runtime.Base.hash_fold_int
-                                             _hash__103_ 89 in
-                                         _hash__103_
-                                     | `Z _x__104_ ->
-                                         let _hash__103_ =
-                                           Ppx_quickcheck_runtime.Base.hash_fold_int
-                                             _hash__103_ 90 in
-                                         let _hash__103_ =
-                                           Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                                             quickcheck_observer_unit
-                                             _x__104_ ~size:_size__102_
-                                             ~hash:_hash__103_ in
-                                         _hash__103_)) _x__106_
-                           ~size:_size__099_ ~hash:_hash__100_ in
-                       _hash__100_
-                   | B (_x__111_, _x__112_) ->
-                       let _hash__100_ =
-                         Ppx_quickcheck_runtime.Base.hash_fold_int
-                           _hash__100_ 1 in
-                       let _hash__100_ =
-                         Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                           quickcheck_observer_bool _x__111_
-                           ~size:_size__099_ ~hash:_hash__100_ in
-                       let _hash__100_ =
-                         Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                           (Ppx_quickcheck_runtime.Base_quickcheck.Observer.create
-                              (fun _x__107_ ->
-                                 fun ~size:_size__108_ ->
-                                   fun ~hash:_hash__109_ ->
-                                     match _x__107_ with
-                                     | `X ->
-                                         let _hash__109_ =
-                                           Ppx_quickcheck_runtime.Base.hash_fold_int
-                                             _hash__109_ 88 in
-                                         _hash__109_
-                                     | `Y ->
-                                         let _hash__109_ =
-                                           Ppx_quickcheck_runtime.Base.hash_fold_int
-                                             _hash__109_ 89 in
-                                         _hash__109_
-                                     | `Z _x__110_ ->
-                                         let _hash__109_ =
-                                           Ppx_quickcheck_runtime.Base.hash_fold_int
-                                             _hash__109_ 90 in
-                                         let _hash__109_ =
-                                           Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                                             quickcheck_observer_unit
-                                             _x__110_ ~size:_size__108_
-                                             ~hash:_hash__109_ in
-                                         _hash__109_)) _x__112_
-                           ~size:_size__099_ ~hash:_hash__100_ in
-                       _hash__100_
-                   | C { x = _x__113_; y = _x__114_ } ->
-                       let _hash__100_ =
-                         Ppx_quickcheck_runtime.Base.hash_fold_int
-                           _hash__100_ 2 in
-                       let _hash__100_ =
-                         Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                           (quickcheck_observer_option
-                              quickcheck_observer_unit) _x__113_
-                           ~size:_size__099_ ~hash:_hash__100_ in
-                       let _hash__100_ =
-                         Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                           quickcheck_observer_bool _x__114_
-                           ~size:_size__099_ ~hash:_hash__100_ in
-                       _hash__100_
-                   | D { x = _x__115_; y = _x__116_ } ->
-                       let _hash__100_ =
-                         Ppx_quickcheck_runtime.Base.hash_fold_int
-                           _hash__100_ 3 in
-                       let _hash__100_ =
-                         Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                           (quickcheck_observer_option
-                              quickcheck_observer_unit) _x__115_
-                           ~size:_size__099_ ~hash:_hash__100_ in
-                       let _hash__100_ =
-                         Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                           quickcheck_observer_bool _x__116_
-                           ~size:_size__099_ ~hash:_hash__100_ in
-                       _hash__100_)
+            (fun _x__098_ ~size:_size__099_ ~hash:_hash__100_ ->
+               match _x__098_ with
+               | A (_x__105_, _x__106_) ->
+                   let _hash__100_ =
+                     Ppx_quickcheck_runtime.Base.hash_fold_int _hash__100_ 0 in
+                   let _hash__100_ =
+                     Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                       quickcheck_observer_bool _x__105_ ~size:_size__099_
+                       ~hash:_hash__100_ in
+                   let _hash__100_ =
+                     Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                       (Ppx_quickcheck_runtime.Base_quickcheck.Observer.create
+                          (fun _x__101_ ~size:_size__102_ ~hash:_hash__103_
+                             ->
+                             match _x__101_ with
+                             | `X ->
+                                 let _hash__103_ =
+                                   Ppx_quickcheck_runtime.Base.hash_fold_int
+                                     _hash__103_ 88 in
+                                 _hash__103_
+                             | `Y ->
+                                 let _hash__103_ =
+                                   Ppx_quickcheck_runtime.Base.hash_fold_int
+                                     _hash__103_ 89 in
+                                 _hash__103_
+                             | `Z _x__104_ ->
+                                 let _hash__103_ =
+                                   Ppx_quickcheck_runtime.Base.hash_fold_int
+                                     _hash__103_ 90 in
+                                 let _hash__103_ =
+                                   Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                                     quickcheck_observer_unit _x__104_
+                                     ~size:_size__102_ ~hash:_hash__103_ in
+                                 _hash__103_)) _x__106_ ~size:_size__099_
+                       ~hash:_hash__100_ in
+                   _hash__100_
+               | B (_x__111_, _x__112_) ->
+                   let _hash__100_ =
+                     Ppx_quickcheck_runtime.Base.hash_fold_int _hash__100_ 1 in
+                   let _hash__100_ =
+                     Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                       quickcheck_observer_bool _x__111_ ~size:_size__099_
+                       ~hash:_hash__100_ in
+                   let _hash__100_ =
+                     Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                       (Ppx_quickcheck_runtime.Base_quickcheck.Observer.create
+                          (fun _x__107_ ~size:_size__108_ ~hash:_hash__109_
+                             ->
+                             match _x__107_ with
+                             | `X ->
+                                 let _hash__109_ =
+                                   Ppx_quickcheck_runtime.Base.hash_fold_int
+                                     _hash__109_ 88 in
+                                 _hash__109_
+                             | `Y ->
+                                 let _hash__109_ =
+                                   Ppx_quickcheck_runtime.Base.hash_fold_int
+                                     _hash__109_ 89 in
+                                 _hash__109_
+                             | `Z _x__110_ ->
+                                 let _hash__109_ =
+                                   Ppx_quickcheck_runtime.Base.hash_fold_int
+                                     _hash__109_ 90 in
+                                 let _hash__109_ =
+                                   Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                                     quickcheck_observer_unit _x__110_
+                                     ~size:_size__108_ ~hash:_hash__109_ in
+                                 _hash__109_)) _x__112_ ~size:_size__099_
+                       ~hash:_hash__100_ in
+                   _hash__100_
+               | C { x = _x__113_; y = _x__114_ } ->
+                   let _hash__100_ =
+                     Ppx_quickcheck_runtime.Base.hash_fold_int _hash__100_ 2 in
+                   let _hash__100_ =
+                     Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                       (quickcheck_observer_option quickcheck_observer_unit)
+                       _x__113_ ~size:_size__099_ ~hash:_hash__100_ in
+                   let _hash__100_ =
+                     Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                       quickcheck_observer_bool _x__114_ ~size:_size__099_
+                       ~hash:_hash__100_ in
+                   _hash__100_
+               | D { x = _x__115_; y = _x__116_ } ->
+                   let _hash__100_ =
+                     Ppx_quickcheck_runtime.Base.hash_fold_int _hash__100_ 3 in
+                   let _hash__100_ =
+                     Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                       (quickcheck_observer_option quickcheck_observer_unit)
+                       _x__115_ ~size:_size__099_ ~hash:_hash__100_ in
+                   let _hash__100_ =
+                     Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                       quickcheck_observer_bool _x__116_ ~size:_size__099_
+                       ~hash:_hash__100_ in
+                   _hash__100_)
         let _ = quickcheck_observer
         let quickcheck_shrinker =
           Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.create
@@ -869,14 +809,14 @@ module Named_arrow =
         let _ = fun (_ : t) -> ()
         let quickcheck_generator =
           Ppx_quickcheck_runtime.Base_quickcheck.Generator.map
-            ~f:(fun _f__139_ -> fun ~x:_x__140_ -> _f__139_ _x__140_)
+            ~f:(fun _f__139_ ~x:_x__140_ -> _f__139_ _x__140_)
             (Ppx_quickcheck_runtime.Base_quickcheck.Generator.fn
                (quickcheck_observer_option quickcheck_observer_unit)
                quickcheck_generator_bool)
         let _ = quickcheck_generator
         let quickcheck_observer =
           Ppx_quickcheck_runtime.Base_quickcheck.Observer.unmap
-            ~f:(fun _f__137_ -> fun _x__138_ -> _f__137_ ~x:_x__138_)
+            ~f:(fun _f__137_ _x__138_ -> _f__137_ ~x:_x__138_)
             (Ppx_quickcheck_runtime.Base_quickcheck.Observer.fn
                (quickcheck_generator_option quickcheck_generator_unit)
                quickcheck_observer_bool)
@@ -894,7 +834,7 @@ module Optional_arrow =
         let _ = fun (_ : t) -> ()
         let quickcheck_generator =
           Ppx_quickcheck_runtime.Base_quickcheck.Generator.map
-            ~f:(fun _f__143_ -> fun ?x:_x__144_ -> _f__143_ _x__144_)
+            ~f:(fun _f__143_ ?x:_x__144_ -> _f__143_ _x__144_)
             (Ppx_quickcheck_runtime.Base_quickcheck.Generator.fn
                (Ppx_quickcheck_runtime.Base_quickcheck.Observer.option
                   (quickcheck_observer_option quickcheck_observer_unit))
@@ -903,7 +843,7 @@ module Optional_arrow =
         let _ = quickcheck_generator
         let quickcheck_observer =
           Ppx_quickcheck_runtime.Base_quickcheck.Observer.unmap
-            ~f:(fun _f__141_ -> fun _x__142_ -> _f__141_ ?x:_x__142_)
+            ~f:(fun _f__141_ _x__142_ -> _f__141_ ?x:_x__142_)
             (Ppx_quickcheck_runtime.Base_quickcheck.Observer.fn
                (Ppx_quickcheck_runtime.Base_quickcheck.Generator.option
                   (quickcheck_generator_option quickcheck_generator_unit))
@@ -974,7 +914,7 @@ module Named_higher_order =
         let quickcheck_generator =
           Ppx_quickcheck_runtime.Base_quickcheck.Generator.fn
             (Ppx_quickcheck_runtime.Base_quickcheck.Observer.unmap
-               ~f:(fun _f__147_ -> fun _x__148_ -> _f__147_ ~x:_x__148_)
+               ~f:(fun _f__147_ _x__148_ -> _f__147_ ~x:_x__148_)
                (Ppx_quickcheck_runtime.Base_quickcheck.Observer.fn
                   (quickcheck_generator_option quickcheck_generator_unit)
                   (quickcheck_observer_option quickcheck_observer_bool)))
@@ -983,7 +923,7 @@ module Named_higher_order =
         let quickcheck_observer =
           Ppx_quickcheck_runtime.Base_quickcheck.Observer.fn
             (Ppx_quickcheck_runtime.Base_quickcheck.Generator.map
-               ~f:(fun _f__145_ -> fun ~x:_x__146_ -> _f__145_ _x__146_)
+               ~f:(fun _f__145_ ~x:_x__146_ -> _f__145_ _x__146_)
                (Ppx_quickcheck_runtime.Base_quickcheck.Generator.fn
                   (quickcheck_observer_option quickcheck_observer_unit)
                   (quickcheck_generator_option quickcheck_generator_bool)))
@@ -1004,7 +944,7 @@ module Optional_higher_order =
         let quickcheck_generator =
           Ppx_quickcheck_runtime.Base_quickcheck.Generator.fn
             (Ppx_quickcheck_runtime.Base_quickcheck.Observer.unmap
-               ~f:(fun _f__151_ -> fun _x__152_ -> _f__151_ ?x:_x__152_)
+               ~f:(fun _f__151_ _x__152_ -> _f__151_ ?x:_x__152_)
                (Ppx_quickcheck_runtime.Base_quickcheck.Observer.fn
                   (Ppx_quickcheck_runtime.Base_quickcheck.Generator.option
                      (quickcheck_generator_option quickcheck_generator_unit))
@@ -1016,7 +956,7 @@ module Optional_higher_order =
         let quickcheck_observer =
           Ppx_quickcheck_runtime.Base_quickcheck.Observer.fn
             (Ppx_quickcheck_runtime.Base_quickcheck.Generator.map
-               ~f:(fun _f__149_ -> fun ?x:_x__150_ -> _f__149_ _x__150_)
+               ~f:(fun _f__149_ ?x:_x__150_ -> _f__149_ _x__150_)
                (Ppx_quickcheck_runtime.Base_quickcheck.Generator.fn
                   (Ppx_quickcheck_runtime.Base_quickcheck.Observer.option
                      (quickcheck_observer_option quickcheck_observer_unit))
@@ -1072,29 +1012,25 @@ module Poly_binary =
         let _ = fun (_ : ('a, 'b) t) -> ()
         let quickcheck_generator _generator__167_ _generator__168_ =
           Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-            (fun ~size:_size__169_ ->
-               fun ~random:_random__170_ ->
-                 ((Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                     _generator__167_ ~size:_size__169_ ~random:_random__170_),
-                   (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                      _generator__168_ ~size:_size__169_
-                      ~random:_random__170_)))
+            (fun ~size:_size__169_ ~random:_random__170_ ->
+               ((Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                   _generator__167_ ~size:_size__169_ ~random:_random__170_),
+                 (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                    _generator__168_ ~size:_size__169_ ~random:_random__170_)))
         let _ = quickcheck_generator
         let quickcheck_observer _observer__160_ _observer__161_ =
           Ppx_quickcheck_runtime.Base_quickcheck.Observer.create
-            (fun _x__162_ ->
-               fun ~size:_size__165_ ->
-                 fun ~hash:_hash__166_ ->
-                   let (_x__163_, _x__164_) = _x__162_ in
-                   let _hash__166_ =
-                     Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                       _observer__160_ _x__163_ ~size:_size__165_
-                       ~hash:_hash__166_ in
-                   let _hash__166_ =
-                     Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                       _observer__161_ _x__164_ ~size:_size__165_
-                       ~hash:_hash__166_ in
-                   _hash__166_)
+            (fun _x__162_ ~size:_size__165_ ~hash:_hash__166_ ->
+               let (_x__163_, _x__164_) = _x__162_ in
+               let _hash__166_ =
+                 Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                   _observer__160_ _x__163_ ~size:_size__165_
+                   ~hash:_hash__166_ in
+               let _hash__166_ =
+                 Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                   _observer__161_ _x__164_ ~size:_size__165_
+                   ~hash:_hash__166_ in
+               _hash__166_)
         let _ = quickcheck_observer
         let quickcheck_shrinker _shrinker__156_ _shrinker__157_ =
           Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.create
@@ -1140,37 +1076,32 @@ module Poly_ternary =
         let quickcheck_generator _generator__186_ _generator__187_
           _generator__188_ =
           Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-            (fun ~size:_size__189_ ->
-               fun ~random:_random__190_ ->
-                 ((Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                     _generator__186_ ~size:_size__189_ ~random:_random__190_),
-                   (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                      _generator__187_ ~size:_size__189_
-                      ~random:_random__190_),
-                   (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                      _generator__188_ ~size:_size__189_
-                      ~random:_random__190_)))
+            (fun ~size:_size__189_ ~random:_random__190_ ->
+               ((Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                   _generator__186_ ~size:_size__189_ ~random:_random__190_),
+                 (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                    _generator__187_ ~size:_size__189_ ~random:_random__190_),
+                 (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                    _generator__188_ ~size:_size__189_ ~random:_random__190_)))
         let _ = quickcheck_generator
         let quickcheck_observer _observer__177_ _observer__178_
           _observer__179_ =
           Ppx_quickcheck_runtime.Base_quickcheck.Observer.create
-            (fun _x__180_ ->
-               fun ~size:_size__184_ ->
-                 fun ~hash:_hash__185_ ->
-                   let (_x__181_, _x__182_, _x__183_) = _x__180_ in
-                   let _hash__185_ =
-                     Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                       _observer__177_ _x__181_ ~size:_size__184_
-                       ~hash:_hash__185_ in
-                   let _hash__185_ =
-                     Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                       _observer__178_ _x__182_ ~size:_size__184_
-                       ~hash:_hash__185_ in
-                   let _hash__185_ =
-                     Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                       _observer__179_ _x__183_ ~size:_size__184_
-                       ~hash:_hash__185_ in
-                   _hash__185_)
+            (fun _x__180_ ~size:_size__184_ ~hash:_hash__185_ ->
+               let (_x__181_, _x__182_, _x__183_) = _x__180_ in
+               let _hash__185_ =
+                 Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                   _observer__177_ _x__181_ ~size:_size__184_
+                   ~hash:_hash__185_ in
+               let _hash__185_ =
+                 Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                   _observer__178_ _x__182_ ~size:_size__184_
+                   ~hash:_hash__185_ in
+               let _hash__185_ =
+                 Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                   _observer__179_ _x__183_ ~size:_size__184_
+                   ~hash:_hash__185_ in
+               _hash__185_)
         let _ = quickcheck_observer
         let quickcheck_shrinker _shrinker__171_ _shrinker__172_
           _shrinker__173_ =
@@ -1231,31 +1162,28 @@ module Poly_with_variance =
         let _ = fun (_ : ('a, 'b) t) -> ()
         let quickcheck_generator _observer__202_ _generator__203_ =
           Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-            (fun ~size:_size__204_ ->
-               fun ~random:_random__205_ ->
-                 ((Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                     _generator__203_ ~size:_size__204_ ~random:_random__205_),
-                   (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                      (Ppx_quickcheck_runtime.Base_quickcheck.Generator.fn
-                         _observer__202_ _generator__203_) ~size:_size__204_
-                      ~random:_random__205_)))
+            (fun ~size:_size__204_ ~random:_random__205_ ->
+               ((Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                   _generator__203_ ~size:_size__204_ ~random:_random__205_),
+                 (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                    (Ppx_quickcheck_runtime.Base_quickcheck.Generator.fn
+                       _observer__202_ _generator__203_) ~size:_size__204_
+                    ~random:_random__205_)))
         let _ = quickcheck_generator
         let quickcheck_observer _generator__195_ _observer__196_ =
           Ppx_quickcheck_runtime.Base_quickcheck.Observer.create
-            (fun _x__197_ ->
-               fun ~size:_size__200_ ->
-                 fun ~hash:_hash__201_ ->
-                   let (_x__198_, _x__199_) = _x__197_ in
-                   let _hash__201_ =
-                     Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                       _observer__196_ _x__198_ ~size:_size__200_
-                       ~hash:_hash__201_ in
-                   let _hash__201_ =
-                     Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                       (Ppx_quickcheck_runtime.Base_quickcheck.Observer.fn
-                          _generator__195_ _observer__196_) _x__199_
-                       ~size:_size__200_ ~hash:_hash__201_ in
-                   _hash__201_)
+            (fun _x__197_ ~size:_size__200_ ~hash:_hash__201_ ->
+               let (_x__198_, _x__199_) = _x__197_ in
+               let _hash__201_ =
+                 Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                   _observer__196_ _x__198_ ~size:_size__200_
+                   ~hash:_hash__201_ in
+               let _hash__201_ =
+                 Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                   (Ppx_quickcheck_runtime.Base_quickcheck.Observer.fn
+                      _generator__195_ _observer__196_) _x__199_
+                   ~size:_size__200_ ~hash:_hash__201_ in
+               _hash__201_)
         let _ = quickcheck_observer
         let quickcheck_shrinker _shrinker__191_ _shrinker__192_ =
           Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.create
@@ -1288,12 +1216,11 @@ module Instance_with_variance =
       Ppx_quickcheck_runtime.Base_quickcheck.Generator.weighted_union
         [(1.,
            (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-              (fun ~size:_size__206_ ->
-                 fun ~random:_random__207_ ->
-                   `Foo
-                     (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                        quickcheck_generator ~size:_size__206_
-                        ~random:_random__207_))))]
+              (fun ~size:_size__206_ ~random:_random__207_ ->
+                 `Foo
+                   (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                      quickcheck_generator ~size:_size__206_
+                      ~random:_random__207_))))]
   end
 module Poly_with_phantom =
   struct
@@ -1323,21 +1250,18 @@ module Instance_with_phantom =
             (Ppx_quickcheck_runtime.Base_quickcheck.Generator.weighted_union
                [(1.,
                   (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                     (fun ~size:_size__217_ ->
-                        fun ~random:_random__218_ -> `phantom)))])
+                     (fun ~size:_size__217_ ~random:_random__218_ -> `phantom)))])
         let _ = quickcheck_generator
         let quickcheck_observer =
           Poly_with_phantom.quickcheck_observer
             (Ppx_quickcheck_runtime.Base_quickcheck.Observer.create
-               (fun _x__214_ ->
-                  fun ~size:_size__215_ ->
-                    fun ~hash:_hash__216_ ->
-                      match _x__214_ with
-                      | `phantom ->
-                          let _hash__216_ =
-                            Ppx_quickcheck_runtime.Base.hash_fold_int
-                              _hash__216_ (-378691891) in
-                          _hash__216_))
+               (fun _x__214_ ~size:_size__215_ ~hash:_hash__216_ ->
+                  match _x__214_ with
+                  | `phantom ->
+                      let _hash__216_ =
+                        Ppx_quickcheck_runtime.Base.hash_fold_int _hash__216_
+                          (-378691891) in
+                      _hash__216_))
         let _ = quickcheck_observer
         let quickcheck_shrinker =
           Poly_with_phantom.quickcheck_shrinker
@@ -1372,8 +1296,8 @@ module Recursive =
                      (let _pair__229_ =
                         (1.,
                           (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                             (fun ~size:_size__233_ ->
-                                fun ~random:_random__234_ -> Leaf)))
+                             (fun ~size:_size__233_ ~random:_random__234_ ->
+                                Leaf)))
                       and _pair__230_ =
                         (1.,
                           (Ppx_quickcheck_runtime.Base_quickcheck.Generator.bind
@@ -1383,17 +1307,17 @@ module Recursive =
                                      ~size:(Ppx_quickcheck_runtime.Base.Int.pred
                                               _size__226_)
                                      (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                                        (fun ~size:_size__231_ ->
-                                           fun ~random:_random__232_ ->
-                                             Node
-                                               ((Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                                                   quickcheck_generator
-                                                   ~size:_size__231_
-                                                   ~random:_random__232_),
-                                                 (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                                                    quickcheck_generator
-                                                    ~size:_size__231_
-                                                    ~random:_random__232_))))))) in
+                                        (fun ~size:_size__231_
+                                           ~random:_random__232_ ->
+                                           Node
+                                             ((Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                                                 quickcheck_generator
+                                                 ~size:_size__231_
+                                                 ~random:_random__232_),
+                                               (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                                                  quickcheck_generator
+                                                  ~size:_size__231_
+                                                  ~random:_random__232_))))))) in
                       let _gen__227_ =
                         Ppx_quickcheck_runtime.Base_quickcheck.Generator.weighted_union
                           [_pair__229_]
@@ -1424,28 +1348,26 @@ module Recursive =
                          quickcheck_observer in
                      ignore quickcheck_observer;
                      Ppx_quickcheck_runtime.Base_quickcheck.Observer.create
-                       (fun _x__221_ ->
-                          fun ~size:_size__222_ ->
-                            fun ~hash:_hash__223_ ->
-                              match _x__221_ with
-                              | Leaf ->
-                                  let _hash__223_ =
-                                    Ppx_quickcheck_runtime.Base.hash_fold_int
-                                      _hash__223_ 0 in
-                                  _hash__223_
-                              | Node (_x__224_, _x__225_) ->
-                                  let _hash__223_ =
-                                    Ppx_quickcheck_runtime.Base.hash_fold_int
-                                      _hash__223_ 1 in
-                                  let _hash__223_ =
-                                    Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                                      quickcheck_observer _x__224_
-                                      ~size:_size__222_ ~hash:_hash__223_ in
-                                  let _hash__223_ =
-                                    Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                                      quickcheck_observer _x__225_
-                                      ~size:_size__222_ ~hash:_hash__223_ in
-                                  _hash__223_))
+                       (fun _x__221_ ~size:_size__222_ ~hash:_hash__223_ ->
+                          match _x__221_ with
+                          | Leaf ->
+                              let _hash__223_ =
+                                Ppx_quickcheck_runtime.Base.hash_fold_int
+                                  _hash__223_ 0 in
+                              _hash__223_
+                          | Node (_x__224_, _x__225_) ->
+                              let _hash__223_ =
+                                Ppx_quickcheck_runtime.Base.hash_fold_int
+                                  _hash__223_ 1 in
+                              let _hash__223_ =
+                                Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                                  quickcheck_observer _x__224_
+                                  ~size:_size__222_ ~hash:_hash__223_ in
+                              let _hash__223_ =
+                                Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                                  quickcheck_observer _x__225_
+                                  ~size:_size__222_ ~hash:_hash__223_ in
+                              _hash__223_))
                 let _ = quickcheck_observer
               end
             let quickcheck_observer =
@@ -1512,15 +1434,14 @@ module Recursive_with_indirect_base_case =
                          quickcheck_generator in
                      ignore quickcheck_generator;
                      Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                       (fun ~size:_size__240_ ->
-                          fun ~random:_random__241_ ->
-                            {
-                              children =
-                                (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                                   (quickcheck_generator_list
-                                      quickcheck_generator) ~size:_size__240_
-                                   ~random:_random__241_)
-                            }))
+                       (fun ~size:_size__240_ ~random:_random__241_ ->
+                          {
+                            children =
+                              (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                                 (quickcheck_generator_list
+                                    quickcheck_generator) ~size:_size__240_
+                                 ~random:_random__241_)
+                          }))
                 let _ = quickcheck_generator
               end
             let quickcheck_generator =
@@ -1542,16 +1463,13 @@ module Recursive_with_indirect_base_case =
                          quickcheck_observer in
                      ignore quickcheck_observer;
                      Ppx_quickcheck_runtime.Base_quickcheck.Observer.create
-                       (fun _x__236_ ->
-                          fun ~size:_size__238_ ->
-                            fun ~hash:_hash__239_ ->
-                              let { children = _x__237_ } = _x__236_ in
-                              let _hash__239_ =
-                                Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                                  (quickcheck_observer_list
-                                     quickcheck_observer) _x__237_
-                                  ~size:_size__238_ ~hash:_hash__239_ in
-                              _hash__239_))
+                       (fun _x__236_ ~size:_size__238_ ~hash:_hash__239_ ->
+                          let { children = _x__237_ } = _x__236_ in
+                          let _hash__239_ =
+                            Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                              (quickcheck_observer_list quickcheck_observer)
+                              _x__237_ ~size:_size__238_ ~hash:_hash__239_ in
+                          _hash__239_))
                 let _ = quickcheck_observer
               end
             let quickcheck_observer =
@@ -1626,13 +1544,11 @@ module Mutually_recursive =
                      (let _pair__259_ =
                         (1.,
                           (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                             (fun ~size:_size__266_ ->
-                                fun ~random:_random__267_ ->
-                                  Constant
-                                    (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                                       quickcheck_generator_int64
-                                       ~size:_size__266_
-                                       ~random:_random__267_))))
+                             (fun ~size:_size__266_ ~random:_random__267_ ->
+                                Constant
+                                  (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                                     quickcheck_generator_int64
+                                     ~size:_size__266_ ~random:_random__267_))))
                       and _pair__260_ =
                         (1.,
                           (Ppx_quickcheck_runtime.Base_quickcheck.Generator.bind
@@ -1642,13 +1558,13 @@ module Mutually_recursive =
                                      ~size:(Ppx_quickcheck_runtime.Base.Int.pred
                                               _size__256_)
                                      (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                                        (fun ~size:_size__262_ ->
-                                           fun ~random:_random__263_ ->
-                                             Operator
-                                               (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                                                  quickcheck_generator_op
-                                                  ~size:_size__262_
-                                                  ~random:_random__263_))))))
+                                        (fun ~size:_size__262_
+                                           ~random:_random__263_ ->
+                                           Operator
+                                             (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                                                quickcheck_generator_op
+                                                ~size:_size__262_
+                                                ~random:_random__263_))))))
                       and _pair__261_ =
                         (1.,
                           (Ppx_quickcheck_runtime.Base_quickcheck.Generator.bind
@@ -1658,17 +1574,17 @@ module Mutually_recursive =
                                      ~size:(Ppx_quickcheck_runtime.Base.Int.pred
                                               _size__256_)
                                      (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                                        (fun ~size:_size__264_ ->
-                                           fun ~random:_random__265_ ->
-                                             Application
-                                               ((Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                                                   quickcheck_generator_expr
-                                                   ~size:_size__264_
-                                                   ~random:_random__265_),
-                                                 (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                                                    quickcheck_generator_args
-                                                    ~size:_size__264_
-                                                    ~random:_random__265_))))))) in
+                                        (fun ~size:_size__264_
+                                           ~random:_random__265_ ->
+                                           Application
+                                             ((Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                                                 quickcheck_generator_expr
+                                                 ~size:_size__264_
+                                                 ~random:_random__265_),
+                                               (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                                                  quickcheck_generator_args
+                                                  ~size:_size__264_
+                                                  ~random:_random__265_))))))) in
                       let _gen__257_ =
                         Ppx_quickcheck_runtime.Base_quickcheck.Generator.weighted_union
                           [_pair__259_]
@@ -1698,16 +1614,16 @@ module Mutually_recursive =
                      Ppx_quickcheck_runtime.Base_quickcheck.Generator.weighted_union
                        [(1.,
                           (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                             (fun ~size:_size__268_ ->
-                                fun ~random:_random__269_ -> `plus)));
+                             (fun ~size:_size__268_ ~random:_random__269_ ->
+                                `plus)));
                        (1.,
                          (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                            (fun ~size:_size__270_ ->
-                               fun ~random:_random__271_ -> `minus)));
+                            (fun ~size:_size__270_ ~random:_random__271_ ->
+                               `minus)));
                        (1.,
                          (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                            (fun ~size:_size__272_ ->
-                               fun ~random:_random__273_ -> `abs)))])
+                            (fun ~size:_size__272_ ~random:_random__273_ ->
+                               `abs)))])
                 and (quickcheck_generator_args :
                   args Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
                     Ppx_quickcheck_runtime.Base.Lazy.t)
@@ -1765,41 +1681,39 @@ module Mutually_recursive =
                      ignore quickcheck_observer_op;
                      ignore quickcheck_observer_expr;
                      Ppx_quickcheck_runtime.Base_quickcheck.Observer.create
-                       (fun _x__246_ ->
-                          fun ~size:_size__247_ ->
-                            fun ~hash:_hash__248_ ->
-                              match _x__246_ with
-                              | Constant _x__249_ ->
-                                  let _hash__248_ =
-                                    Ppx_quickcheck_runtime.Base.hash_fold_int
-                                      _hash__248_ 0 in
-                                  let _hash__248_ =
-                                    Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                                      quickcheck_observer_int64 _x__249_
-                                      ~size:_size__247_ ~hash:_hash__248_ in
-                                  _hash__248_
-                              | Operator _x__250_ ->
-                                  let _hash__248_ =
-                                    Ppx_quickcheck_runtime.Base.hash_fold_int
-                                      _hash__248_ 1 in
-                                  let _hash__248_ =
-                                    Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                                      quickcheck_observer_op _x__250_
-                                      ~size:_size__247_ ~hash:_hash__248_ in
-                                  _hash__248_
-                              | Application (_x__251_, _x__252_) ->
-                                  let _hash__248_ =
-                                    Ppx_quickcheck_runtime.Base.hash_fold_int
-                                      _hash__248_ 2 in
-                                  let _hash__248_ =
-                                    Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                                      quickcheck_observer_expr _x__251_
-                                      ~size:_size__247_ ~hash:_hash__248_ in
-                                  let _hash__248_ =
-                                    Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                                      quickcheck_observer_args _x__252_
-                                      ~size:_size__247_ ~hash:_hash__248_ in
-                                  _hash__248_))
+                       (fun _x__246_ ~size:_size__247_ ~hash:_hash__248_ ->
+                          match _x__246_ with
+                          | Constant _x__249_ ->
+                              let _hash__248_ =
+                                Ppx_quickcheck_runtime.Base.hash_fold_int
+                                  _hash__248_ 0 in
+                              let _hash__248_ =
+                                Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                                  quickcheck_observer_int64 _x__249_
+                                  ~size:_size__247_ ~hash:_hash__248_ in
+                              _hash__248_
+                          | Operator _x__250_ ->
+                              let _hash__248_ =
+                                Ppx_quickcheck_runtime.Base.hash_fold_int
+                                  _hash__248_ 1 in
+                              let _hash__248_ =
+                                Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                                  quickcheck_observer_op _x__250_
+                                  ~size:_size__247_ ~hash:_hash__248_ in
+                              _hash__248_
+                          | Application (_x__251_, _x__252_) ->
+                              let _hash__248_ =
+                                Ppx_quickcheck_runtime.Base.hash_fold_int
+                                  _hash__248_ 2 in
+                              let _hash__248_ =
+                                Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                                  quickcheck_observer_expr _x__251_
+                                  ~size:_size__247_ ~hash:_hash__248_ in
+                              let _hash__248_ =
+                                Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                                  quickcheck_observer_args _x__252_
+                                  ~size:_size__247_ ~hash:_hash__248_ in
+                              _hash__248_))
                 and (quickcheck_observer_op :
                   op Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
                     Ppx_quickcheck_runtime.Base.Lazy.t)
@@ -1818,25 +1732,23 @@ module Mutually_recursive =
                      ignore quickcheck_observer_op;
                      ignore quickcheck_observer_expr;
                      Ppx_quickcheck_runtime.Base_quickcheck.Observer.create
-                       (fun _x__253_ ->
-                          fun ~size:_size__254_ ->
-                            fun ~hash:_hash__255_ ->
-                              match _x__253_ with
-                              | `plus ->
-                                  let _hash__255_ =
-                                    Ppx_quickcheck_runtime.Base.hash_fold_int
-                                      _hash__255_ (-900055206) in
-                                  _hash__255_
-                              | `minus ->
-                                  let _hash__255_ =
-                                    Ppx_quickcheck_runtime.Base.hash_fold_int
-                                      _hash__255_ 141066352 in
-                                  _hash__255_
-                              | `abs ->
-                                  let _hash__255_ =
-                                    Ppx_quickcheck_runtime.Base.hash_fold_int
-                                      _hash__255_ 4845682 in
-                                  _hash__255_))
+                       (fun _x__253_ ~size:_size__254_ ~hash:_hash__255_ ->
+                          match _x__253_ with
+                          | `plus ->
+                              let _hash__255_ =
+                                Ppx_quickcheck_runtime.Base.hash_fold_int
+                                  _hash__255_ (-900055206) in
+                              _hash__255_
+                          | `minus ->
+                              let _hash__255_ =
+                                Ppx_quickcheck_runtime.Base.hash_fold_int
+                                  _hash__255_ 141066352 in
+                              _hash__255_
+                          | `abs ->
+                              let _hash__255_ =
+                                Ppx_quickcheck_runtime.Base.hash_fold_int
+                                  _hash__255_ 4845682 in
+                              _hash__255_))
                 and (quickcheck_observer_args :
                   args Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
                     Ppx_quickcheck_runtime.Base.Lazy.t)
@@ -2014,8 +1926,8 @@ module Poly_recursive =
                        (let _pair__291_ =
                           (1.,
                             (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                               (fun ~size:_size__295_ ->
-                                  fun ~random:_random__296_ -> Zero)))
+                               (fun ~size:_size__295_ ~random:_random__296_
+                                  -> Zero)))
                         and _pair__292_ =
                           (1.,
                             (Ppx_quickcheck_runtime.Base_quickcheck.Generator.bind
@@ -2025,18 +1937,18 @@ module Poly_recursive =
                                        ~size:(Ppx_quickcheck_runtime.Base.Int.pred
                                                 _size__288_)
                                        (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                                          (fun ~size:_size__293_ ->
-                                             fun ~random:_random__294_ ->
-                                               Succ
-                                                 ((Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                                                     _generator__287_
-                                                     ~size:_size__293_
-                                                     ~random:_random__294_),
-                                                   (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                                                      (quickcheck_generator
-                                                         _generator__287_)
-                                                      ~size:_size__293_
-                                                      ~random:_random__294_))))))) in
+                                          (fun ~size:_size__293_
+                                             ~random:_random__294_ ->
+                                             Succ
+                                               ((Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                                                   _generator__287_
+                                                   ~size:_size__293_
+                                                   ~random:_random__294_),
+                                                 (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                                                    (quickcheck_generator
+                                                       _generator__287_)
+                                                    ~size:_size__293_
+                                                    ~random:_random__294_))))))) in
                         let _gen__289_ =
                           Ppx_quickcheck_runtime.Base_quickcheck.Generator.weighted_union
                             [_pair__291_]
@@ -2074,29 +1986,27 @@ module Poly_recursive =
                                  quickcheck_observer _recur__285_)) in
                        ignore quickcheck_observer;
                        Ppx_quickcheck_runtime.Base_quickcheck.Observer.create
-                         (fun _x__280_ ->
-                            fun ~size:_size__281_ ->
-                              fun ~hash:_hash__282_ ->
-                                match _x__280_ with
-                                | Zero ->
-                                    let _hash__282_ =
-                                      Ppx_quickcheck_runtime.Base.hash_fold_int
-                                        _hash__282_ 0 in
-                                    _hash__282_
-                                | Succ (_x__283_, _x__284_) ->
-                                    let _hash__282_ =
-                                      Ppx_quickcheck_runtime.Base.hash_fold_int
-                                        _hash__282_ 1 in
-                                    let _hash__282_ =
-                                      Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                                        _observer__279_ _x__283_
-                                        ~size:_size__281_ ~hash:_hash__282_ in
-                                    let _hash__282_ =
-                                      Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                                        (quickcheck_observer _observer__279_)
-                                        _x__284_ ~size:_size__281_
-                                        ~hash:_hash__282_ in
-                                    _hash__282_))
+                         (fun _x__280_ ~size:_size__281_ ~hash:_hash__282_ ->
+                            match _x__280_ with
+                            | Zero ->
+                                let _hash__282_ =
+                                  Ppx_quickcheck_runtime.Base.hash_fold_int
+                                    _hash__282_ 0 in
+                                _hash__282_
+                            | Succ (_x__283_, _x__284_) ->
+                                let _hash__282_ =
+                                  Ppx_quickcheck_runtime.Base.hash_fold_int
+                                    _hash__282_ 1 in
+                                let _hash__282_ =
+                                  Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                                    _observer__279_ _x__283_
+                                    ~size:_size__281_ ~hash:_hash__282_ in
+                                let _hash__282_ =
+                                  Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                                    (quickcheck_observer _observer__279_)
+                                    _x__284_ ~size:_size__281_
+                                    ~hash:_hash__282_ in
+                                _hash__282_))
                 let _ = quickcheck_observer
               end
             let quickcheck_observer _recur__286_ =
@@ -2202,13 +2112,11 @@ module Murec_poly_mono =
                      (let _pair__315_ =
                         (1.,
                           (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                             (fun ~size:_size__319_ ->
-                                fun ~random:_random__320_ ->
-                                  Leaf
-                                    (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                                       quickcheck_generator_bool
-                                       ~size:_size__319_
-                                       ~random:_random__320_))))
+                             (fun ~size:_size__319_ ~random:_random__320_ ->
+                                Leaf
+                                  (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                                     quickcheck_generator_bool
+                                     ~size:_size__319_ ~random:_random__320_))))
                       and _pair__316_ =
                         (1.,
                           (Ppx_quickcheck_runtime.Base_quickcheck.Generator.bind
@@ -2218,14 +2126,14 @@ module Murec_poly_mono =
                                      ~size:(Ppx_quickcheck_runtime.Base.Int.pred
                                               _size__312_)
                                      (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                                        (fun ~size:_size__317_ ->
-                                           fun ~random:_random__318_ ->
-                                             Node
-                                               (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                                                  (quickcheck_generator_node
-                                                     quickcheck_generator)
-                                                  ~size:_size__317_
-                                                  ~random:_random__318_)))))) in
+                                        (fun ~size:_size__317_
+                                           ~random:_random__318_ ->
+                                           Node
+                                             (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                                                (quickcheck_generator_node
+                                                   quickcheck_generator)
+                                                ~size:_size__317_
+                                                ~random:_random__318_)))))) in
                       let _gen__313_ =
                         Ppx_quickcheck_runtime.Base_quickcheck.Generator.weighted_union
                           [_pair__315_]
@@ -2289,29 +2197,27 @@ module Murec_poly_mono =
                      ignore quickcheck_observer_node;
                      ignore quickcheck_observer;
                      Ppx_quickcheck_runtime.Base_quickcheck.Observer.create
-                       (fun _x__304_ ->
-                          fun ~size:_size__305_ ->
-                            fun ~hash:_hash__306_ ->
-                              match _x__304_ with
-                              | Leaf _x__307_ ->
-                                  let _hash__306_ =
-                                    Ppx_quickcheck_runtime.Base.hash_fold_int
-                                      _hash__306_ 0 in
-                                  let _hash__306_ =
-                                    Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                                      quickcheck_observer_bool _x__307_
-                                      ~size:_size__305_ ~hash:_hash__306_ in
-                                  _hash__306_
-                              | Node _x__308_ ->
-                                  let _hash__306_ =
-                                    Ppx_quickcheck_runtime.Base.hash_fold_int
-                                      _hash__306_ 1 in
-                                  let _hash__306_ =
-                                    Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                                      (quickcheck_observer_node
-                                         quickcheck_observer) _x__308_
-                                      ~size:_size__305_ ~hash:_hash__306_ in
-                                  _hash__306_))
+                       (fun _x__304_ ~size:_size__305_ ~hash:_hash__306_ ->
+                          match _x__304_ with
+                          | Leaf _x__307_ ->
+                              let _hash__306_ =
+                                Ppx_quickcheck_runtime.Base.hash_fold_int
+                                  _hash__306_ 0 in
+                              let _hash__306_ =
+                                Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                                  quickcheck_observer_bool _x__307_
+                                  ~size:_size__305_ ~hash:_hash__306_ in
+                              _hash__306_
+                          | Node _x__308_ ->
+                              let _hash__306_ =
+                                Ppx_quickcheck_runtime.Base.hash_fold_int
+                                  _hash__306_ 1 in
+                              let _hash__306_ =
+                                Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                                  (quickcheck_observer_node
+                                     quickcheck_observer) _x__308_
+                                  ~size:_size__305_ ~hash:_hash__306_ in
+                              _hash__306_))
                 and quickcheck_observer_node :
                   'a .
                     ('a Ppx_quickcheck_runtime.Base_quickcheck.Observer.t ->
@@ -2446,12 +2352,12 @@ module Polymorphic_recursion =
                        (let _pair__348_ =
                           (1.,
                             (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                               (fun ~size:_size__354_ ->
-                                  fun ~random:_random__355_ ->
-                                    Single
-                                      (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                                         _generator__344_ ~size:_size__354_
-                                         ~random:_random__355_))))
+                               (fun ~size:_size__354_ ~random:_random__355_
+                                  ->
+                                  Single
+                                    (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                                       _generator__344_ ~size:_size__354_
+                                       ~random:_random__355_))))
                         and _pair__349_ =
                           (1.,
                             (Ppx_quickcheck_runtime.Base_quickcheck.Generator.bind
@@ -2461,28 +2367,26 @@ module Polymorphic_recursion =
                                        ~size:(Ppx_quickcheck_runtime.Base.Int.pred
                                                 _size__345_)
                                        (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                                          (fun ~size:_size__352_ ->
-                                             fun ~random:_random__353_ ->
-                                               Double
-                                                 (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                                                    (quickcheck_generator
-                                                       (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                                                          (fun
-                                                             ~size:_size__350_
-                                                             ->
-                                                             fun
-                                                               ~random:_random__351_
-                                                               ->
-                                                               ((Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                                                                   _generator__344_
-                                                                   ~size:_size__350_
-                                                                   ~random:_random__351_),
-                                                                 (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                                                                    _generator__344_
-                                                                    ~size:_size__350_
-                                                                    ~random:_random__351_)))))
-                                                    ~size:_size__352_
-                                                    ~random:_random__353_)))))) in
+                                          (fun ~size:_size__352_
+                                             ~random:_random__353_ ->
+                                             Double
+                                               (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                                                  (quickcheck_generator
+                                                     (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
+                                                        (fun
+                                                           ~size:_size__350_
+                                                           ~random:_random__351_
+                                                           ->
+                                                           ((Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                                                               _generator__344_
+                                                               ~size:_size__350_
+                                                               ~random:_random__351_),
+                                                             (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                                                                _generator__344_
+                                                                ~size:_size__350_
+                                                                ~random:_random__351_)))))
+                                                  ~size:_size__352_
+                                                  ~random:_random__353_)))))) in
                         let _gen__346_ =
                           Ppx_quickcheck_runtime.Base_quickcheck.Generator.weighted_union
                             [_pair__348_]
@@ -2520,47 +2424,42 @@ module Polymorphic_recursion =
                                  quickcheck_observer _recur__342_)) in
                        ignore quickcheck_observer;
                        Ppx_quickcheck_runtime.Base_quickcheck.Observer.create
-                         (fun _x__332_ ->
-                            fun ~size:_size__333_ ->
-                              fun ~hash:_hash__334_ ->
-                                match _x__332_ with
-                                | Single _x__335_ ->
-                                    let _hash__334_ =
-                                      Ppx_quickcheck_runtime.Base.hash_fold_int
-                                        _hash__334_ 0 in
-                                    let _hash__334_ =
-                                      Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                                        _observer__331_ _x__335_
-                                        ~size:_size__333_ ~hash:_hash__334_ in
-                                    _hash__334_
-                                | Double _x__341_ ->
-                                    let _hash__334_ =
-                                      Ppx_quickcheck_runtime.Base.hash_fold_int
-                                        _hash__334_ 1 in
-                                    let _hash__334_ =
-                                      Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                                        (quickcheck_observer
-                                           (Ppx_quickcheck_runtime.Base_quickcheck.Observer.create
-                                              (fun _x__336_ ->
-                                                 fun ~size:_size__339_ ->
-                                                   fun ~hash:_hash__340_ ->
-                                                     let (_x__337_, _x__338_)
-                                                       = _x__336_ in
-                                                     let _hash__340_ =
-                                                       Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                                                         _observer__331_
-                                                         _x__337_
-                                                         ~size:_size__339_
-                                                         ~hash:_hash__340_ in
-                                                     let _hash__340_ =
-                                                       Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                                                         _observer__331_
-                                                         _x__338_
-                                                         ~size:_size__339_
-                                                         ~hash:_hash__340_ in
-                                                     _hash__340_))) _x__341_
-                                        ~size:_size__333_ ~hash:_hash__334_ in
-                                    _hash__334_))
+                         (fun _x__332_ ~size:_size__333_ ~hash:_hash__334_ ->
+                            match _x__332_ with
+                            | Single _x__335_ ->
+                                let _hash__334_ =
+                                  Ppx_quickcheck_runtime.Base.hash_fold_int
+                                    _hash__334_ 0 in
+                                let _hash__334_ =
+                                  Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                                    _observer__331_ _x__335_
+                                    ~size:_size__333_ ~hash:_hash__334_ in
+                                _hash__334_
+                            | Double _x__341_ ->
+                                let _hash__334_ =
+                                  Ppx_quickcheck_runtime.Base.hash_fold_int
+                                    _hash__334_ 1 in
+                                let _hash__334_ =
+                                  Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                                    (quickcheck_observer
+                                       (Ppx_quickcheck_runtime.Base_quickcheck.Observer.create
+                                          (fun _x__336_ ~size:_size__339_
+                                             ~hash:_hash__340_ ->
+                                             let (_x__337_, _x__338_) =
+                                               _x__336_ in
+                                             let _hash__340_ =
+                                               Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                                                 _observer__331_ _x__337_
+                                                 ~size:_size__339_
+                                                 ~hash:_hash__340_ in
+                                             let _hash__340_ =
+                                               Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                                                 _observer__331_ _x__338_
+                                                 ~size:_size__339_
+                                                 ~hash:_hash__340_ in
+                                             _hash__340_))) _x__341_
+                                    ~size:_size__333_ ~hash:_hash__334_ in
+                                _hash__334_))
                 let _ = quickcheck_observer
               end
             let quickcheck_observer _recur__343_ =
@@ -2637,56 +2536,50 @@ module Extensions =
       Ppx_quickcheck_runtime.Base_quickcheck.Generator.weighted_union
         [(1.,
            (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-              (fun ~size:_size__358_ -> fun ~random:_random__359_ -> `A)));
+              (fun ~size:_size__358_ ~random:_random__359_ -> `A)));
         (1.,
           (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-             (fun ~size:_size__362_ ->
-                fun ~random:_random__363_ ->
-                  `B
-                    (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                       (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                          (fun ~size:_size__360_ ->
-                             fun ~random:_random__361_ ->
-                               ((Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                                   quickcheck_generator_bool
-                                   ~size:_size__360_ ~random:_random__361_),
-                                 (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                                    (quickcheck_generator_option
-                                       quickcheck_generator_unit)
-                                    ~size:_size__360_ ~random:_random__361_))))
-                       ~size:_size__362_ ~random:_random__363_))))]
+             (fun ~size:_size__362_ ~random:_random__363_ ->
+                `B
+                  (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                     (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
+                        (fun ~size:_size__360_ ~random:_random__361_ ->
+                           ((Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                               quickcheck_generator_bool ~size:_size__360_
+                               ~random:_random__361_),
+                             (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                                (quickcheck_generator_option
+                                   quickcheck_generator_unit)
+                                ~size:_size__360_ ~random:_random__361_))))
+                     ~size:_size__362_ ~random:_random__363_))))]
     let quickcheck_observer =
       Ppx_quickcheck_runtime.Base_quickcheck.Observer.create
-        (fun _x__364_ ->
-           fun ~size:_size__365_ ->
-             fun ~hash:_hash__366_ ->
-               match _x__364_ with
-               | `A ->
-                   let _hash__366_ =
-                     Ppx_quickcheck_runtime.Base.hash_fold_int _hash__366_ 65 in
-                   _hash__366_
-               | `B _x__372_ ->
-                   let _hash__366_ =
-                     Ppx_quickcheck_runtime.Base.hash_fold_int _hash__366_ 66 in
-                   let _hash__366_ =
-                     Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                       (Ppx_quickcheck_runtime.Base_quickcheck.Observer.create
-                          (fun _x__367_ ->
-                             fun ~size:_size__370_ ->
-                               fun ~hash:_hash__371_ ->
-                                 let (_x__368_, _x__369_) = _x__367_ in
-                                 let _hash__371_ =
-                                   Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                                     quickcheck_observer_bool _x__368_
-                                     ~size:_size__370_ ~hash:_hash__371_ in
-                                 let _hash__371_ =
-                                   Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                                     (quickcheck_observer_option
-                                        quickcheck_observer_unit) _x__369_
-                                     ~size:_size__370_ ~hash:_hash__371_ in
-                                 _hash__371_)) _x__372_ ~size:_size__365_
-                       ~hash:_hash__366_ in
-                   _hash__366_)
+        (fun _x__364_ ~size:_size__365_ ~hash:_hash__366_ ->
+           match _x__364_ with
+           | `A ->
+               let _hash__366_ =
+                 Ppx_quickcheck_runtime.Base.hash_fold_int _hash__366_ 65 in
+               _hash__366_
+           | `B _x__372_ ->
+               let _hash__366_ =
+                 Ppx_quickcheck_runtime.Base.hash_fold_int _hash__366_ 66 in
+               let _hash__366_ =
+                 Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                   (Ppx_quickcheck_runtime.Base_quickcheck.Observer.create
+                      (fun _x__367_ ~size:_size__370_ ~hash:_hash__371_ ->
+                         let (_x__368_, _x__369_) = _x__367_ in
+                         let _hash__371_ =
+                           Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                             quickcheck_observer_bool _x__368_
+                             ~size:_size__370_ ~hash:_hash__371_ in
+                         let _hash__371_ =
+                           Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                             (quickcheck_observer_option
+                                quickcheck_observer_unit) _x__369_
+                             ~size:_size__370_ ~hash:_hash__371_ in
+                         _hash__371_)) _x__372_ ~size:_size__365_
+                   ~hash:_hash__366_ in
+               _hash__366_)
     let quickcheck_shrinker =
       Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.create
         (function
@@ -2714,36 +2607,32 @@ module Escaped =
     type t = (int * char * bool option)
     let quickcheck_generator =
       Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-        (fun ~size:_size__376_ ->
-           fun ~random:_random__377_ ->
-             ((Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                 Generator.small_strictly_positive_int ~size:_size__376_
-                 ~random:_random__377_),
-               (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                  quickcheck_generator_char ~size:_size__376_
-                  ~random:_random__377_),
-               (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                  (quickcheck_generator_option quickcheck_generator_bool)
-                  ~size:_size__376_ ~random:_random__377_)))
+        (fun ~size:_size__376_ ~random:_random__377_ ->
+           ((Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+               Generator.small_strictly_positive_int ~size:_size__376_
+               ~random:_random__377_),
+             (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                quickcheck_generator_char ~size:_size__376_
+                ~random:_random__377_),
+             (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                (quickcheck_generator_option quickcheck_generator_bool)
+                ~size:_size__376_ ~random:_random__377_)))
     let quickcheck_observer =
       Ppx_quickcheck_runtime.Base_quickcheck.Observer.create
-        (fun _x__378_ ->
-           fun ~size:_size__382_ ->
-             fun ~hash:_hash__383_ ->
-               let (_x__379_, _x__380_, _x__381_) = _x__378_ in
-               let _hash__383_ =
-                 Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                   quickcheck_observer_int _x__379_ ~size:_size__382_
-                   ~hash:_hash__383_ in
-               let _hash__383_ =
-                 Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                   Observer.opaque _x__380_ ~size:_size__382_
-                   ~hash:_hash__383_ in
-               let _hash__383_ =
-                 Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                   (quickcheck_observer_option quickcheck_observer_bool)
-                   _x__381_ ~size:_size__382_ ~hash:_hash__383_ in
-               _hash__383_)
+        (fun _x__378_ ~size:_size__382_ ~hash:_hash__383_ ->
+           let (_x__379_, _x__380_, _x__381_) = _x__378_ in
+           let _hash__383_ =
+             Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+               quickcheck_observer_int _x__379_ ~size:_size__382_
+               ~hash:_hash__383_ in
+           let _hash__383_ =
+             Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+               Observer.opaque _x__380_ ~size:_size__382_ ~hash:_hash__383_ in
+           let _hash__383_ =
+             Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+               (quickcheck_observer_option quickcheck_observer_bool) _x__381_
+               ~size:_size__382_ ~hash:_hash__383_ in
+           _hash__383_)
     let quickcheck_shrinker =
       Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.create
         (fun (_x__384_, _x__385_, _x__386_) ->
@@ -2791,53 +2680,46 @@ module Attribute_override =
           Ppx_quickcheck_runtime.Base_quickcheck.Generator.weighted_union
             [(0.1,
                (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                  (fun ~size:_size__394_ -> fun ~random:_random__395_ -> Null)));
+                  (fun ~size:_size__394_ ~random:_random__395_ -> Null)));
             (1.,
               (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                 (fun ~size:_size__396_ ->
-                    fun ~random:_random__397_ ->
-                      Text
-                        (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                           (Generator.string_of Generator.char_lowercase)
-                           ~size:_size__396_ ~random:_random__397_))));
+                 (fun ~size:_size__396_ ~random:_random__397_ ->
+                    Text
+                      (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                         (Generator.string_of Generator.char_lowercase)
+                         ~size:_size__396_ ~random:_random__397_))));
             (1.,
               (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                 (fun ~size:_size__398_ ->
-                    fun ~random:_random__399_ ->
-                      Number
-                        (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                           Generator.float_strictly_positive
-                           ~size:_size__398_ ~random:_random__399_))))]
+                 (fun ~size:_size__398_ ~random:_random__399_ ->
+                    Number
+                      (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                         Generator.float_strictly_positive ~size:_size__398_
+                         ~random:_random__399_))))]
         let _ = quickcheck_generator
         let quickcheck_observer =
           Ppx_quickcheck_runtime.Base_quickcheck.Observer.create
-            (fun _x__389_ ->
-               fun ~size:_size__390_ ->
-                 fun ~hash:_hash__391_ ->
-                   match _x__389_ with
-                   | Null ->
-                       let _hash__391_ =
-                         Ppx_quickcheck_runtime.Base.hash_fold_int
-                           _hash__391_ 0 in
-                       _hash__391_
-                   | Text _x__392_ ->
-                       let _hash__391_ =
-                         Ppx_quickcheck_runtime.Base.hash_fold_int
-                           _hash__391_ 1 in
-                       let _hash__391_ =
-                         Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                           quickcheck_observer_string _x__392_
-                           ~size:_size__390_ ~hash:_hash__391_ in
-                       _hash__391_
-                   | Number _x__393_ ->
-                       let _hash__391_ =
-                         Ppx_quickcheck_runtime.Base.hash_fold_int
-                           _hash__391_ 2 in
-                       let _hash__391_ =
-                         Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                           quickcheck_observer_float _x__393_
-                           ~size:_size__390_ ~hash:_hash__391_ in
-                       _hash__391_)
+            (fun _x__389_ ~size:_size__390_ ~hash:_hash__391_ ->
+               match _x__389_ with
+               | Null ->
+                   let _hash__391_ =
+                     Ppx_quickcheck_runtime.Base.hash_fold_int _hash__391_ 0 in
+                   _hash__391_
+               | Text _x__392_ ->
+                   let _hash__391_ =
+                     Ppx_quickcheck_runtime.Base.hash_fold_int _hash__391_ 1 in
+                   let _hash__391_ =
+                     Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                       quickcheck_observer_string _x__392_ ~size:_size__390_
+                       ~hash:_hash__391_ in
+                   _hash__391_
+               | Number _x__393_ ->
+                   let _hash__391_ =
+                     Ppx_quickcheck_runtime.Base.hash_fold_int _hash__391_ 2 in
+                   let _hash__391_ =
+                     Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                       quickcheck_observer_float _x__393_ ~size:_size__390_
+                       ~hash:_hash__391_ in
+                   _hash__391_)
         let _ = quickcheck_observer
         let quickcheck_shrinker =
           Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.create
@@ -2884,8 +2766,8 @@ module Attribute_override_recursive =
                      (let _pair__422_ =
                         (1.,
                           (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                             (fun ~size:_size__429_ ->
-                                fun ~random:_random__430_ -> Leaf)))
+                             (fun ~size:_size__429_ ~random:_random__430_ ->
+                                Leaf)))
                       and _pair__423_ =
                         (0.5,
                           (Ppx_quickcheck_runtime.Base_quickcheck.Generator.bind
@@ -2895,21 +2777,21 @@ module Attribute_override_recursive =
                                      ~size:(Ppx_quickcheck_runtime.Base.Int.pred
                                               _size__419_)
                                      (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                                        (fun ~size:_size__425_ ->
-                                           fun ~random:_random__426_ ->
-                                             Node1
-                                               ((Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                                                   quickcheck_generator
-                                                   ~size:_size__425_
-                                                   ~random:_random__426_),
-                                                 (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                                                    quickcheck_generator_int64
-                                                    ~size:_size__425_
-                                                    ~random:_random__426_),
-                                                 (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                                                    quickcheck_generator
-                                                    ~size:_size__425_
-                                                    ~random:_random__426_)))))))
+                                        (fun ~size:_size__425_
+                                           ~random:_random__426_ ->
+                                           Node1
+                                             ((Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                                                 quickcheck_generator
+                                                 ~size:_size__425_
+                                                 ~random:_random__426_),
+                                               (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                                                  quickcheck_generator_int64
+                                                  ~size:_size__425_
+                                                  ~random:_random__426_),
+                                               (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                                                  quickcheck_generator
+                                                  ~size:_size__425_
+                                                  ~random:_random__426_)))))))
                       and _pair__424_ =
                         (0.25,
                           (Ppx_quickcheck_runtime.Base_quickcheck.Generator.bind
@@ -2919,29 +2801,29 @@ module Attribute_override_recursive =
                                      ~size:(Ppx_quickcheck_runtime.Base.Int.pred
                                               _size__419_)
                                      (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                                        (fun ~size:_size__427_ ->
-                                           fun ~random:_random__428_ ->
-                                             Node2
-                                               ((Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                                                   quickcheck_generator
-                                                   ~size:_size__427_
-                                                   ~random:_random__428_),
-                                                 (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                                                    quickcheck_generator_int64
-                                                    ~size:_size__427_
-                                                    ~random:_random__428_),
-                                                 (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                                                    quickcheck_generator
-                                                    ~size:_size__427_
-                                                    ~random:_random__428_),
-                                                 (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                                                    quickcheck_generator_int64
-                                                    ~size:_size__427_
-                                                    ~random:_random__428_),
-                                                 (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                                                    quickcheck_generator
-                                                    ~size:_size__427_
-                                                    ~random:_random__428_))))))) in
+                                        (fun ~size:_size__427_
+                                           ~random:_random__428_ ->
+                                           Node2
+                                             ((Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                                                 quickcheck_generator
+                                                 ~size:_size__427_
+                                                 ~random:_random__428_),
+                                               (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                                                  quickcheck_generator_int64
+                                                  ~size:_size__427_
+                                                  ~random:_random__428_),
+                                               (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                                                  quickcheck_generator
+                                                  ~size:_size__427_
+                                                  ~random:_random__428_),
+                                               (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                                                  quickcheck_generator_int64
+                                                  ~size:_size__427_
+                                                  ~random:_random__428_),
+                                               (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                                                  quickcheck_generator
+                                                  ~size:_size__427_
+                                                  ~random:_random__428_))))))) in
                       let _gen__420_ =
                         Ppx_quickcheck_runtime.Base_quickcheck.Generator.weighted_union
                           [_pair__422_]
@@ -2972,60 +2854,58 @@ module Attribute_override_recursive =
                          quickcheck_observer in
                      ignore quickcheck_observer;
                      Ppx_quickcheck_runtime.Base_quickcheck.Observer.create
-                       (fun _x__408_ ->
-                          fun ~size:_size__409_ ->
-                            fun ~hash:_hash__410_ ->
-                              match _x__408_ with
-                              | Leaf ->
-                                  let _hash__410_ =
-                                    Ppx_quickcheck_runtime.Base.hash_fold_int
-                                      _hash__410_ 0 in
-                                  _hash__410_
-                              | Node1 (_x__411_, _x__412_, _x__413_) ->
-                                  let _hash__410_ =
-                                    Ppx_quickcheck_runtime.Base.hash_fold_int
-                                      _hash__410_ 1 in
-                                  let _hash__410_ =
-                                    Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                                      quickcheck_observer _x__411_
-                                      ~size:_size__409_ ~hash:_hash__410_ in
-                                  let _hash__410_ =
-                                    Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                                      quickcheck_observer_int64 _x__412_
-                                      ~size:_size__409_ ~hash:_hash__410_ in
-                                  let _hash__410_ =
-                                    Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                                      quickcheck_observer _x__413_
-                                      ~size:_size__409_ ~hash:_hash__410_ in
-                                  _hash__410_
-                              | Node2
-                                  (_x__414_, _x__415_, _x__416_, _x__417_,
-                                   _x__418_)
-                                  ->
-                                  let _hash__410_ =
-                                    Ppx_quickcheck_runtime.Base.hash_fold_int
-                                      _hash__410_ 2 in
-                                  let _hash__410_ =
-                                    Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                                      quickcheck_observer _x__414_
-                                      ~size:_size__409_ ~hash:_hash__410_ in
-                                  let _hash__410_ =
-                                    Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                                      quickcheck_observer_int64 _x__415_
-                                      ~size:_size__409_ ~hash:_hash__410_ in
-                                  let _hash__410_ =
-                                    Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                                      quickcheck_observer _x__416_
-                                      ~size:_size__409_ ~hash:_hash__410_ in
-                                  let _hash__410_ =
-                                    Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                                      quickcheck_observer_int64 _x__417_
-                                      ~size:_size__409_ ~hash:_hash__410_ in
-                                  let _hash__410_ =
-                                    Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                                      quickcheck_observer _x__418_
-                                      ~size:_size__409_ ~hash:_hash__410_ in
-                                  _hash__410_))
+                       (fun _x__408_ ~size:_size__409_ ~hash:_hash__410_ ->
+                          match _x__408_ with
+                          | Leaf ->
+                              let _hash__410_ =
+                                Ppx_quickcheck_runtime.Base.hash_fold_int
+                                  _hash__410_ 0 in
+                              _hash__410_
+                          | Node1 (_x__411_, _x__412_, _x__413_) ->
+                              let _hash__410_ =
+                                Ppx_quickcheck_runtime.Base.hash_fold_int
+                                  _hash__410_ 1 in
+                              let _hash__410_ =
+                                Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                                  quickcheck_observer _x__411_
+                                  ~size:_size__409_ ~hash:_hash__410_ in
+                              let _hash__410_ =
+                                Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                                  quickcheck_observer_int64 _x__412_
+                                  ~size:_size__409_ ~hash:_hash__410_ in
+                              let _hash__410_ =
+                                Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                                  quickcheck_observer _x__413_
+                                  ~size:_size__409_ ~hash:_hash__410_ in
+                              _hash__410_
+                          | Node2
+                              (_x__414_, _x__415_, _x__416_, _x__417_,
+                               _x__418_)
+                              ->
+                              let _hash__410_ =
+                                Ppx_quickcheck_runtime.Base.hash_fold_int
+                                  _hash__410_ 2 in
+                              let _hash__410_ =
+                                Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                                  quickcheck_observer _x__414_
+                                  ~size:_size__409_ ~hash:_hash__410_ in
+                              let _hash__410_ =
+                                Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                                  quickcheck_observer_int64 _x__415_
+                                  ~size:_size__409_ ~hash:_hash__410_ in
+                              let _hash__410_ =
+                                Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                                  quickcheck_observer _x__416_
+                                  ~size:_size__409_ ~hash:_hash__410_ in
+                              let _hash__410_ =
+                                Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                                  quickcheck_observer_int64 _x__417_
+                                  ~size:_size__409_ ~hash:_hash__410_ in
+                              let _hash__410_ =
+                                Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                                  quickcheck_observer _x__418_
+                                  ~size:_size__409_ ~hash:_hash__410_ in
+                              _hash__410_))
                 let _ = quickcheck_observer
               end
             let quickcheck_observer =
@@ -3175,37 +3055,32 @@ module Do_not_generate_clauses =
           Ppx_quickcheck_runtime.Base_quickcheck.Generator.weighted_union
             [(1.,
                (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                  (fun ~size:_size__447_ ->
-                     fun ~random:_random__448_ ->
-                       Can_generate
-                         (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                            quickcheck_generator_bool ~size:_size__447_
-                            ~random:_random__448_))))]
+                  (fun ~size:_size__447_ ~random:_random__448_ ->
+                     Can_generate
+                       (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                          quickcheck_generator_bool ~size:_size__447_
+                          ~random:_random__448_))))]
         let _ = quickcheck_generator
         let quickcheck_observer =
           Ppx_quickcheck_runtime.Base_quickcheck.Observer.create
-            (fun _x__442_ ->
-               fun ~size:_size__443_ ->
-                 fun ~hash:_hash__444_ ->
-                   match _x__442_ with
-                   | Can_generate _x__445_ ->
-                       let _hash__444_ =
-                         Ppx_quickcheck_runtime.Base.hash_fold_int
-                           _hash__444_ 0 in
-                       let _hash__444_ =
-                         Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                           quickcheck_observer_bool _x__445_
-                           ~size:_size__443_ ~hash:_hash__444_ in
-                       _hash__444_
-                   | Cannot_generate _x__446_ ->
-                       let _hash__444_ =
-                         Ppx_quickcheck_runtime.Base.hash_fold_int
-                           _hash__444_ 1 in
-                       let _hash__444_ =
-                         Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                           Cannot_generate.quickcheck_observer _x__446_
-                           ~size:_size__443_ ~hash:_hash__444_ in
-                       _hash__444_)
+            (fun _x__442_ ~size:_size__443_ ~hash:_hash__444_ ->
+               match _x__442_ with
+               | Can_generate _x__445_ ->
+                   let _hash__444_ =
+                     Ppx_quickcheck_runtime.Base.hash_fold_int _hash__444_ 0 in
+                   let _hash__444_ =
+                     Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                       quickcheck_observer_bool _x__445_ ~size:_size__443_
+                       ~hash:_hash__444_ in
+                   _hash__444_
+               | Cannot_generate _x__446_ ->
+                   let _hash__444_ =
+                     Ppx_quickcheck_runtime.Base.hash_fold_int _hash__444_ 1 in
+                   let _hash__444_ =
+                     Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                       Cannot_generate.quickcheck_observer _x__446_
+                       ~size:_size__443_ ~hash:_hash__444_ in
+                   _hash__444_)
         let _ = quickcheck_observer
         let quickcheck_shrinker =
           Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.create
@@ -3237,37 +3112,34 @@ module Do_not_generate_clauses =
               Ppx_quickcheck_runtime.Base_quickcheck.Generator.weighted_union
                 [(1.,
                    (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                      (fun ~size:_size__456_ ->
-                         fun ~random:_random__457_ ->
-                           `Can_generate
-                             (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-                                quickcheck_generator_bool ~size:_size__456_
-                                ~random:_random__457_))))]
+                      (fun ~size:_size__456_ ~random:_random__457_ ->
+                         `Can_generate
+                           (Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+                              quickcheck_generator_bool ~size:_size__456_
+                              ~random:_random__457_))))]
             let _ = quickcheck_generator
             let quickcheck_observer =
               Ppx_quickcheck_runtime.Base_quickcheck.Observer.create
-                (fun _x__451_ ->
-                   fun ~size:_size__452_ ->
-                     fun ~hash:_hash__453_ ->
-                       match _x__451_ with
-                       | `Can_generate _x__454_ ->
-                           let _hash__453_ =
-                             Ppx_quickcheck_runtime.Base.hash_fold_int
-                               _hash__453_ (-895996764) in
-                           let _hash__453_ =
-                             Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                               quickcheck_observer_bool _x__454_
-                               ~size:_size__452_ ~hash:_hash__453_ in
-                           _hash__453_
-                       | `Cannot_generate _x__455_ ->
-                           let _hash__453_ =
-                             Ppx_quickcheck_runtime.Base.hash_fold_int
-                               _hash__453_ 501585681 in
-                           let _hash__453_ =
-                             Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                               Cannot_generate.quickcheck_observer _x__455_
-                               ~size:_size__452_ ~hash:_hash__453_ in
-                           _hash__453_)
+                (fun _x__451_ ~size:_size__452_ ~hash:_hash__453_ ->
+                   match _x__451_ with
+                   | `Can_generate _x__454_ ->
+                       let _hash__453_ =
+                         Ppx_quickcheck_runtime.Base.hash_fold_int
+                           _hash__453_ (-895996764) in
+                       let _hash__453_ =
+                         Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                           quickcheck_observer_bool _x__454_
+                           ~size:_size__452_ ~hash:_hash__453_ in
+                       _hash__453_
+                   | `Cannot_generate _x__455_ ->
+                       let _hash__453_ =
+                         Ppx_quickcheck_runtime.Base.hash_fold_int
+                           _hash__453_ 501585681 in
+                       let _hash__453_ =
+                         Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                           Cannot_generate.quickcheck_observer _x__455_
+                           ~size:_size__452_ ~hash:_hash__453_ in
+                       _hash__453_)
             let _ = quickcheck_observer
             let quickcheck_shrinker =
               Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.create
@@ -3311,8 +3183,8 @@ module Do_not_generate_clauses =
                          Ppx_quickcheck_runtime.Base_quickcheck.Generator.weighted_union
                            [(1.,
                               (Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-                                 (fun ~size:_size__463_ ->
-                                    fun ~random:_random__464_ -> A)))])
+                                 (fun ~size:_size__463_ ~random:_random__464_
+                                    -> A)))])
                     let _ = quickcheck_generator
                   end
                 let quickcheck_generator =
@@ -3334,24 +3206,23 @@ module Do_not_generate_clauses =
                              quickcheck_observer in
                          ignore quickcheck_observer;
                          Ppx_quickcheck_runtime.Base_quickcheck.Observer.create
-                           (fun _x__459_ ->
-                              fun ~size:_size__460_ ->
-                                fun ~hash:_hash__461_ ->
-                                  match _x__459_ with
-                                  | A ->
-                                      let _hash__461_ =
-                                        Ppx_quickcheck_runtime.Base.hash_fold_int
-                                          _hash__461_ 0 in
-                                      _hash__461_
-                                  | B _x__462_ ->
-                                      let _hash__461_ =
-                                        Ppx_quickcheck_runtime.Base.hash_fold_int
-                                          _hash__461_ 1 in
-                                      let _hash__461_ =
-                                        Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-                                          quickcheck_observer _x__462_
-                                          ~size:_size__460_ ~hash:_hash__461_ in
-                                      _hash__461_))
+                           (fun _x__459_ ~size:_size__460_ ~hash:_hash__461_
+                              ->
+                              match _x__459_ with
+                              | A ->
+                                  let _hash__461_ =
+                                    Ppx_quickcheck_runtime.Base.hash_fold_int
+                                      _hash__461_ 0 in
+                                  _hash__461_
+                              | B _x__462_ ->
+                                  let _hash__461_ =
+                                    Ppx_quickcheck_runtime.Base.hash_fold_int
+                                      _hash__461_ 1 in
+                                  let _hash__461_ =
+                                    Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+                                      quickcheck_observer _x__462_
+                                      ~size:_size__460_ ~hash:_hash__461_ in
+                                  _hash__461_))
                     let _ = quickcheck_observer
                   end
                 let quickcheck_observer =
