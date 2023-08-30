@@ -257,10 +257,10 @@ module Escaped = struct
 end
 
 module Wildcard (Elt : sig
-    type t
+  type t
 
-    val examples : t list
-  end) =
+  val examples : t list
+end) =
 struct
   type t = Elt.t list
 

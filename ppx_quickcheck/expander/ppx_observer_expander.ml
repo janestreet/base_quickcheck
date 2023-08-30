@@ -3,12 +3,12 @@ open! Import
 let any ~loc = [%expr Ppx_quickcheck_runtime.Base_quickcheck.Observer.opaque]
 
 let arrow
-      ~observer_of_core_type
-      ~generator_of_core_type
-      ~loc
-      ~arg_label
-      ~input_type
-      ~output_type
+  ~observer_of_core_type
+  ~generator_of_core_type
+  ~loc
+  ~arg_label
+  ~input_type
+  ~output_type
   =
   let input_generator =
     match arg_label with
@@ -49,11 +49,11 @@ let compound_hash ~loc ~size_expr ~hash_expr ~hash_pat ~observer_exprs ~field_ex
 ;;
 
 let compound
-      (type field)
-      ~observer_of_core_type
-      ~loc
-      ~fields
-      (module Field : Field_syntax.S with type ast = field)
+  (type field)
+  ~observer_of_core_type
+  ~loc
+  ~fields
+  (module Field : Field_syntax.S with type ast = field)
   =
   let pat, exp = gensym "x" loc in
   let fields = List.map fields ~f:Field.create in
@@ -67,16 +67,16 @@ let compound
   [%expr
     Ppx_quickcheck_runtime.Base_quickcheck.Observer.create
       (fun [%p pat] ~size:[%p size_pat] ~hash:[%p hash_pat] ->
-         let [%p record_pat] = [%e exp] in
-         [%e compound_hash ~loc ~size_expr ~hash_expr ~hash_pat ~observer_exprs ~field_exprs])]
+      let [%p record_pat] = [%e exp] in
+      [%e compound_hash ~loc ~size_expr ~hash_expr ~hash_pat ~observer_exprs ~field_exprs])]
 ;;
 
 let variant
-      (type clause)
-      ~observer_of_core_type
-      ~loc
-      ~clauses
-      (module Clause : Clause_syntax.S with type ast = clause)
+  (type clause)
+  ~observer_of_core_type
+  ~loc
+  ~clauses
+  (module Clause : Clause_syntax.S with type ast = clause)
   =
   let clauses = Clause.create_list clauses in
   let pat, expr = gensym "x" loc in
@@ -85,45 +85,45 @@ let variant
   [%expr
     Ppx_quickcheck_runtime.Base_quickcheck.Observer.create
       (fun [%p pat] ~size:[%p size_pat] ~hash:[%p hash_pat] ->
-         [%e
-           pexp_match
-             ~loc
-             expr
-             (List.map clauses ~f:(fun clause ->
-                let core_type_list = Clause.core_type_list clause in
-                let observer_exprs = List.map core_type_list ~f:observer_of_core_type in
-                let field_pats, field_exprs =
-                  gensyms
-                    "x"
-                    (List.map core_type_list ~f:(fun core_type -> core_type.ptyp_loc))
-                in
-                let lhs = Clause.pattern clause ~loc field_pats in
-                let body =
-                  compound_hash
-                    ~loc
-                    ~size_expr
-                    ~hash_expr
-                    ~hash_pat
-                    ~observer_exprs
-                    ~field_exprs
-                in
-                let rhs =
-                  match Clause.salt clause with
-                  | None -> body
-                  | Some salt ->
-                    pexp_let
-                      ~loc
-                      Nonrecursive
-                      [ value_binding
-                          ~loc
-                          ~pat:hash_pat
-                          ~expr:
-                            [%expr
-                              Ppx_quickcheck_runtime.Base.hash_fold_int
-                                [%e hash_expr]
-                                [%e eint ~loc salt]]
-                      ]
-                      body
-                in
-                case ~lhs ~guard:None ~rhs))])]
+      [%e
+        pexp_match
+          ~loc
+          expr
+          (List.map clauses ~f:(fun clause ->
+             let core_type_list = Clause.core_type_list clause in
+             let observer_exprs = List.map core_type_list ~f:observer_of_core_type in
+             let field_pats, field_exprs =
+               gensyms
+                 "x"
+                 (List.map core_type_list ~f:(fun core_type -> core_type.ptyp_loc))
+             in
+             let lhs = Clause.pattern clause ~loc field_pats in
+             let body =
+               compound_hash
+                 ~loc
+                 ~size_expr
+                 ~hash_expr
+                 ~hash_pat
+                 ~observer_exprs
+                 ~field_exprs
+             in
+             let rhs =
+               match Clause.salt clause with
+               | None -> body
+               | Some salt ->
+                 pexp_let
+                   ~loc
+                   Nonrecursive
+                   [ value_binding
+                       ~loc
+                       ~pat:hash_pat
+                       ~expr:
+                         [%expr
+                           Ppx_quickcheck_runtime.Base.hash_fold_int
+                             [%e hash_expr]
+                             [%e eint ~loc salt]]
+                   ]
+                   body
+             in
+             case ~lhs ~guard:None ~rhs))])]
 ;;

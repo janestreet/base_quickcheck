@@ -336,9 +336,9 @@ let m_ref m = m_biject m ~f:Ref.create ~f_inverse:Ref.( ! )
 let m_lazy_t m = m_biject m ~f:Lazy.from_val ~f_inverse:Lazy.force
 
 let m_arrow
-      (type a b)
-      (module A : With_examples with type t = a)
-      (module B : With_examples with type t = b)
+  (type a b)
+  (module A : With_examples with type t = a)
+  (module B : With_examples with type t = b)
   =
   (module struct
     type t = A.t -> B.t
@@ -355,8 +355,8 @@ let m_arrow
             let pair = a, b in
             List.map alists ~f:(fun alist -> pair :: alist)))
         |> List.map ~f:(fun alist a ->
-          List.Assoc.find alist a ~equal:[%compare.equal: A.t]
-          |> Option.value ~default:(List.hd_exn B.examples))
+             List.Assoc.find alist a ~equal:[%compare.equal: A.t]
+             |> Option.value ~default:(List.hd_exn B.examples))
       else List.map B.examples ~f:Fn.const
     ;;
   end : With_examples
@@ -364,9 +364,9 @@ let m_arrow
 ;;
 
 let m_arrow_named
-      (type a b)
-      (module A : With_examples with type t = a)
-      (module B : With_examples with type t = b)
+  (type a b)
+  (module A : With_examples with type t = a)
+  (module B : With_examples with type t = b)
   : (module With_examples with type t = x:a -> b)
   =
   m_biject
@@ -376,9 +376,9 @@ let m_arrow_named
 ;;
 
 let m_arrow_optional
-      (type a b)
-      (module A : With_examples with type t = a)
-      (module B : With_examples with type t = b)
+  (type a b)
+  (module A : With_examples with type t = a)
+  (module B : With_examples with type t = b)
   : (module With_examples with type t = ?x:a -> unit -> b)
   =
   m_biject
@@ -388,9 +388,9 @@ let m_arrow_optional
 ;;
 
 let m_either
-      (type a b)
-      (module A : With_examples with type t = a)
-      (module B : With_examples with type t = b)
+  (type a b)
+  (module A : With_examples with type t = a)
+  (module B : With_examples with type t = b)
   =
   (module struct
     type t = (A.t, B.t) Either.t [@@deriving compare, sexp_of]
@@ -403,9 +403,9 @@ let m_either
 ;;
 
 let m_result
-      (type a b)
-      (module A : With_examples with type t = a)
-      (module B : With_examples with type t = b)
+  (type a b)
+  (module A : With_examples with type t = a)
+  (module B : With_examples with type t = b)
   =
   (module struct
     type t = (A.t, B.t) Result.t [@@deriving compare, sexp_of]
@@ -418,9 +418,9 @@ let m_result
 ;;
 
 let m_pair
-      (type a b)
-      (module A : With_examples with type t = a)
-      (module B : With_examples with type t = b)
+  (type a b)
+  (module A : With_examples with type t = a)
+  (module B : With_examples with type t = b)
   =
   (module struct
     type t = A.t * B.t [@@deriving compare, sexp_of]
@@ -431,10 +431,10 @@ let m_pair
 ;;
 
 let m_triple
-      (type a b c)
-      (module A : With_examples with type t = a)
-      (module B : With_examples with type t = b)
-      (module C : With_examples with type t = c)
+  (type a b c)
+  (module A : With_examples with type t = a)
+  (module B : With_examples with type t = b)
+  (module C : With_examples with type t = c)
   =
   (module struct
     type t = A.t * B.t * C.t [@@deriving compare, sexp_of]
@@ -537,19 +537,19 @@ let m_sexp =
 ;;
 
 let m_set
-      (type elt cmp)
-      (module Cmp : Comparator.S with type t = elt and type comparator_witness = cmp)
-      (module Elt : With_examples with type t = elt)
+  (type elt cmp)
+  (module Cmp : Comparator.S with type t = elt and type comparator_witness = cmp)
+  (module Elt : With_examples with type t = elt)
   : (module With_examples with type t = (elt, cmp) Set.t)
   =
   m_biject (m_list (module Elt)) ~f:(Set.of_list (module Cmp)) ~f_inverse:Set.to_list
 ;;
 
 let m_map
-      (type key data cmp)
-      (module Cmp : Comparator.S with type t = key and type comparator_witness = cmp)
-      (module Key : With_examples with type t = key)
-      (module Data : With_examples with type t = data)
+  (type key data cmp)
+  (module Cmp : Comparator.S with type t = key and type comparator_witness = cmp)
+  (module Key : With_examples with type t = key)
+  (module Data : With_examples with type t = data)
   =
   (module struct
     type t = (key, data, cmp) Map.t
@@ -560,7 +560,7 @@ let m_map
     let examples =
       [ Map.empty (module Cmp) ]
       @ List.map Data.examples ~f:(fun data ->
-        Map.of_alist_exn (module Cmp) (List.map Key.examples ~f:(fun key -> key, data)))
+          Map.of_alist_exn (module Cmp) (List.map Key.examples ~f:(fun key -> key, data)))
     ;;
   end : With_examples
     with type t = (key, data, cmp) Map.t)

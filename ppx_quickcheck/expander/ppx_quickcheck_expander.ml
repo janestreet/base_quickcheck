@@ -283,12 +283,12 @@ let close_the_loop ~of_lazy decl impl =
          ~loc
          of_lazy
          [ [%expr
-           lazy
-             [%e
-               eapply
-                 ~loc
-                 (eapply ~loc [%expr Ppx_quickcheck_runtime.Base.Lazy.force] [ exp ])
-                 exps]]
+             lazy
+               [%e
+                 eapply
+                   ~loc
+                   (eapply ~loc [%expr Ppx_quickcheck_runtime.Base.Lazy.force] [ exp ])
+                   exps]]
          ])
 ;;
 
@@ -402,13 +402,13 @@ let intf type_decl ~f ~covar ~contravar =
       type_decl.ptype_params
       ~init:result
       ~f:(fun (core_type, (variance, _)) result ->
-        let id =
-          match variance with
-          | NoVariance | Covariant -> covar
-          | Contravariant -> contravar
-        in
-        let arg = ptyp_constr ~loc { loc; txt = id } [ core_type ] in
-        [%type: [%t arg] -> [%t result]])
+      let id =
+        match variance with
+        | NoVariance | Covariant -> covar
+        | Contravariant -> contravar
+      in
+      let arg = ptyp_constr ~loc { loc; txt = id } [ core_type ] in
+      [%type: [%t arg] -> [%t result]])
   in
   psig_value ~loc (value_description ~loc ~name ~type_ ~prim:[])
 ;;

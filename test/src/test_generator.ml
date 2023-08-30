@@ -1673,8 +1673,8 @@ let%expect_test "string_like" =
   Test.with_sample_exn
     (Generator.string_like "The quick brown fox jumps over the lazy dog.")
     ~f:(fun sequence ->
-      Sequence.take sequence 30
-      |> Sequence.iter ~f:(fun string -> print_s (sexp_of_string string)));
+    Sequence.take sequence 30
+    |> Sequence.iter ~f:(fun string -> print_s (sexp_of_string string)));
   [%expect
     {|
     "The quick uick brown fox jumps over the lazy dog."
@@ -1855,9 +1855,9 @@ let float64_vec = Generator.float64_vec
 
 let%expect_test "[bigarray1], [bigstring], [float32_vec], [float64_vec]" =
   let test
-        (type elt pack layout)
-        (t : (elt, pack, layout) Bigarray.Array1.t Generator.t)
-        sexp_of_elt
+    (type elt pack layout)
+    (t : (elt, pack, layout) Bigarray.Array1.t Generator.t)
+    sexp_of_elt
     =
     let module M = struct
       type t = (elt, pack, layout) Bigarray.Array1.t
@@ -1920,9 +1920,9 @@ let float64_mat = Generator.float64_mat
 
 let%expect_test "[float32_mat], [float64_mat]" =
   let test
-        (type elt pack layout)
-        (t : (elt, pack, layout) Bigarray.Array2.t Generator.t)
-        sexp_of_elt
+    (type elt pack layout)
+    (t : (elt, pack, layout) Bigarray.Array2.t Generator.t)
+    sexp_of_elt
     =
     let module M = struct
       type t = (elt, pack, layout) Bigarray.Array2.t
@@ -1947,8 +1947,8 @@ module Debug = struct
     let test config =
       Generator.string_of (Generator.return '.')
       |> Test.with_sample_exn ~config ~f:(fun sample ->
-        let counts = coverage (module Int) (Sequence.map sample ~f:String.length) in
-        counts |> [%sexp_of: int Map.M(Int).t] |> print_s)
+           let counts = coverage (module Int) (Sequence.map sample ~f:String.length) in
+           counts |> [%sexp_of: int Map.M(Int).t] |> print_s)
     in
     (* small sample size *)
     test { config with test_count = 3 };

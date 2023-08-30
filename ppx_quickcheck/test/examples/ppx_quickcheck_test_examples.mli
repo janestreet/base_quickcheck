@@ -217,10 +217,10 @@ module Escaped : sig
 end
 
 module Wildcard (Elt : sig
-    type t
+  type t
 
-    val examples : t list
-  end) : sig
+  val examples : t list
+end) : sig
   type t = Elt.t list [@@deriving quickcheck]
 end
 
