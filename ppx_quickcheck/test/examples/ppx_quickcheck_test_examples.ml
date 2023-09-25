@@ -9,25 +9,25 @@ include struct
 end
 
 module Simple_reference = struct
-  type t = bool [@@deriving quickcheck]
+  type t = bool [@@deriving quickcheck ~generator ~observer ~shrinker]
 end
 
 module Dotted_reference = struct
-  type t = Simple_reference.t [@@deriving quickcheck]
+  type t = Simple_reference.t [@@deriving quickcheck ~generator ~observer ~shrinker]
 end
 
 module Nonrec_reference = struct
   open Dotted_reference
 
-  type nonrec t = t [@@deriving quickcheck]
+  type nonrec t = t [@@deriving quickcheck ~generator ~observer ~shrinker]
 end
 
 module Application_of_polymorphic_type = struct
-  type t = bool option [@@deriving quickcheck]
+  type t = bool option [@@deriving quickcheck ~generator ~observer ~shrinker]
 end
 
 module Tuple = struct
-  type t = bool * unit option [@@deriving quickcheck]
+  type t = bool * unit option [@@deriving quickcheck ~generator ~observer ~shrinker]
 end
 
 module Poly_variant = struct
@@ -40,7 +40,7 @@ module Poly_variant = struct
     | `E of bool * unit option
     | `F of bool * unit option
     ]
-  [@@deriving quickcheck]
+  [@@deriving quickcheck ~generator ~observer ~shrinker]
 end
 
 module Inherit_poly_variant = struct
@@ -49,7 +49,7 @@ module Inherit_poly_variant = struct
     | Poly_variant.t
     | `Z of unit option
     ]
-  [@@deriving quickcheck]
+  [@@deriving quickcheck ~generator ~observer ~shrinker]
 end
 
 module Record_type = struct
@@ -57,7 +57,7 @@ module Record_type = struct
     { mutable x : bool
     ; y : unit option
     }
-  [@@deriving quickcheck]
+  [@@deriving quickcheck ~generator ~observer ~shrinker]
 end
 
 module Nullary_and_unary_variant = struct
@@ -67,7 +67,7 @@ module Nullary_and_unary_variant = struct
     | B
     | C of unit
     | D of unit
-  [@@deriving quickcheck]
+  [@@deriving quickcheck ~generator ~observer ~shrinker]
 end
 
 module Binary_and_record_variant = struct
@@ -82,71 +82,80 @@ module Binary_and_record_variant = struct
         { x : unit option
         ; mutable y : bool
         }
-  [@@deriving quickcheck]
+  [@@deriving quickcheck ~generator ~observer ~shrinker]
 end
 
 module Simple_arrow = struct
-  type t = unit option -> bool [@@deriving quickcheck]
+  type t = unit option -> bool [@@deriving quickcheck ~generator ~observer ~shrinker]
 end
 
 module Named_arrow = struct
-  type t = x:unit option -> bool [@@deriving quickcheck]
+  type t = x:unit option -> bool [@@deriving quickcheck ~generator ~observer ~shrinker]
 end
 
 module Optional_arrow = struct
-  type t = ?x:unit option -> unit -> bool [@@deriving quickcheck]
+  type t = ?x:unit option -> unit -> bool
+  [@@deriving quickcheck ~generator ~observer ~shrinker]
 end
 
 module Curried_arrow = struct
-  type t = unit option -> bool option -> bool [@@deriving quickcheck]
+  type t = unit option -> bool option -> bool
+  [@@deriving quickcheck ~generator ~observer ~shrinker]
 end
 
 module Simple_higher_order = struct
-  type t = (unit option -> bool option) -> bool [@@deriving quickcheck]
+  type t = (unit option -> bool option) -> bool
+  [@@deriving quickcheck ~generator ~observer ~shrinker]
 end
 
 module Named_higher_order = struct
-  type t = (x:unit option -> bool option) -> bool [@@deriving quickcheck]
+  type t = (x:unit option -> bool option) -> bool
+  [@@deriving quickcheck ~generator ~observer ~shrinker]
 end
 
 module Optional_higher_order = struct
-  type t = (?x:unit option -> unit -> bool option) -> bool [@@deriving quickcheck]
+  type t = (?x:unit option -> unit -> bool option) -> bool
+  [@@deriving quickcheck ~generator ~observer ~shrinker]
 end
 
 module Poly_unary = struct
-  type 'a t = 'a list [@@deriving quickcheck]
+  type 'a t = 'a list [@@deriving quickcheck ~generator ~observer ~shrinker]
 end
 
 module Instance_of_unary = struct
-  type t = bool Poly_unary.t [@@deriving quickcheck]
+  type t = bool Poly_unary.t [@@deriving quickcheck ~generator ~observer ~shrinker]
 end
 
 module Poly_binary = struct
-  type ('a, 'b) t = 'a * 'b [@@deriving quickcheck]
+  type ('a, 'b) t = 'a * 'b [@@deriving quickcheck ~generator ~observer ~shrinker]
 end
 
 module Instance_of_binary = struct
-  type t = (bool, unit option) Poly_binary.t [@@deriving quickcheck]
+  type t = (bool, unit option) Poly_binary.t
+  [@@deriving quickcheck ~generator ~observer ~shrinker]
 end
 
 module Poly_ternary = struct
-  type ('a, 'b, 'c) t = 'a * 'b * 'c [@@deriving quickcheck]
+  type ('a, 'b, 'c) t = 'a * 'b * 'c
+  [@@deriving quickcheck ~generator ~observer ~shrinker]
 end
 
 module Instance_of_ternary = struct
   type t = (bool, unit option, (unit option, bool) Poly_binary.t) Poly_ternary.t
-  [@@deriving quickcheck]
+  [@@deriving quickcheck ~generator ~observer ~shrinker]
 end
 
 module Poly_with_variance = struct
-  type (-'a, +'b) t = 'b * ('a -> 'b) [@@deriving quickcheck]
+  type (-'a, +'b) t = 'b * ('a -> 'b)
+  [@@deriving quickcheck ~generator ~observer ~shrinker]
 end
 
 module Instance_with_variance = struct
   type t = (bool, unit option) Poly_with_variance.t
 
-  (* We cannot use [@@deriving quickcheck] here because ppx_quickcheck cannot tell the
-     [bool] argument needs to swap generators with observers. *)
+  (* We cannot use [@@deriving quickcheck ~generator ~observer ~shrinker] here because
+     ppx_quickcheck cannot tell the [bool] argument needs to swap generators with
+     observers. *)
   let quickcheck_generator =
     Poly_with_variance.quickcheck_generator
       quickcheck_observer_bool
@@ -171,22 +180,23 @@ module Instance_with_variance = struct
 end
 
 module Poly_with_phantom = struct
-  type _ t = unit option [@@deriving quickcheck]
+  type _ t = unit option [@@deriving quickcheck ~generator ~observer ~shrinker]
 end
 
 module Instance_with_phantom = struct
-  type t = [ `phantom ] Poly_with_phantom.t [@@deriving quickcheck]
+  type t = [ `phantom ] Poly_with_phantom.t
+  [@@deriving quickcheck ~generator ~observer ~shrinker]
 end
 
 module Recursive = struct
   type t =
     | Leaf
     | Node of t * t
-  [@@deriving quickcheck]
+  [@@deriving quickcheck ~generator ~observer ~shrinker]
 end
 
 module Recursive_with_indirect_base_case = struct
-  type t = { children : t list } [@@deriving quickcheck]
+  type t = { children : t list } [@@deriving quickcheck ~generator ~observer ~shrinker]
 end
 
 module Mutually_recursive = struct
@@ -201,18 +211,18 @@ module Mutually_recursive = struct
     | `abs
     ]
 
-  and args = expr list [@@deriving quickcheck]
+  and args = expr list [@@deriving quickcheck ~generator ~observer ~shrinker]
 end
 
 module Poly_recursive = struct
   type 'a t =
     | Zero
     | Succ of 'a * 'a t
-  [@@deriving quickcheck]
+  [@@deriving quickcheck ~generator ~observer ~shrinker]
 end
 
 module Instance_of_recursive = struct
-  type t = bool Poly_recursive.t [@@deriving quickcheck]
+  type t = bool Poly_recursive.t [@@deriving quickcheck ~generator ~observer ~shrinker]
 end
 
 module Murec_poly_mono = struct
@@ -220,14 +230,14 @@ module Murec_poly_mono = struct
     | Leaf of bool
     | Node of t node
 
-  and 'a node = 'a list [@@deriving quickcheck]
+  and 'a node = 'a list [@@deriving quickcheck ~generator ~observer ~shrinker]
 end
 
 module Polymorphic_recursion = struct
   type 'a t =
     | Single of 'a
     | Double of ('a * 'a) t
-  [@@deriving quickcheck]
+  [@@deriving quickcheck ~generator ~observer ~shrinker]
 end
 
 module Extensions = struct
@@ -274,7 +284,7 @@ module Attribute_override = struct
     | Null [@quickcheck.weight 0.1]
     | Text of (string[@quickcheck.generator Generator.string_of Generator.char_lowercase])
     | Number of (float[@quickcheck.generator Generator.float_strictly_positive])
-  [@@deriving quickcheck]
+  [@@deriving quickcheck ~generator ~observer ~shrinker]
 end
 
 module Attribute_override_recursive = struct
@@ -282,12 +292,12 @@ module Attribute_override_recursive = struct
     | Leaf
     | Node1 of t * int64 * t [@quickcheck.weight 0.5]
     | Node2 of t * int64 * t * int64 * t [@quickcheck.weight 0.25]
-  [@@deriving quickcheck]
+  [@@deriving quickcheck ~generator ~observer ~shrinker]
 end
 
 module Deriving_from_wildcard = struct
-  type _ transparent = string [@@deriving quickcheck]
-  type 'a opaque = 'a option [@@deriving quickcheck]
+  type _ transparent = string [@@deriving quickcheck ~generator ~observer ~shrinker]
+  type 'a opaque = 'a option [@@deriving quickcheck ~generator ~observer ~shrinker]
 
   let compare_opaque = compare_option
   let sexp_of_opaque = sexp_of_option
@@ -308,20 +318,20 @@ module Do_not_generate_clauses = struct
   type t =
     | Can_generate of bool
     | Cannot_generate of Cannot_generate.t [@quickcheck.do_not_generate]
-  [@@deriving quickcheck]
+  [@@deriving quickcheck ~generator ~observer ~shrinker]
 
   module Poly = struct
     type t =
       [ `Can_generate of bool
       | `Cannot_generate of Cannot_generate.t [@quickcheck.do_not_generate]
       ]
-    [@@deriving quickcheck]
+    [@@deriving quickcheck ~generator ~observer ~shrinker]
   end
 
   module _ = struct
     type t =
       | A
       | B of t [@quickcheck.do_not_generate]
-    [@@deriving quickcheck]
+    [@@deriving quickcheck ~generator ~observer ~shrinker]
   end
 end

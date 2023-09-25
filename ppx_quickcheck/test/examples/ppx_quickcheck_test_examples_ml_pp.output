@@ -8,7 +8,7 @@ include
   end
 module Simple_reference =
   struct
-    type t = bool[@@deriving quickcheck]
+    type t = bool[@@deriving quickcheck ~generator ~observer ~shrinker]
     include
       struct
         let _ = fun (_ : t) -> ()
@@ -22,7 +22,8 @@ module Simple_reference =
   end
 module Dotted_reference =
   struct
-    type t = Simple_reference.t[@@deriving quickcheck]
+    type t = Simple_reference.t[@@deriving
+                                 quickcheck ~generator ~observer ~shrinker]
     include
       struct
         let _ = fun (_ : t) -> ()
@@ -37,7 +38,7 @@ module Dotted_reference =
 module Nonrec_reference =
   struct
     open Dotted_reference
-    type nonrec t = t[@@deriving quickcheck]
+    type nonrec t = t[@@deriving quickcheck ~generator ~observer ~shrinker]
     include
       struct
         let _ = fun (_ : t) -> ()
@@ -51,7 +52,8 @@ module Nonrec_reference =
   end
 module Application_of_polymorphic_type =
   struct
-    type t = bool option[@@deriving quickcheck]
+    type t = bool option[@@deriving
+                          quickcheck ~generator ~observer ~shrinker]
     include
       struct
         let _ = fun (_ : t) -> ()
@@ -68,7 +70,8 @@ module Application_of_polymorphic_type =
   end
 module Tuple =
   struct
-    type t = (bool * unit option)[@@deriving quickcheck]
+    type t = (bool * unit option)[@@deriving
+                                   quickcheck ~generator ~observer ~shrinker]
     include
       struct
         let _ = fun (_ : t) -> ()
@@ -115,7 +118,9 @@ module Poly_variant =
   struct
     type t =
       [ `A  | `B  | `C of bool  | `D of bool  | `E of (bool * unit option) 
-      | `F of (bool * unit option) ][@@deriving quickcheck]
+      | `F of (bool * unit option) ][@@deriving
+                                      quickcheck ~generator ~observer
+                                        ~shrinker]
     include
       struct
         let _ = fun (_ : t) -> ()
@@ -300,7 +305,10 @@ module Poly_variant =
 module Inherit_poly_variant =
   struct
     type t = [ `X  | Poly_variant.t | `Z of unit option ][@@deriving
-                                                           quickcheck]
+                                                           quickcheck
+                                                             ~generator
+                                                             ~observer
+                                                             ~shrinker]
     include
       struct
         let _ = fun (_ : t) -> ()
@@ -378,7 +386,7 @@ module Record_type =
   struct
     type t = {
       mutable x: bool ;
-      y: unit option }[@@deriving quickcheck]
+      y: unit option }[@@deriving quickcheck ~generator ~observer ~shrinker]
     include
       struct
         let _ = fun (_ : t) -> ()
@@ -432,7 +440,7 @@ module Nullary_and_unary_variant =
       | A 
       | B 
       | C of unit 
-      | D of unit [@@deriving quickcheck]
+      | D of unit [@@deriving quickcheck ~generator ~observer ~shrinker]
     include
       struct
         let _ = fun (_ : t) -> ()
@@ -518,7 +526,8 @@ module Binary_and_record_variant =
       mutable y: bool } 
       | D of {
       x: unit option ;
-      mutable y: bool } [@@deriving quickcheck]
+      mutable y: bool } [@@deriving
+                          quickcheck ~generator ~observer ~shrinker]
     include
       struct
         let _ = fun (_ : t) -> ()
@@ -782,7 +791,8 @@ module Binary_and_record_variant =
   end
 module Simple_arrow =
   struct
-    type t = unit option -> bool[@@deriving quickcheck]
+    type t = unit option -> bool[@@deriving
+                                  quickcheck ~generator ~observer ~shrinker]
     include
       struct
         let _ = fun (_ : t) -> ()
@@ -803,7 +813,8 @@ module Simple_arrow =
   end
 module Named_arrow =
   struct
-    type t = x:unit option -> bool[@@deriving quickcheck]
+    type t = x:unit option -> bool[@@deriving
+                                    quickcheck ~generator ~observer ~shrinker]
     include
       struct
         let _ = fun (_ : t) -> ()
@@ -828,7 +839,9 @@ module Named_arrow =
   end
 module Optional_arrow =
   struct
-    type t = ?x:unit option -> unit -> bool[@@deriving quickcheck]
+    type t = ?x:unit option -> unit -> bool[@@deriving
+                                             quickcheck ~generator ~observer
+                                               ~shrinker]
     include
       struct
         let _ = fun (_ : t) -> ()
@@ -857,7 +870,9 @@ module Optional_arrow =
   end
 module Curried_arrow =
   struct
-    type t = unit option -> bool option -> bool[@@deriving quickcheck]
+    type t = unit option -> bool option -> bool[@@deriving
+                                                 quickcheck ~generator
+                                                   ~observer ~shrinker]
     include
       struct
         let _ = fun (_ : t) -> ()
@@ -882,7 +897,9 @@ module Curried_arrow =
   end
 module Simple_higher_order =
   struct
-    type t = (unit option -> bool option) -> bool[@@deriving quickcheck]
+    type t = (unit option -> bool option) -> bool[@@deriving
+                                                   quickcheck ~generator
+                                                     ~observer ~shrinker]
     include
       struct
         let _ = fun (_ : t) -> ()
@@ -907,7 +924,9 @@ module Simple_higher_order =
   end
 module Named_higher_order =
   struct
-    type t = (x:unit option -> bool option) -> bool[@@deriving quickcheck]
+    type t = (x:unit option -> bool option) -> bool[@@deriving
+                                                     quickcheck ~generator
+                                                       ~observer ~shrinker]
     include
       struct
         let _ = fun (_ : t) -> ()
@@ -937,7 +956,10 @@ module Named_higher_order =
 module Optional_higher_order =
   struct
     type t = (?x:unit option -> unit -> bool option) -> bool[@@deriving
-                                                              quickcheck]
+                                                              quickcheck
+                                                                ~generator
+                                                                ~observer
+                                                                ~shrinker]
     include
       struct
         let _ = fun (_ : t) -> ()
@@ -972,7 +994,7 @@ module Optional_higher_order =
   end
 module Poly_unary =
   struct
-    type 'a t = 'a list[@@deriving quickcheck]
+    type 'a t = 'a list[@@deriving quickcheck ~generator ~observer ~shrinker]
     include
       struct
         let _ = fun (_ : 'a t) -> ()
@@ -989,7 +1011,8 @@ module Poly_unary =
   end
 module Instance_of_unary =
   struct
-    type t = bool Poly_unary.t[@@deriving quickcheck]
+    type t = bool Poly_unary.t[@@deriving
+                                quickcheck ~generator ~observer ~shrinker]
     include
       struct
         let _ = fun (_ : t) -> ()
@@ -1006,7 +1029,8 @@ module Instance_of_unary =
   end
 module Poly_binary =
   struct
-    type ('a, 'b) t = ('a * 'b)[@@deriving quickcheck]
+    type ('a, 'b) t = ('a * 'b)[@@deriving
+                                 quickcheck ~generator ~observer ~shrinker]
     include
       struct
         let _ = fun (_ : ('a, 'b) t) -> ()
@@ -1049,7 +1073,9 @@ module Poly_binary =
   end
 module Instance_of_binary =
   struct
-    type t = (bool, unit option) Poly_binary.t[@@deriving quickcheck]
+    type t = (bool, unit option) Poly_binary.t[@@deriving
+                                                quickcheck ~generator
+                                                  ~observer ~shrinker]
     include
       struct
         let _ = fun (_ : t) -> ()
@@ -1069,7 +1095,9 @@ module Instance_of_binary =
   end
 module Poly_ternary =
   struct
-    type ('a, 'b, 'c) t = ('a * 'b * 'c)[@@deriving quickcheck]
+    type ('a, 'b, 'c) t = ('a * 'b * 'c)[@@deriving
+                                          quickcheck ~generator ~observer
+                                            ~shrinker]
     include
       struct
         let _ = fun (_ : ('a, 'b, 'c) t) -> ()
@@ -1127,7 +1155,7 @@ module Instance_of_ternary =
   struct
     type t =
       (bool, unit option, (unit option, bool) Poly_binary.t) Poly_ternary.t
-    [@@deriving quickcheck]
+    [@@deriving quickcheck ~generator ~observer ~shrinker]
     include
       struct
         let _ = fun (_ : t) -> ()
@@ -1156,7 +1184,9 @@ module Instance_of_ternary =
   end
 module Poly_with_variance =
   struct
-    type (-'a, +'b) t = ('b * ('a -> 'b))[@@deriving quickcheck]
+    type (-'a, +'b) t = ('b * ('a -> 'b))[@@deriving
+                                           quickcheck ~generator ~observer
+                                             ~shrinker]
     include
       struct
         let _ = fun (_ : ('a, 'b) t) -> ()
@@ -1224,7 +1254,8 @@ module Instance_with_variance =
   end
 module Poly_with_phantom =
   struct
-    type _ t = unit option[@@deriving quickcheck]
+    type _ t = unit option[@@deriving
+                            quickcheck ~generator ~observer ~shrinker]
     include
       struct
         let _ = fun (_ : _ t) -> ()
@@ -1241,7 +1272,9 @@ module Poly_with_phantom =
   end
 module Instance_with_phantom =
   struct
-    type t = [ `phantom ] Poly_with_phantom.t[@@deriving quickcheck]
+    type t = [ `phantom ] Poly_with_phantom.t[@@deriving
+                                               quickcheck ~generator
+                                                 ~observer ~shrinker]
     include
       struct
         let _ = fun (_ : t) -> ()
@@ -1276,7 +1309,7 @@ module Recursive =
   struct
     type t =
       | Leaf 
-      | Node of t * t [@@deriving quickcheck]
+      | Node of t * t [@@deriving quickcheck ~generator ~observer ~shrinker]
     include
       struct
         let _ = fun (_ : t) -> ()
@@ -1416,7 +1449,8 @@ module Recursive =
 module Recursive_with_indirect_base_case =
   struct
     type t = {
-      children: t list }[@@deriving quickcheck]
+      children: t list }[@@deriving
+                          quickcheck ~generator ~observer ~shrinker]
     include
       struct
         let _ = fun (_ : t) -> ()
@@ -1514,7 +1548,8 @@ module Mutually_recursive =
       | Operator of op 
       | Application of expr * args 
     and op = [ `plus  | `minus  | `abs ]
-    and args = expr list[@@deriving quickcheck]
+    and args = expr list[@@deriving
+                          quickcheck ~generator ~observer ~shrinker]
     include
       struct
         let _ = fun (_ : expr) -> ()
@@ -1900,7 +1935,8 @@ module Poly_recursive =
   struct
     type 'a t =
       | Zero 
-      | Succ of 'a * 'a t [@@deriving quickcheck]
+      | Succ of 'a * 'a t [@@deriving
+                            quickcheck ~generator ~observer ~shrinker]
     include
       struct
         let _ = fun (_ : 'a t) -> ()
@@ -2065,7 +2101,8 @@ module Poly_recursive =
   end
 module Instance_of_recursive =
   struct
-    type t = bool Poly_recursive.t[@@deriving quickcheck]
+    type t = bool Poly_recursive.t[@@deriving
+                                    quickcheck ~generator ~observer ~shrinker]
     include
       struct
         let _ = fun (_ : t) -> ()
@@ -2085,7 +2122,8 @@ module Murec_poly_mono =
     type t =
       | Leaf of bool 
       | Node of t node 
-    and 'a node = 'a list[@@deriving quickcheck]
+    and 'a node = 'a list[@@deriving
+                           quickcheck ~generator ~observer ~shrinker]
     include
       struct
         let _ = fun (_ : t) -> ()
@@ -2326,7 +2364,8 @@ module Polymorphic_recursion =
   struct
     type 'a t =
       | Single of 'a 
-      | Double of ('a * 'a) t [@@deriving quickcheck]
+      | Double of ('a * 'a) t [@@deriving
+                                quickcheck ~generator ~observer ~shrinker]
     include
       struct
         let _ = fun (_ : 'a t) -> ()
@@ -2672,7 +2711,7 @@ module Attribute_override =
       
       | Number of
       ((float)[@quickcheck.generator Generator.float_strictly_positive]) 
-    [@@deriving quickcheck]
+    [@@deriving quickcheck ~generator ~observer ~shrinker]
     include
       struct
         let _ = fun (_ : t) -> ()
@@ -2746,7 +2785,10 @@ module Attribute_override_recursive =
       | Leaf 
       | Node1 of t * int64 * t [@quickcheck.weight 0.5]
       | Node2 of t * int64 * t * int64 * t [@quickcheck.weight 0.25][@@deriving
-                                                                    quickcheck]
+                                                                    quickcheck
+                                                                    ~generator
+                                                                    ~observer
+                                                                    ~shrinker]
     include
       struct
         let _ = fun (_ : t) -> ()
@@ -2999,7 +3041,8 @@ module Attribute_override_recursive =
   end
 module Deriving_from_wildcard =
   struct
-    type _ transparent = string[@@deriving quickcheck]
+    type _ transparent = string[@@deriving
+                                 quickcheck ~generator ~observer ~shrinker]
     include
       struct
         let _ = fun (_ : _ transparent) -> ()
@@ -3013,7 +3056,8 @@ module Deriving_from_wildcard =
           quickcheck_shrinker_string
         let _ = quickcheck_shrinker_transparent
       end[@@ocaml.doc "@inline"][@@merlin.hide ]
-    type 'a opaque = 'a option[@@deriving quickcheck]
+    type 'a opaque = 'a option[@@deriving
+                                quickcheck ~generator ~observer ~shrinker]
     include
       struct
         let _ = fun (_ : 'a opaque) -> ()
@@ -3047,7 +3091,7 @@ module Do_not_generate_clauses =
     type t =
       | Can_generate of bool 
       | Cannot_generate of Cannot_generate.t [@quickcheck.do_not_generate ]
-    [@@deriving quickcheck]
+    [@@deriving quickcheck ~generator ~observer ~shrinker]
     include
       struct
         let _ = fun (_ : t) -> ()
@@ -3104,7 +3148,9 @@ module Do_not_generate_clauses =
         type t =
           [ `Can_generate of bool 
           | `Cannot_generate of Cannot_generate.t
-              [@quickcheck.do_not_generate ]][@@deriving quickcheck]
+              [@quickcheck.do_not_generate ]][@@deriving
+                                               quickcheck ~generator
+                                                 ~observer ~shrinker]
         include
           struct
             let _ = fun (_ : t) -> ()
@@ -3163,7 +3209,9 @@ module Do_not_generate_clauses =
       struct
         type t =
           | A 
-          | B of t [@quickcheck.do_not_generate ][@@deriving quickcheck]
+          | B of t [@quickcheck.do_not_generate ][@@deriving
+                                                   quickcheck ~generator
+                                                     ~observer ~shrinker]
         include
           struct
             let _ = fun (_ : t) -> ()

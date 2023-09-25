@@ -420,7 +420,7 @@ let generator_intf_list type_decl_list = List.map type_decl_list ~f:generator_in
 let observer_intf_list type_decl_list = List.map type_decl_list ~f:observer_intf
 let shrinker_intf_list type_decl_list = List.map type_decl_list ~f:shrinker_intf
 
-let try_include_decl type_decl_list ~loc =
+let try_include_decl type_decl_list ~loc ~incl_generator ~incl_observer ~incl_shrinker =
   match type_decl_list with
   | [ type_decl ] ->
     let has_contravariant_arg =
@@ -429,7 +429,7 @@ let try_include_decl type_decl_list ~loc =
         | Contravariant -> true
         | NoVariance | Covariant -> false)
     in
-    if has_contravariant_arg
+    if has_contravariant_arg || not (incl_generator && incl_observer && incl_shrinker)
     then None
     else (
       let sg_name = "Ppx_quickcheck_runtime.Quickcheckable.S" in
@@ -441,20 +441,69 @@ let try_include_decl type_decl_list ~loc =
     None
 ;;
 
+let args () =
+  Deriving.Args.(empty +> flag "generator" +> flag "observer" +> flag "shrinker")
+;;
+
+let flags ~incl_generator ~incl_observer ~incl_shrinker =
+  if not (incl_generator || incl_observer || incl_shrinker)
+  then (* If no flags are provided, include everything. *)
+    true, true, true
+  else incl_generator, incl_observer, incl_shrinker
+;;
+
+let create
+  ~incl_generator
+  ~incl_observer
+  ~incl_shrinker
+  ~make_generator_list
+  ~make_observer_list
+  ~make_shrinker_list
+  decls
+  =
+  List.concat
+    [ (if incl_generator then make_generator_list decls else [])
+    ; (if incl_observer then make_observer_list decls else [])
+    ; (if incl_shrinker then make_shrinker_list decls else [])
+    ]
+;;
+
 let sig_type_decl =
-  Deriving.Generator.make_noarg (fun ~loc ~path:_ (_, decls) ->
-    match try_include_decl ~loc decls with
+  Deriving.Generator.make
+    (args ())
+    (fun ~loc ~path:_ (_, decls) incl_generator incl_observer incl_shrinker ->
+    let incl_generator, incl_observer, incl_shrinker =
+      flags ~incl_generator ~incl_observer ~incl_shrinker
+    in
+    match try_include_decl ~loc ~incl_generator ~incl_observer ~incl_shrinker decls with
     | Some decl -> [ decl ]
     | None ->
-      generator_intf_list decls @ observer_intf_list decls @ shrinker_intf_list decls)
+      create
+        ~incl_generator
+        ~incl_observer
+        ~incl_shrinker
+        ~make_generator_list:generator_intf_list
+        ~make_observer_list:observer_intf_list
+        ~make_shrinker_list:shrinker_intf_list
+        decls)
 ;;
 
 let str_type_decl =
-  Deriving.Generator.make_noarg (fun ~loc ~path:_ (rec_flag, decls) ->
+  Deriving.Generator.make
+    (args ())
+    (fun ~loc ~path:_ (rec_flag, decls) incl_generator incl_observer incl_shrinker ->
     let rec_flag = really_recursive rec_flag decls in
-    generator_impl_list ~loc ~rec_flag decls
-    @ observer_impl_list ~loc ~rec_flag decls
-    @ shrinker_impl_list ~loc ~rec_flag decls)
+    let incl_generator, incl_observer, incl_shrinker =
+      flags ~incl_generator ~incl_observer ~incl_shrinker
+    in
+    create
+      ~incl_generator
+      ~incl_observer
+      ~incl_shrinker
+      ~make_generator_list:(generator_impl_list ~rec_flag ~loc)
+      ~make_observer_list:(observer_impl_list ~rec_flag ~loc)
+      ~make_shrinker_list:(shrinker_impl_list ~rec_flag ~loc)
+      decls)
 ;;
 
 let generator_extension ~loc:_ ~path:_ core_type =
