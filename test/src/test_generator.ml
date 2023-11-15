@@ -10,16 +10,13 @@ let%expect_test "create & generate" =
   let int_up_to_size =
     Generator.create (fun ~size ~random -> Splittable_random.int random ~lo:0 ~hi:size)
   in
-  let random = Splittable_random.State.create Random.State.default in
+  let random = Splittable_random.create Random.State.default in
   List.init 30 ~f:(fun size -> Generator.generate int_up_to_size ~size ~random)
   |> [%sexp_of: int list]
   |> print_s;
   [%expect {| (0 0 1 0 4 3 0 4 2 4 5 0 1 9 10 5 13 3 18 11 8 20 15 4 24 3 2 15 6 2) |}];
   require_does_raise [%here] (fun () ->
-    Generator.generate
-      int_up_to_size
-      ~size:(-1)
-      ~random:(Splittable_random.State.of_int 0));
+    Generator.generate int_up_to_size ~size:(-1) ~random:(Splittable_random.of_int 0));
   [%expect {| ("Base_quickcheck.Generator.generate: size < 0" (size -1)) |}]
 ;;
 
@@ -77,7 +74,7 @@ let%expect_test "perturb" =
   in
   let size = 0 in
   List.init 10 ~f:(fun salt ->
-    let random = Splittable_random.State.of_int 0 in
+    let random = Splittable_random.of_int 0 in
     let gen = Generator.perturb gen salt in
     List.init 10 ~f:(fun _ -> Generator.generate gen ~size ~random))
   |> [%sexp_of: int list list]

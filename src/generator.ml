@@ -3,10 +3,10 @@ open! Base
 module T : sig
   type +'a t
 
-  val create : (size:int -> random:Splittable_random.State.t -> 'a) -> 'a t
-  val generate : 'a t -> size:int -> random:Splittable_random.State.t -> 'a
+  val create : (size:int -> random:Splittable_random.t -> 'a) -> 'a t
+  val generate : 'a t -> size:int -> random:Splittable_random.t -> 'a
 end = struct
-  type 'a t = (size:int -> random:Splittable_random.State.t -> 'a) Staged.t
+  type 'a t = (size:int -> random:Splittable_random.t -> 'a) Staged.t
 
   let create f : _ t = Staged.stage f
 
@@ -23,11 +23,11 @@ let size = create (fun ~size ~random:_ -> size)
 
 let fn dom rng =
   create (fun ~size ~random ->
-    let random = Splittable_random.State.split random in
+    let random = Splittable_random.split random in
     fun x ->
       let hash = Observer0.observe dom x ~size ~hash:(Hash.alloc ()) in
-      let random = Splittable_random.State.copy random in
-      Splittable_random.State.perturb random (Hash.get_hash_value hash);
+      let random = Splittable_random.copy random in
+      Splittable_random.perturb random (Hash.get_hash_value hash);
       generate rng ~size ~random)
 ;;
 
@@ -35,7 +35,7 @@ let with_size t ~size = create (fun ~size:_ ~random -> generate t ~size ~random)
 
 let perturb t salt =
   create (fun ~size ~random ->
-    Splittable_random.State.perturb random salt;
+    Splittable_random.perturb random salt;
     generate t ~size ~random)
 ;;
 
@@ -332,8 +332,8 @@ let small_strictly_positive_int = small_int ~allow_zero:false
 module type Int_with_random = sig
   include Int.S
 
-  val uniform : Splittable_random.State.t -> lo:t -> hi:t -> t
-  val log_uniform : Splittable_random.State.t -> lo:t -> hi:t -> t
+  val uniform : Splittable_random.t -> lo:t -> hi:t -> t
+  val log_uniform : Splittable_random.t -> lo:t -> hi:t -> t
 end
 
 module For_integer (Integer : Int_with_random) = struct

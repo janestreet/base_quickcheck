@@ -379,11 +379,11 @@ val perturb : 'a t -> int -> 'a t
 
 (** Creates a generator that calls the given function with the current size parameter and
     pseudorandom state. *)
-val create : (size:int -> random:Splittable_random.State.t -> 'a) -> 'a t
+val create : (size:int -> random:Splittable_random.t -> 'a) -> 'a t
 
 (** Generates a random value using the given size and pseudorandom state. Useful when
     using [create] and dispatching to other existing generators. *)
-val generate : 'a t -> size:int -> random:Splittable_random.State.t -> 'a
+val generate : 'a t -> size:int -> random:Splittable_random.t -> 'a
 
 module Debug : sig
   (** {3 Helpers for debugging generators} *)

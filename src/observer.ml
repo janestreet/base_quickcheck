@@ -56,7 +56,7 @@ let option value_t =
 
 let list elt_t =
   create (fun list ~size ~hash ->
-    let random = Splittable_random.State.of_int (Hash.get_hash_value hash) in
+    let random = Splittable_random.of_int (Hash.get_hash_value hash) in
     let length = List.length list in
     let sizes =
       Generator.sizes ~min_length:length ~max_length:length ()
@@ -72,7 +72,7 @@ let lazy_t t = unmap t ~f:Lazy.force
 
 let fn dom rng =
   create (fun f ~size ~hash ->
-    let random = Splittable_random.State.of_int (Hash.get_hash_value hash) in
+    let random = Splittable_random.of_int (Hash.get_hash_value hash) in
     let sizes =
       (* Empirically, doubling the size when generating the list of inputs gives us much
          better coverage of the space of functions. *)
