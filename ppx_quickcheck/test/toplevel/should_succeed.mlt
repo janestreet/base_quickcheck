@@ -3,7 +3,8 @@ type 'a t =
   | Succ of 'a t
 [@@deriving quickcheck]
 
-[%%expect {|
+[%%expect
+  {|
 |}]
 
 module With_base_shadowed = struct
@@ -15,7 +16,8 @@ module With_base_shadowed = struct
   [@@deriving quickcheck]
 end
 
-[%%expect {|
+[%%expect
+  {|
 |}]
 
 module With_base_quickcheck_shadowed = struct
@@ -27,7 +29,8 @@ module With_base_quickcheck_shadowed = struct
   [@@deriving quickcheck]
 end
 
-[%%expect {|
+[%%expect
+  {|
 |}]
 
 (* Make sure [@quickcheck.do_not_generate] works with recursive variant types.
@@ -37,7 +40,8 @@ type recursive_with_do_not_generate =
   | B of recursive_with_do_not_generate [@quickcheck.do_not_generate]
 [@@deriving quickcheck]
 
-[%%expect {|
+[%%expect
+  {|
 |}]
 
 type recursive_with_do_not_generate2 =
@@ -46,7 +50,8 @@ type recursive_with_do_not_generate2 =
   | C of recursive_with_do_not_generate2
 [@@deriving quickcheck]
 
-[%%expect {|
+[%%expect
+  {|
 |}]
 
 module _ = struct
@@ -58,5 +63,6 @@ module _ = struct
   [@@deriving quickcheck]
 end
 
-[%%expect {|
+[%%expect
+  {|
 |}]

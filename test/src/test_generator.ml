@@ -14,7 +14,7 @@ let%expect_test "create & generate" =
   List.init 30 ~f:(fun size -> Generator.generate int_up_to_size ~size ~random)
   |> [%sexp_of: int list]
   |> print_s;
-  [%expect {| (0 0 1 0 4 3 0 4 2 4 5 0 1 9 10 5 13 3 18 11 8 20 15 4 24 3 2 15 6 2) |}];
+  [%expect {| (0 1 1 1 1 1 3 0 8 7 1 8 11 13 12 7 6 6 0 8 16 4 15 2 6 14 4 24 16 11) |}];
   require_does_raise [%here] (fun () ->
     Generator.generate int_up_to_size ~size:(-1) ~random:(Splittable_random.of_int 0));
   [%expect {| ("Base_quickcheck.Generator.generate: size < 0" (size -1)) |}]

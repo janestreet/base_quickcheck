@@ -1,13 +1,15 @@
 type abstract [@@deriving quickcheck]
 
-[%%expect {|
+[%%expect
+  {|
 Line _, characters _-_:
 Error: ppx_quickcheck: unsupported: abstract type
 |}]
 
 type gadt = GADT : 'a -> gadt [@@deriving quickcheck]
 
-[%%expect {|
+[%%expect
+  {|
 Line _, characters _-_:
 Error: ppx_quickcheck: unsupported: GADT
 |}]
@@ -75,7 +77,8 @@ Error: ppx_quickcheck: invalid syntax: [%custom] extension expects a single expr
 
 let _ = [%quickcheck.generator: _ list]
 
-[%%expect {|
+[%%expect
+  {|
 Line _, characters _-_:
 Error: ppx_quickcheck: unsupported: wildcard type
 |}]
