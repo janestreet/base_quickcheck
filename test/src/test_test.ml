@@ -17,7 +17,8 @@ let%expect_test ("default_config" [@tags "64-bits-only"]) =
       (0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27
        28 29 30 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24
        25 26 27 28 29 30 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21
-       22 23 24 25 26 27 28 29 30 0 1 2 3 4 5 6 ...))) |}]
+       22 23 24 25 26 27 28 29 30 0 1 2 3 4 5 6 ...)))
+    |}]
 ;;
 
 let%expect_test ("default_config" [@tags "32-bits-only"]) =
@@ -31,7 +32,8 @@ let%expect_test ("default_config" [@tags "32-bits-only"]) =
       (0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27
        28 29 30 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24
        25 26 27 28 29 30 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21
-       22 23 24 25 26 27 28 29 30 0 1 2 3 4 5 6 ...))) |}]
+       22 23 24 25 26 27 28 29 30 0 1 2 3 4 5 6 ...)))
+    |}]
 ;;
 
 let run = Test.run
@@ -74,7 +76,8 @@ let%expect_test "run_exn" =
     {|
     ("Base_quickcheck.Test.run: test failed"
      (input ((false) ()))
-     (error "Assert_failure test_test.ml:LINE:COL")) |}];
+     (error "Assert_failure test_test.ml:LINE:COL"))
+    |}];
   (* failure without shrinking *)
   require_does_raise [%here] ~hide_positions:true (fun () ->
     Test.run_exn ~config ~f:failure (module M_without_shrinker));
@@ -82,7 +85,8 @@ let%expect_test "run_exn" =
     {|
     ("Base_quickcheck.Test.run: test failed"
      (input (() () (false) (true) (false) ()))
-     (error "Assert_failure test_test.ml:LINE:COL")) |}];
+     (error "Assert_failure test_test.ml:LINE:COL"))
+    |}];
   (* failure from examples *)
   require_does_raise [%here] ~hide_positions:true (fun () ->
     Test.run_exn
@@ -94,7 +98,8 @@ let%expect_test "run_exn" =
     {|
     ("Base_quickcheck.Test.run: test failed"
      (input ((true) ()))
-     (error "Assert_failure test_test.ml:LINE:COL")) |}];
+     (error "Assert_failure test_test.ml:LINE:COL"))
+    |}];
   (* failure from examples without shrinking *)
   require_does_raise [%here] ~hide_positions:true (fun () ->
     Test.run_exn
@@ -106,7 +111,8 @@ let%expect_test "run_exn" =
     {|
     ("Base_quickcheck.Test.run: test failed"
      (input ((true) (true) () (true) (true)))
-     (error "Assert_failure test_test.ml:LINE:COL")) |}]
+     (error "Assert_failure test_test.ml:LINE:COL"))
+    |}]
 ;;
 
 let with_sample = Test.with_sample
@@ -142,5 +148,6 @@ let%expect_test "with_sample_exn" =
     ((true) (false) (true))
     ((false) () () (false) () () () (false) (false) () (true) () () () ()
      (false))
-    () |}]
+    ()
+    |}]
 ;;

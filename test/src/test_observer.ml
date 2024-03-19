@@ -28,7 +28,8 @@ let%expect_test ("observe & create" [@tags "64-bits-only"]) =
      809201503
      809201503
      809201503
-     809201503) |}]
+     809201503)
+    |}]
 ;;
 
 let opaque = Observer.opaque
@@ -42,8 +43,7 @@ let unmap = Observer.unmap
 
 let%expect_test "unmap" =
   test_observer (Observer.unmap Observer.int64 ~f:Int.to_int64) (m_int (module Int));
-  [%expect {|
-    (observer transparent) |}]
+  [%expect {| (observer transparent) |}]
 ;;
 
 let of_hash_fold = Observer.of_hash_fold
@@ -79,7 +79,8 @@ let%expect_test "fn" =
     (((false false) (true false))
      ((false false) (true true))
      ((false true) (true false))
-     ((false true) (true true))) |}];
+     ((false true) (true true)))
+    |}];
   let higher_order = m_arrow first_order m_bool in
   let (module _) = higher_order in
   test_observer
@@ -156,16 +157,14 @@ let int64 = Observer.int64
 
 let%expect_test "int64" =
   test_observer Observer.int64 (m_int (module Int64));
-  [%expect {|
-    (observer transparent) |}]
+  [%expect {| (observer transparent) |}]
 ;;
 
 let nativeint = Observer.nativeint
 
 let%expect_test "nativeint" =
   test_observer Observer.nativeint (m_int (module Nativeint));
-  [%expect {|
-    (observer transparent) |}]
+  [%expect {| (observer transparent) |}]
 ;;
 
 let float = Observer.float

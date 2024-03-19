@@ -50,19 +50,22 @@ let%expect_test "type names" =
     {|
     (generator exhaustive)
     (observer transparent)
-    (shrinker atomic) |}];
+    (shrinker atomic)
+    |}];
   test ~shrinker:`atomic (module Dotted_reference) m_bool;
   [%expect
     {|
     (generator exhaustive)
     (observer transparent)
-    (shrinker atomic) |}];
+    (shrinker atomic)
+    |}];
   test ~shrinker:`atomic (module Nonrec_reference) m_bool;
   [%expect
     {|
     (generator exhaustive)
     (observer transparent)
-    (shrinker atomic) |}]
+    (shrinker atomic)
+    |}]
 ;;
 
 module Application_of_polymorphic_type = Application_of_polymorphic_type
@@ -73,7 +76,8 @@ let%expect_test "application of polymorphic type" =
     {|
     (generator exhaustive)
     (observer transparent)
-    (shrinker (((false) => ()) ((true) => ()))) |}]
+    (shrinker (((false) => ()) ((true) => ())))
+    |}]
 ;;
 
 module Tuple = Tuple
@@ -84,7 +88,8 @@ let%expect_test "tuple" =
     {|
     (generator exhaustive)
     (observer transparent)
-    (shrinker (((false (())) => (false ())) ((true (())) => (true ())))) |}]
+    (shrinker (((false (())) => (false ())) ((true (())) => (true ()))))
+    |}]
 ;;
 
 module Poly_variant = Poly_variant
@@ -112,7 +117,8 @@ let%expect_test "polymorphic variant" =
      (((E (false (()))) => (E (false ())))
       ((E (true (()))) => (E (true ())))
       ((F (false (()))) => (F (false ())))
-      ((F (true (()))) => (F (true ()))))) |}];
+      ((F (true (()))) => (F (true ())))))
+    |}];
   let module Inherit_poly_variant' = struct
     type t =
       [ `X
@@ -132,7 +138,8 @@ let%expect_test "polymorphic variant" =
       ((E (true (()))) => (E (true ())))
       ((F (false (()))) => (F (false ())))
       ((F (true (()))) => (F (true ())))
-      ((Z (())) => (Z ())))) |}]
+      ((Z (())) => (Z ()))))
+    |}]
 ;;
 
 module Record_type = Record_type
@@ -153,7 +160,8 @@ let%expect_test "record type" =
     (observer transparent)
     (shrinker
      ((((x false) (y (()))) => ((x false) (y ())))
-      (((x true) (y (()))) => ((x true) (y ()))))) |}]
+      (((x true) (y (()))) => ((x true) (y ())))))
+    |}]
 ;;
 
 module Nullary_and_unary_variant = Nullary_and_unary_variant
@@ -177,7 +185,8 @@ let%expect_test "variant type" =
     {|
     (generator exhaustive)
     (observer transparent)
-    (shrinker atomic) |}];
+    (shrinker atomic)
+    |}];
   let module Binary_and_record_variant' = struct
     type t = Binary_and_record_variant.t =
       | A of bool * [ `X | `Y | `Z of unit ]
@@ -202,7 +211,8 @@ let%expect_test "variant type" =
      (((C (x (())) (y false)) => (C (x ()) (y false)))
       ((C (x (())) (y true)) => (C (x ()) (y true)))
       ((D (x (())) (y false)) => (D (x ()) (y false)))
-      ((D (x (())) (y true)) => (D (x ()) (y true))))) |}]
+      ((D (x (())) (y true)) => (D (x ()) (y true)))))
+    |}]
 ;;
 
 module Simple_arrow = Simple_arrow
@@ -218,19 +228,22 @@ let%expect_test "first order arrow type" =
     {|
     (generator exhaustive)
     (observer transparent)
-    (shrinker atomic) |}];
+    (shrinker atomic)
+    |}];
   test (module Named_arrow) (m_arrow_named (m_option m_unit) m_bool);
   [%expect
     {|
     (generator exhaustive)
     (observer transparent)
-    (shrinker atomic) |}];
+    (shrinker atomic)
+    |}];
   test (module Optional_arrow) (m_arrow_optional (m_option m_unit) m_bool);
   [%expect
     {|
     (generator exhaustive)
     (observer transparent)
-    (shrinker atomic) |}];
+    (shrinker atomic)
+    |}];
   test
     (module Curried_arrow)
     (m_arrow (m_option m_unit) (m_arrow (m_option m_bool) m_bool));
@@ -238,7 +251,8 @@ let%expect_test "first order arrow type" =
     {|
     (generator "generated 64 distinct values in 1_000 iterations")
     (observer transparent)
-    (shrinker atomic) |}]
+    (shrinker atomic)
+    |}]
 ;;
 
 module Simple_higher_order = Simple_higher_order
@@ -255,7 +269,8 @@ let%expect_test ("higher order arrow type" [@tags "64-bits-only"]) =
     {|
     (generator "generated 55 distinct values in 100 iterations")
     (observer transparent)
-    (shrinker atomic) |}];
+    (shrinker atomic)
+    |}];
   test
     (module Named_higher_order)
     (m_arrow (m_arrow_named (m_option m_unit) (m_option m_bool)) m_bool);
@@ -263,7 +278,8 @@ let%expect_test ("higher order arrow type" [@tags "64-bits-only"]) =
     {|
     (generator "generated 55 distinct values in 100 iterations")
     (observer transparent)
-    (shrinker atomic) |}];
+    (shrinker atomic)
+    |}];
   test
     (module Optional_higher_order)
     (m_arrow (m_arrow_optional (m_option m_unit) (m_option m_bool)) m_bool);
@@ -271,7 +287,8 @@ let%expect_test ("higher order arrow type" [@tags "64-bits-only"]) =
     {|
     (generator "generated 49 distinct values in 100 iterations")
     (observer transparent)
-    (shrinker atomic) |}]
+    (shrinker atomic)
+    |}]
 ;;
 
 module Poly_unary = Poly_unary
@@ -297,13 +314,15 @@ let%expect_test "polymorphic type" =
       ((false true) => (true))
       ((false true) => (false))
       ((true false) => (false))
-      ((true false) => (true)))) |}];
+      ((true false) => (true))))
+    |}];
   test (module Instance_of_binary) (m_pair m_bool (m_option m_unit));
   [%expect
     {|
     (generator exhaustive)
     (observer transparent)
-    (shrinker (((false (())) => (false ())) ((true (())) => (true ())))) |}];
+    (shrinker (((false (())) => (false ())) ((true (())) => (true ()))))
+    |}];
   test
     (module Instance_of_ternary)
     (m_triple m_bool (m_option m_unit) (m_pair (m_option m_unit) m_bool));
@@ -327,7 +346,8 @@ let%expect_test "polymorphic type" =
       ((true (()) ((()) false)) => (true () ((()) false)))
       ((true (()) ((()) false)) => (true (()) (() false)))
       ((true (()) ((()) true)) => (true () ((()) true)))
-      ((true (()) ((()) true)) => (true (()) (() true))))) |}];
+      ((true (()) ((()) true)) => (true (()) (() true)))))
+    |}];
   test
     (module Instance_with_variance)
     (m_pair (m_option m_unit) (m_arrow m_bool (m_option m_unit)));
@@ -339,13 +359,15 @@ let%expect_test "polymorphic type" =
      ((((()) ((false ()) (true ()))) => (() ((false ()) (true ()))))
       (((()) ((false ()) (true (())))) => (() ((false ()) (true (())))))
       (((()) ((false (())) (true ()))) => (() ((false (())) (true ()))))
-      (((()) ((false (())) (true (())))) => (() ((false (())) (true (()))))))) |}];
+      (((()) ((false (())) (true (())))) => (() ((false (())) (true (())))))))
+    |}];
   test (module Instance_with_phantom) (m_option m_unit);
   [%expect
     {|
     (generator exhaustive)
     (observer transparent)
-    (shrinker (((()) => ()))) |}]
+    (shrinker (((()) => ())))
+    |}]
 ;;
 
 module Recursive = Recursive
@@ -372,7 +394,8 @@ let%expect_test "recursive type" =
     {|
     (generator "generated 1_954 distinct values in 10_000 iterations")
     (observer transparent)
-    (shrinker atomic) |}]
+    (shrinker atomic)
+    |}]
 ;;
 
 module Recursive_with_indirect_base_case = Recursive_with_indirect_base_case
@@ -401,7 +424,8 @@ let%expect_test "recursive type with indirect base case" =
        ((children (((children ()))))))
       (((children (((children ())) ((children ())))))
        =>
-       ((children (((children ())))))))) |}]
+       ((children (((children ()))))))))
+    |}]
 ;;
 
 module Mutually_recursive = Mutually_recursive
@@ -438,7 +462,8 @@ let%expect_test "mutually recursive types" =
     {|
     (generator "generated 5_895 distinct values in 10_000 iterations")
     (observer transparent)
-    (shrinker atomic) |}]
+    (shrinker atomic)
+    |}]
 ;;
 
 module Poly_recursive = Poly_recursive
@@ -473,7 +498,8 @@ let%expect_test "polymorphic, recursive type" =
     {|
     (generator "generated 154 distinct values in 10_000 iterations")
     (observer transparent)
-    (shrinker atomic) |}]
+    (shrinker atomic)
+    |}]
 ;;
 
 module Murec_poly_mono = Murec_poly_mono
@@ -494,7 +520,8 @@ let%expect_test "mutually recursive polymorphic and monomorphic types" =
     {|
     (generator "generated 2_343 distinct values in 10_000 iterations")
     (observer transparent)
-    (shrinker (((Node ((Leaf true))) => (Node ())))) |}]
+    (shrinker (((Node ((Leaf true))) => (Node ()))))
+    |}]
 ;;
 
 module Polymorphic_recursion = Polymorphic_recursion
@@ -541,7 +568,8 @@ let%expect_test "type using polymorphic recursion" =
        (Double (Double (Single (((true) ()) ((true) (false)))))))
       ((Double (Double (Single (((true) (false)) ((true) (false))))))
        =>
-       (Double (Double (Single (((true) (false)) ((true) ())))))))) |}]
+       (Double (Double (Single (((true) (false)) ((true) ()))))))))
+    |}]
 ;;
 
 module Extensions = Extensions
@@ -561,7 +589,8 @@ let%expect_test "extensions" =
     (generator exhaustive)
     (observer transparent)
     (shrinker
-     (((B (false (()))) => (B (false ()))) ((B (true (()))) => (B (true ()))))) |}]
+     (((B (false (()))) => (B (false ()))) ((B (true (()))) => (B (true ())))))
+    |}]
 ;;
 
 module Escaped = Escaped
@@ -592,7 +621,8 @@ let%expect_test "escaped" =
        ((2 a (true)) (2 b (true))))))
     (* require-failed: lib/base_quickcheck/test/helpers/base_quickcheck_test_helpers.ml:LINE:COL. *)
     "did not generate any single function that distinguishes all values"
-    (shrinker atomic) |}]
+    (shrinker atomic)
+    |}]
 ;;
 
 module Wildcard = Wildcard
@@ -625,7 +655,8 @@ let%expect_test "wildcard" =
       ((false true) => (true))
       ((false true) => (false))
       ((true false) => (false))
-      ((true false) => (true)))) |}]
+      ((true false) => (true))))
+    |}]
 ;;
 
 module Attribute_override = Attribute_override
@@ -646,7 +677,8 @@ let%expect_test "attributes" =
     {|
     (generator "generated 8_470 distinct values in 10_000 iterations")
     (observer transparent)
-    (shrinker (((Text a) => (Text "")))) |}];
+    (shrinker (((Text a) => (Text ""))))
+    |}];
   show_distribution
     ~config
     Attribute_override.quickcheck_generator
@@ -672,7 +704,8 @@ let%expect_test "attributes" =
      (15bp (Text e))
      (14bp (Number 0.5))
      (14bp (Text r))
-     (14bp (Text i))) |}]
+     (14bp (Text i)))
+    |}]
 ;;
 
 module Attribute_override_recursive = Attribute_override_recursive
@@ -696,7 +729,8 @@ let%expect_test "attributes for recursive types" =
     {|
     (generator "generated 4_007 distinct values in 10_000 iterations")
     (observer transparent)
-    (shrinker atomic) |}];
+    (shrinker atomic)
+    |}];
   show_distribution
     ~config
     Attribute_override_recursive.quickcheck_generator
@@ -722,7 +756,8 @@ let%expect_test "attributes for recursive types" =
      (2bp (Node2 Leaf -1 Leaf 9223372036854775807 Leaf))
      (2bp (Node1 Leaf 98 Leaf))
      (2bp (Node1 Leaf 83 Leaf))
-     (2bp (Node1 Leaf 29 Leaf))) |}]
+     (2bp (Node1 Leaf 29 Leaf)))
+    |}]
 ;;
 
 module Deriving_from_wildcard = Deriving_from_wildcard
@@ -741,7 +776,8 @@ let%expect_test "polymorphic wildcard" =
     {|
     (generator "generated 8_583 distinct values in 10_000 iterations")
     (observer transparent)
-    (shrinker ((a => ""))) |}];
+    (shrinker ((a => "")))
+    |}];
   let module Opaque = struct
     type t = int64 Deriving_from_wildcard.opaque [@@deriving compare, quickcheck, sexp_of]
 
@@ -753,7 +789,8 @@ let%expect_test "polymorphic wildcard" =
     {|
     (generator "generated 4_207 distinct values in 10_000 iterations")
     (observer transparent)
-    (shrinker (((0) => ()) ((1) => ()))) |}]
+    (shrinker (((0) => ()) ((1) => ())))
+    |}]
 ;;
 
 module Do_not_generate_clauses = Do_not_generate_clauses
@@ -779,7 +816,8 @@ let%expect_test "variant with clauses excluded from generator" =
     (observer transparent)
     (shrinker
      (((Cannot_generate (false)) => (Cannot_generate ()))
-      ((Cannot_generate (true)) => (Cannot_generate ())))) |}];
+      ((Cannot_generate (true)) => (Cannot_generate ()))))
+    |}];
   let module Poly' = struct
     type t =
       [ `Can_generate of bool
@@ -801,5 +839,6 @@ let%expect_test "variant with clauses excluded from generator" =
     (observer transparent)
     (shrinker
      (((Cannot_generate (false)) => (Cannot_generate ()))
-      ((Cannot_generate (true)) => (Cannot_generate ())))) |}]
+      ((Cannot_generate (true)) => (Cannot_generate ()))))
+    |}]
 ;;

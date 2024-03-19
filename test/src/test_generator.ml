@@ -39,7 +39,8 @@ let%expect_test "return" =
     {|
     (generator
      ("generated 1 distinct values in 10_000 iterations"
-      ("did not generate these values" (true)))) |}]
+      ("did not generate these values" (true))))
+    |}]
 ;;
 
 let%expect_test "map" =
@@ -63,7 +64,8 @@ let%expect_test "bind" =
     {|
     (generator
      ("generated 2 distinct values in 10_000 iterations"
-      ("did not generate these values" ((false true) (true false))))) |}]
+      ("did not generate these values" ((false true) (true false)))))
+    |}]
 ;;
 
 let perturb = Generator.perturb
@@ -90,7 +92,8 @@ let%expect_test "perturb" =
      (3 8 6 8 5 6 9 9 6 5)
      (0 4 1 3 5 6 6 6 3 5)
      (5 0 9 7 6 5 9 1 6 0)
-     (0 6 8 8 1 7 7 9 4 0)) |}]
+     (0 6 8 8 1 7 7 9 4 0))
+    |}]
 ;;
 
 let size = Generator.size
@@ -108,7 +111,8 @@ let%expect_test "sizes" =
     {|
     (generator
      ("generated 3_724 distinct values in 10_000 iterations"
-      ("did not generate these values" ((0 10) (10 0))))) |}];
+      ("did not generate these values" ((0 10) (10 0)))))
+    |}];
   (* The most common size lists: *)
   show_distribution
     (Generator.sizes ())
@@ -136,7 +140,8 @@ let%expect_test "sizes" =
      (60bp (10))
      (60bp (0 0 0 0 0 0 0 0))
      (59bp (11))
-     (58bp (13))) |}];
+     (58bp (13)))
+    |}];
   (* The most common lengths of a size list: *)
   show_distribution
     (Generator.sizes () |> Generator.map ~f:(List.length :> _ -> _))
@@ -162,7 +167,8 @@ let%expect_test "sizes" =
      (1.25% 15)
      (1.18% 14)
      (1.06% 18)
-     (76bp 21)) |}];
+     (76bp 21))
+    |}];
   (* The most common number of non-zero sizes in a size list: *)
   show_distribution
     (Generator.sizes () |> Generator.map ~f:(List.count ~f:(Int.( <> ) 0)))
@@ -180,7 +186,8 @@ let%expect_test "sizes" =
      (1.38% 8)
      (56bp 9)
      (13bp 10)
-     (6bp 11)) |}]
+     (6bp 11))
+    |}]
 ;;
 
 let with_size = Generator.with_size
@@ -194,7 +201,8 @@ let%expect_test "with_size" =
     {|
     (generator
      ("generated 1 distinct values in 10_000 iterations"
-      ("did not generate these values" (1 2 3 4 5 6 7 8 9 10)))) |}]
+      ("did not generate these values" (1 2 3 4 5 6 7 8 9 10))))
+    |}]
 ;;
 
 let filter = Generator.filter
@@ -209,7 +217,8 @@ let%expect_test "filter" =
     {|
     (generator
      ("generated 16 distinct values in 10_000 iterations"
-      ("did not generate these values" (1 3 5 7 9 11 13 15 17 19 21 23 25 27 29)))) |}]
+      ("did not generate these values" (1 3 5 7 9 11 13 15 17 19 21 23 25 27 29))))
+    |}]
 ;;
 
 let filter_map = Generator.filter_map
@@ -238,7 +247,8 @@ let%expect_test "of_weighted_list" =
     {|
     (generator
      ("generated 30 distinct values in 10_000 iterations"
-      ("did not generate these values" (0)))) |}]
+      ("did not generate these values" (0))))
+    |}]
 ;;
 
 let union = Generator.union
@@ -262,7 +272,8 @@ let%expect_test "weighted_union" =
     {|
     (generator
      ("generated 30 distinct values in 10_000 iterations"
-      ("did not generate these values" (0)))) |}]
+      ("did not generate these values" (0))))
+    |}]
 ;;
 
 let fixed_point = Generator.fixed_point
@@ -280,7 +291,8 @@ let%expect_test "fixed_point" =
     (generator
      ("generated 15 distinct values in 10_000 iterations"
       ("did not generate these values"
-       (14 15 16 17 19 20 21 22 23 24 25 26 27 28 29 30)))) |}];
+       (14 15 16 17 19 20 21 22 23 24 25 26 27 28 29 30))))
+    |}];
   (* [fixed_point] should only have to call its argument once *)
   let recursive_calls = ref 0 in
   let values_generated = ref 0 in
@@ -312,7 +324,8 @@ let%expect_test "recursive_union" =
     {|
     (generator
      ("generated 2_519 distinct values in 10_000 iterations"
-      ("did not generate these values" ((a bc def (a) (bc) (def) (a bc def)))))) |}];
+      ("did not generate these values" ((a bc def (a) (bc) (def) (a bc def))))))
+    |}];
   (* [recursive_union] should only have to call its argument once *)
   let recursive_calls = ref 0 in
   let values_generated = ref 0 in
@@ -345,7 +358,8 @@ let%expect_test "weighted_recursive_union" =
     {|
     (generator
      ("generated 1_520 distinct values in 10_000 iterations"
-      ("did not generate these values" ((a bc def (a) (bc) (def) (a bc def)))))) |}];
+      ("did not generate these values" ((a bc def (a) (bc) (def) (a bc def))))))
+    |}];
   (* [weighted_recursive_union] should only have to call its argument once *)
   let recursive_calls = ref 0 in
   let values_generated = ref 0 in
@@ -443,7 +457,8 @@ let%expect_test "small_strictly_positive_int" =
     {|
     (generator
      ("generated 31 distinct values in 10_000 iterations"
-      ("did not generate these values" (0)))) |}]
+      ("did not generate these values" (0))))
+    |}]
 ;;
 
 let int = Generator.int
@@ -462,7 +477,8 @@ let%expect_test ("int_uniform" [@tags "64-bits-only"]) =
     (generator
      ("generated 10_000 distinct values in 10_000 iterations"
       ("did not generate these values"
-       (-4611686018427387904 -1 0 1 4611686018427387903)))) |}]
+       (-4611686018427387904 -1 0 1 4611686018427387903))))
+    |}]
 ;;
 
 let int_inclusive = Generator.int_inclusive
@@ -483,7 +499,8 @@ let%expect_test "int_inclusive" =
      (8.21% 2)
      (8.18% 6)
      (8.15% 7)
-     (7.57% 3)) |}]
+     (7.57% 3))
+    |}]
 ;;
 
 let int_uniform_inclusive = Generator.int_uniform_inclusive
@@ -504,7 +521,8 @@ let%expect_test "int_uniform_inclusive" =
      (8.89% 8)
      (8.88% 3)
      (8.86% 2)
-     (8.79% 6)) |}]
+     (8.79% 6))
+    |}]
 ;;
 
 let int_log_inclusive = Generator.int_log_inclusive
@@ -525,7 +543,8 @@ let%expect_test "int_log_inclusive" =
      (4.82% 5)
      (4.59% 4)
      (4.37% 7)
-     (4.26% 6)) |}]
+     (4.26% 6))
+    |}]
 ;;
 
 let int_log_uniform_inclusive = Generator.int_log_uniform_inclusive
@@ -546,7 +565,8 @@ let%expect_test "int_log_uniform_inclusive" =
      (5.11% 6)
      (5.08% 5)
      (5.07% 7)
-     (4.84% 4)) |}]
+     (4.84% 4))
+    |}]
 ;;
 
 let int_geometric = Generator.int_geometric
@@ -567,19 +587,22 @@ let%expect_test "int_geometric" =
     (generator
      ("generated 29 distinct values in 10_000 iterations"
       ("did not generate these values" (0))))
-    ((25.65% 1) (18.97% 2) (14.45% 3) (10.34% 4)) |}];
+    ((25.65% 1) (18.97% 2) (14.45% 3) (10.34% 4))
+    |}];
   test 2 0.5;
   [%expect
     {|
     (generator
      ("generated 14 distinct values in 10_000 iterations"
       ("did not generate these values" (0 1))))
-    ((50.77% 2) (25.07% 3) (11.79% 4) (5.78% 5)) |}];
+    ((50.77% 2) (25.07% 3) (11.79% 4) (5.78% 5))
+    |}];
   test (-3) 0.75;
   [%expect
     {|
     (generator "generated 8 distinct values in 10_000 iterations")
-    ((75.84% -3) (17.57% -2) (4.97% -1) (1.2% 0)) |}];
+    ((75.84% -3) (17.57% -2) (4.97% -1) (1.2% 0))
+    |}];
   (* test a very low [p] *)
   test 1 Float.min_positive_subnormal_value;
   expect_test_output [%here]
@@ -590,7 +613,8 @@ let%expect_test "int_geometric" =
     (generator
      ("generated 1 distinct values in 10_000 iterations"
       ("did not generate these values" (0 1))))
-    ((1x MAX_VALUE)) |}];
+    ((1x MAX_VALUE))
+    |}];
   (* test bounds checking *)
   require_does_raise [%here] (fun () -> Generator.int_geometric 0 ~p:Float.nan);
   [%expect {| ("geometric distribution: p must be between 0 and 1" (p NAN)) |}];
@@ -615,7 +639,8 @@ let%expect_test "int32_uniform" =
     {|
     (generator
      ("generated 10_000 distinct values in 10_000 iterations"
-      ("did not generate these values" (-2147483648 -1 0 1 2147483647)))) |}]
+      ("did not generate these values" (-2147483648 -1 0 1 2147483647))))
+    |}]
 ;;
 
 let int32_inclusive = Generator.int32_inclusive
@@ -636,7 +661,8 @@ let%expect_test "int32_inclusive" =
      (8.21% 2)
      (8.18% 6)
      (8.15% 7)
-     (7.57% 3)) |}]
+     (7.57% 3))
+    |}]
 ;;
 
 let int32_uniform_inclusive = Generator.int32_uniform_inclusive
@@ -659,7 +685,8 @@ let%expect_test "int32_uniform_inclusive" =
      (8.89% 8)
      (8.88% 3)
      (8.86% 2)
-     (8.79% 6)) |}]
+     (8.79% 6))
+    |}]
 ;;
 
 let int32_log_inclusive = Generator.int32_log_inclusive
@@ -680,7 +707,8 @@ let%expect_test "int32_log_inclusive" =
      (4.82% 5)
      (4.59% 4)
      (4.37% 7)
-     (4.26% 6)) |}]
+     (4.26% 6))
+    |}]
 ;;
 
 let int32_log_uniform_inclusive = Generator.int32_log_uniform_inclusive
@@ -703,7 +731,8 @@ let%expect_test "int32_log_uniform_inclusive" =
      (5.11% 6)
      (5.08% 5)
      (5.07% 7)
-     (4.84% 4)) |}]
+     (4.84% 4))
+    |}]
 ;;
 
 let int32_geometric = Generator.int32_geometric
@@ -724,27 +753,31 @@ let%expect_test "int32_geometric" =
     (generator
      ("generated 29 distinct values in 10_000 iterations"
       ("did not generate these values" (0))))
-    ((25.65% 1) (18.97% 2) (14.45% 3) (10.34% 4)) |}];
+    ((25.65% 1) (18.97% 2) (14.45% 3) (10.34% 4))
+    |}];
   test 2 0.5;
   [%expect
     {|
     (generator
      ("generated 14 distinct values in 10_000 iterations"
       ("did not generate these values" (0 1))))
-    ((50.77% 2) (25.07% 3) (11.79% 4) (5.78% 5)) |}];
+    ((50.77% 2) (25.07% 3) (11.79% 4) (5.78% 5))
+    |}];
   test (-3) 0.75;
   [%expect
     {|
     (generator "generated 8 distinct values in 10_000 iterations")
-    ((75.84% -3) (17.57% -2) (4.97% -1) (1.2% 0)) |}];
+    ((75.84% -3) (17.57% -2) (4.97% -1) (1.2% 0))
+    |}];
   (* test a very low [p] *)
   test 1 Float.min_positive_subnormal_value;
   [%expect
     {|
-      (generator
-       ("generated 1 distinct values in 10_000 iterations"
-        ("did not generate these values" (0 1))))
-      ((1x 2147483647)) |}];
+    (generator
+     ("generated 1 distinct values in 10_000 iterations"
+      ("did not generate these values" (0 1))))
+    ((1x 2147483647))
+    |}];
   (* test bounds checking *)
   require_does_raise [%here] (fun () -> Generator.int32_geometric 0l ~p:Float.nan);
   [%expect {| ("geometric distribution: p must be between 0 and 1" (p NAN)) |}];
@@ -770,7 +803,8 @@ let%expect_test "int63_uniform" =
     (generator
      ("generated 10_000 distinct values in 10_000 iterations"
       ("did not generate these values"
-       (-4611686018427387904 -1 0 1 4611686018427387903)))) |}]
+       (-4611686018427387904 -1 0 1 4611686018427387903))))
+    |}]
 ;;
 
 let int63_inclusive = Generator.int63_inclusive
@@ -795,7 +829,8 @@ let%expect_test "int63_inclusive" =
      (8.21% 2)
      (8.18% 6)
      (8.15% 7)
-     (7.57% 3)) |}]
+     (7.57% 3))
+    |}]
 ;;
 
 let int63_uniform_inclusive = Generator.int63_uniform_inclusive
@@ -820,7 +855,8 @@ let%expect_test "int63_uniform_inclusive" =
      (8.89% 8)
      (8.88% 3)
      (8.86% 2)
-     (8.79% 6)) |}]
+     (8.79% 6))
+    |}]
 ;;
 
 let int63_log_inclusive = Generator.int63_log_inclusive
@@ -845,7 +881,8 @@ let%expect_test "int63_log_inclusive" =
      (4.82% 5)
      (4.59% 4)
      (4.37% 7)
-     (4.26% 6)) |}]
+     (4.26% 6))
+    |}]
 ;;
 
 let int63_log_uniform_inclusive = Generator.int63_log_uniform_inclusive
@@ -870,7 +907,8 @@ let%expect_test "int63_log_uniform_inclusive" =
      (5.11% 6)
      (5.08% 5)
      (5.07% 7)
-     (4.84% 4)) |}]
+     (4.84% 4))
+    |}]
 ;;
 
 let int63_geometric = Generator.int63_geometric
@@ -891,19 +929,22 @@ let%expect_test "int63_geometric" =
     (generator
      ("generated 29 distinct values in 10_000 iterations"
       ("did not generate these values" (0))))
-    ((25.65% 1) (18.97% 2) (14.45% 3) (10.34% 4)) |}];
+    ((25.65% 1) (18.97% 2) (14.45% 3) (10.34% 4))
+    |}];
   test 2 0.5;
   [%expect
     {|
     (generator
      ("generated 14 distinct values in 10_000 iterations"
       ("did not generate these values" (0 1))))
-    ((50.77% 2) (25.07% 3) (11.79% 4) (5.78% 5)) |}];
+    ((50.77% 2) (25.07% 3) (11.79% 4) (5.78% 5))
+    |}];
   test (-3) 0.75;
   [%expect
     {|
     (generator "generated 8 distinct values in 10_000 iterations")
-    ((75.84% -3) (17.57% -2) (4.97% -1) (1.2% 0)) |}];
+    ((75.84% -3) (17.57% -2) (4.97% -1) (1.2% 0))
+    |}];
   (* test a very low [p] *)
   test 1 Float.min_positive_subnormal_value;
   [%expect
@@ -911,7 +952,8 @@ let%expect_test "int63_geometric" =
     (generator
      ("generated 1 distinct values in 10_000 iterations"
       ("did not generate these values" (0 1))))
-    ((1x 4611686018427387903)) |}];
+    ((1x 4611686018427387903))
+    |}];
   (* test bounds checking *)
   require_does_raise [%here] (fun () -> Generator.int63_geometric Int63.zero ~p:Float.nan);
   [%expect {| ("geometric distribution: p must be between 0 and 1" (p NAN)) |}];
@@ -937,7 +979,8 @@ let%expect_test "int64_uniform" =
     (generator
      ("generated 10_000 distinct values in 10_000 iterations"
       ("did not generate these values"
-       (-9223372036854775808 -1 0 1 9223372036854775807)))) |}]
+       (-9223372036854775808 -1 0 1 9223372036854775807))))
+    |}]
 ;;
 
 let int64_inclusive = Generator.int64_inclusive
@@ -958,7 +1001,8 @@ let%expect_test "int64_inclusive" =
      (8.21% 2)
      (8.18% 6)
      (8.15% 7)
-     (7.57% 3)) |}]
+     (7.57% 3))
+    |}]
 ;;
 
 let int64_uniform_inclusive = Generator.int64_uniform_inclusive
@@ -981,7 +1025,8 @@ let%expect_test "int64_uniform_inclusive" =
      (8.89% 8)
      (8.88% 3)
      (8.86% 2)
-     (8.79% 6)) |}]
+     (8.79% 6))
+    |}]
 ;;
 
 let int64_log_inclusive = Generator.int64_log_inclusive
@@ -1002,7 +1047,8 @@ let%expect_test "int64_log_inclusive" =
      (4.82% 5)
      (4.59% 4)
      (4.37% 7)
-     (4.26% 6)) |}]
+     (4.26% 6))
+    |}]
 ;;
 
 let int64_log_uniform_inclusive = Generator.int64_log_uniform_inclusive
@@ -1025,7 +1071,8 @@ let%expect_test "int64_log_uniform_inclusive" =
      (5.11% 6)
      (5.08% 5)
      (5.07% 7)
-     (4.84% 4)) |}]
+     (4.84% 4))
+    |}]
 ;;
 
 let int64_geometric = Generator.int64_geometric
@@ -1046,27 +1093,31 @@ let%expect_test "int64_geometric" =
     (generator
      ("generated 29 distinct values in 10_000 iterations"
       ("did not generate these values" (0))))
-    ((25.65% 1) (18.97% 2) (14.45% 3) (10.34% 4)) |}];
+    ((25.65% 1) (18.97% 2) (14.45% 3) (10.34% 4))
+    |}];
   test 2 0.5;
   [%expect
     {|
     (generator
      ("generated 14 distinct values in 10_000 iterations"
       ("did not generate these values" (0 1))))
-    ((50.77% 2) (25.07% 3) (11.79% 4) (5.78% 5)) |}];
+    ((50.77% 2) (25.07% 3) (11.79% 4) (5.78% 5))
+    |}];
   test (-3) 0.75;
   [%expect
     {|
     (generator "generated 8 distinct values in 10_000 iterations")
-    ((75.84% -3) (17.57% -2) (4.97% -1) (1.2% 0)) |}];
+    ((75.84% -3) (17.57% -2) (4.97% -1) (1.2% 0))
+    |}];
   (* test a very low [p] *)
   test 1 Float.min_positive_subnormal_value;
   [%expect
     {|
-      (generator
-       ("generated 1 distinct values in 10_000 iterations"
-        ("did not generate these values" (0 1))))
-      ((1x 9223372036854775807)) |}];
+    (generator
+     ("generated 1 distinct values in 10_000 iterations"
+      ("did not generate these values" (0 1))))
+    ((1x 9223372036854775807))
+    |}];
   (* test bounds checking *)
   require_does_raise [%here] (fun () -> Generator.int64_geometric 0L ~p:Float.nan);
   [%expect {| ("geometric distribution: p must be between 0 and 1" (p NAN)) |}];
@@ -1095,7 +1146,8 @@ let%expect_test ("nativeint_uniform" [@tags "64-bits-only"]) =
     (generator
      ("generated 10_000 distinct values in 10_000 iterations"
       ("did not generate these values"
-       (-9223372036854775808 -1 0 1 9223372036854775807)))) |}]
+       (-9223372036854775808 -1 0 1 9223372036854775807))))
+    |}]
 ;;
 
 let nativeint_inclusive = Generator.nativeint_inclusive
@@ -1118,7 +1170,8 @@ let%expect_test "nativeint_inclusive" =
      (8.21% 2)
      (8.18% 6)
      (8.15% 7)
-     (7.57% 3)) |}]
+     (7.57% 3))
+    |}]
 ;;
 
 let nativeint_uniform_inclusive = Generator.nativeint_uniform_inclusive
@@ -1141,7 +1194,8 @@ let%expect_test "nativeint_uniform_inclusive" =
      (8.89% 8)
      (8.88% 3)
      (8.86% 2)
-     (8.79% 6)) |}]
+     (8.79% 6))
+    |}]
 ;;
 
 let nativeint_log_inclusive = Generator.nativeint_log_inclusive
@@ -1164,7 +1218,8 @@ let%expect_test "nativeint_log_inclusive" =
      (4.82% 5)
      (4.59% 4)
      (4.37% 7)
-     (4.26% 6)) |}]
+     (4.26% 6))
+    |}]
 ;;
 
 let nativeint_log_uniform_inclusive = Generator.nativeint_log_uniform_inclusive
@@ -1187,7 +1242,8 @@ let%expect_test "nativeint_log_uniform_inclusive" =
      (5.11% 6)
      (5.08% 5)
      (5.07% 7)
-     (4.84% 4)) |}]
+     (4.84% 4))
+    |}]
 ;;
 
 let nativeint_geometric = Generator.nativeint_geometric
@@ -1208,19 +1264,22 @@ let%expect_test "nativeint_geometric" =
     (generator
      ("generated 29 distinct values in 10_000 iterations"
       ("did not generate these values" (0))))
-    ((25.65% 1) (18.97% 2) (14.45% 3) (10.34% 4)) |}];
+    ((25.65% 1) (18.97% 2) (14.45% 3) (10.34% 4))
+    |}];
   test 2 0.5;
   [%expect
     {|
     (generator
      ("generated 14 distinct values in 10_000 iterations"
       ("did not generate these values" (0 1))))
-    ((50.77% 2) (25.07% 3) (11.79% 4) (5.78% 5)) |}];
+    ((50.77% 2) (25.07% 3) (11.79% 4) (5.78% 5))
+    |}];
   test (-3) 0.75;
   [%expect
     {|
     (generator "generated 8 distinct values in 10_000 iterations")
-    ((75.84% -3) (17.57% -2) (4.97% -1) (1.2% 0)) |}];
+    ((75.84% -3) (17.57% -2) (4.97% -1) (1.2% 0))
+    |}];
   (* test a very low [p] *)
   test 1 Float.min_positive_subnormal_value;
   expect_test_output [%here]
@@ -1228,10 +1287,11 @@ let%expect_test "nativeint_geometric" =
   |> print_string;
   [%expect
     {|
-      (generator
-       ("generated 1 distinct values in 10_000 iterations"
-        ("did not generate these values" (0 1))))
-      ((1x MAX_VALUE)) |}];
+    (generator
+     ("generated 1 distinct values in 10_000 iterations"
+      ("did not generate these values" (0 1))))
+    ((1x MAX_VALUE))
+    |}];
   (* test bounds checking *)
   require_does_raise [%here] (fun () -> Generator.nativeint_geometric 0n ~p:Float.nan);
   [%expect {| ("geometric distribution: p must be between 0 and 1" (p NAN)) |}];
@@ -1250,7 +1310,8 @@ let%expect_test "float" =
     (generator
      ("generated 9_127 distinct values in 10_000 iterations"
       ("did not generate these values"
-       (-1.7976931348623157E+308 1.7976931348623157E+308)))) |}]
+       (-1.7976931348623157E+308 1.7976931348623157E+308))))
+    |}]
 ;;
 
 let float_without_nan = Generator.float_without_nan
@@ -1262,7 +1323,8 @@ let%expect_test "float_without_nan" =
     (generator
      ("generated 9_170 distinct values in 10_000 iterations"
       ("did not generate these values"
-       (NAN -1.7976931348623157E+308 1.7976931348623157E+308)))) |}]
+       (NAN -1.7976931348623157E+308 1.7976931348623157E+308))))
+    |}]
 ;;
 
 let float_finite = Generator.float_finite
@@ -1274,7 +1336,8 @@ let%expect_test "float_finite" =
     (generator
      ("generated 9_252 distinct values in 10_000 iterations"
       ("did not generate these values"
-       (NAN -INF -1.7976931348623157E+308 1.7976931348623157E+308 INF)))) |}]
+       (NAN -INF -1.7976931348623157E+308 1.7976931348623157E+308 INF))))
+    |}]
 ;;
 
 let float_strictly_positive = Generator.float_strictly_positive
@@ -1294,7 +1357,8 @@ let%expect_test "float_strictly_positive" =
         -4.94065645841247E-324
         0
         1.7976931348623157E+308
-        INF)))) |}]
+        INF))))
+    |}]
 ;;
 
 let float_strictly_negative = Generator.float_strictly_negative
@@ -1314,7 +1378,8 @@ let%expect_test "float_strictly_negative" =
         2.2250738585072009E-308
         2.2250738585072014E-308
         1.7976931348623157E+308
-        INF)))) |}]
+        INF))))
+    |}]
 ;;
 
 let float_positive_or_zero = Generator.float_positive_or_zero
@@ -1333,7 +1398,8 @@ let%expect_test "float_positive_or_zero" =
         -2.2250738585072009E-308
         -4.94065645841247E-324
         1.7976931348623157E+308
-        INF)))) |}]
+        INF))))
+    |}]
 ;;
 
 let float_negative_or_zero = Generator.float_negative_or_zero
@@ -1352,7 +1418,8 @@ let%expect_test "float_negative_or_zero" =
         2.2250738585072009E-308
         2.2250738585072014E-308
         1.7976931348623157E+308
-        INF)))) |}]
+        INF))))
+    |}]
 ;;
 
 let float_inclusive = Generator.float_inclusive
@@ -1375,7 +1442,8 @@ let%expect_test "float_inclusive" =
         2.2250738585072009E-308
         2.2250738585072014E-308
         1.7976931348623157E+308
-        INF)))) |}]
+        INF))))
+    |}]
 ;;
 
 let%expect_test "float_inclusive singular range edge case" =
@@ -1396,7 +1464,8 @@ let%expect_test "float_inclusive singular range edge case" =
         2.2250738585072009E-308
         2.2250738585072014E-308
         1.7976931348623157E+308
-        INF)))) |}]
+        INF))))
+    |}]
 ;;
 
 let%expect_test "float_inclusive two-value range edge case" =
@@ -1422,7 +1491,8 @@ let%expect_test "float_inclusive two-value range edge case" =
         2.2250738585072014E-308
         1.7976931348623157E+308
         INF))))
-    "did not raise" |}]
+    "did not raise"
+    |}]
 ;;
 
 let float_uniform_exclusive = Generator.float_uniform_exclusive
@@ -1445,7 +1515,8 @@ let%expect_test "float_uniform_exclusive" =
         2.2250738585072009E-308
         2.2250738585072014E-308
         1.7976931348623157E+308
-        INF)))) |}]
+        INF))))
+    |}]
 ;;
 
 let float_of_class = Generator.float_of_class
@@ -1466,7 +1537,8 @@ let%expect_test "float_of_class" =
         4.94065645841247E-324
         2.2250738585072009E-308
         1.7976931348623157E+308
-        INF)))) |}];
+        INF))))
+    |}];
   test_generator ~mode:`inexhaustive (Generator.float_of_class Subnormal) m_float;
   [%expect
     {|
@@ -1480,7 +1552,8 @@ let%expect_test "float_of_class" =
         0
         2.2250738585072014E-308
         1.7976931348623157E+308
-        INF)))) |}]
+        INF))))
+    |}]
 ;;
 
 let char = Generator.char
@@ -1498,7 +1571,8 @@ let%expect_test "char_lowercase" =
     {|
     (generator
      ("generated 26 distinct values in 10_000 iterations"
-      ("did not generate these values" ("\000" "\t" " " ! 0 9 A Z ~ "\255")))) |}]
+      ("did not generate these values" ("\000" "\t" " " ! 0 9 A Z ~ "\255"))))
+    |}]
 ;;
 
 let char_uppercase = Generator.char_uppercase
@@ -1509,7 +1583,8 @@ let%expect_test "char_uppercase" =
     {|
     (generator
      ("generated 26 distinct values in 10_000 iterations"
-      ("did not generate these values" ("\000" "\t" " " ! 0 9 a z ~ "\255")))) |}]
+      ("did not generate these values" ("\000" "\t" " " ! 0 9 a z ~ "\255"))))
+    |}]
 ;;
 
 let char_digit = Generator.char_digit
@@ -1520,7 +1595,8 @@ let%expect_test "char_digit" =
     {|
     (generator
      ("generated 10 distinct values in 10_000 iterations"
-      ("did not generate these values" ("\000" "\t" " " ! A Z a z ~ "\255")))) |}]
+      ("did not generate these values" ("\000" "\t" " " ! A Z a z ~ "\255"))))
+    |}]
 ;;
 
 let char_alpha = Generator.char_alpha
@@ -1531,7 +1607,8 @@ let%expect_test "char_alpha" =
     {|
     (generator
      ("generated 52 distinct values in 10_000 iterations"
-      ("did not generate these values" ("\000" "\t" " " ! 0 9 ~ "\255")))) |}]
+      ("did not generate these values" ("\000" "\t" " " ! 0 9 ~ "\255"))))
+    |}]
 ;;
 
 let char_alphanum = Generator.char_alphanum
@@ -1542,7 +1619,8 @@ let%expect_test "char_alphanum" =
     {|
     (generator
      ("generated 62 distinct values in 10_000 iterations"
-      ("did not generate these values" ("\000" "\t" " " ! ~ "\255")))) |}]
+      ("did not generate these values" ("\000" "\t" " " ! ~ "\255"))))
+    |}]
 ;;
 
 let char_whitespace = Generator.char_whitespace
@@ -1553,7 +1631,8 @@ let%expect_test "char_whitespace" =
     {|
     (generator
      ("generated 6 distinct values in 10_000 iterations"
-      ("did not generate these values" ("\000" ! 0 9 A Z a z ~ "\255")))) |}]
+      ("did not generate these values" ("\000" ! 0 9 A Z a z ~ "\255"))))
+    |}]
 ;;
 
 let char_print = Generator.char_print
@@ -1564,7 +1643,8 @@ let%expect_test "char_print" =
     {|
     (generator
      ("generated 95 distinct values in 10_000 iterations"
-      ("did not generate these values" ("\000" "\t" "\255")))) |}]
+      ("did not generate these values" ("\000" "\t" "\255"))))
+    |}]
 ;;
 
 let char_uniform_inclusive = Generator.char_uniform_inclusive
@@ -1575,7 +1655,8 @@ let%expect_test "char_uniform_inclusive" =
     {|
     (generator
      ("generated 26 distinct values in 10_000 iterations"
-      ("did not generate these values" ("\000" "\t" " " ! 0 9 a z ~ "\255")))) |}]
+      ("did not generate these values" ("\000" "\t" " " ! 0 9 a z ~ "\255"))))
+    |}]
 ;;
 
 let string = Generator.string
@@ -1586,7 +1667,8 @@ let%expect_test "string" =
     {|
     (generator
      ("generated 8_583 distinct values in 10_000 iterations"
-      ("did not generate these values" (" " "\000\000" "  " 00 AA __ zz)))) |}]
+      ("did not generate these values" (" " "\000\000" "  " 00 AA __ zz))))
+    |}]
 ;;
 
 let string_non_empty = Generator.string_non_empty
@@ -1597,7 +1679,8 @@ let%expect_test "string_non_empty" =
     {|
     (generator
      ("generated 8_936 distinct values in 10_000 iterations"
-      ("did not generate these values" ("" " " "\000\000" "  " 00 AA __ zz)))) |}]
+      ("did not generate these values" ("" " " "\000\000" "  " 00 AA __ zz))))
+    |}]
 ;;
 
 let string_with_length = Generator.string_with_length
@@ -1608,7 +1691,8 @@ let%expect_test "string_with_length" =
     {|
     (generator
      ("generated 5_239 distinct values in 10_000 iterations"
-      ("did not generate these values" ("" "\000" " " 0 A _ z "\000\000" "  " __)))) |}]
+      ("did not generate these values" ("" "\000" " " 0 A _ z "\000\000" "  " __))))
+    |}]
 ;;
 
 let string_of = Generator.string_of
@@ -1623,7 +1707,8 @@ let%expect_test "string_of" =
     (generator
      ("generated 8_320 distinct values in 10_000 iterations"
       ("did not generate these values"
-       ("\000" " " 0 A _ "\000\000" "  " 00 AA __)))) |}]
+       ("\000" " " 0 A _ "\000\000" "  " 00 AA __))))
+    |}]
 ;;
 
 let string_non_empty_of = Generator.string_non_empty_of
@@ -1638,7 +1723,8 @@ let%expect_test "string_non_empty_of" =
     (generator
      ("generated 8_569 distinct values in 10_000 iterations"
       ("did not generate these values"
-       ("" "\000" " " 0 A _ "\000\000" "  " 00 AA __ zz)))) |}]
+       ("" "\000" " " 0 A _ "\000\000" "  " 00 AA __ zz))))
+    |}]
 ;;
 
 let string_with_length_of = Generator.string_with_length_of
@@ -1655,7 +1741,8 @@ let%expect_test "string_with_length_of" =
     (generator
      ("generated 676 distinct values in 10_000 iterations"
       ("did not generate these values"
-       ("" "\000" " " 0 A _ z "\000\000" "  " 00 AA __)))) |}]
+       ("" "\000" " " 0 A _ z "\000\000" "  " 00 AA __))))
+    |}]
 ;;
 
 let string_like = Generator.string_like
@@ -1666,7 +1753,8 @@ let%expect_test "string_like" =
     {|
     (generator
      ("generated 2_643 distinct values in 10_000 iterations"
-      ("did not generate these values" (" " "\000\000" "  " 00)))) |}];
+      ("did not generate these values" (" " "\000\000" "  " 00))))
+    |}];
   Test.with_sample_exn
     (Generator.string_like "The quick brown fox jumps over the lazy dog.")
     ~f:(fun sequence ->
@@ -1703,7 +1791,8 @@ let%expect_test "string_like" =
     "TOe quick brown fox jm|tumps over thethe lazy dog."
     "\\\003DuRB9A4O8p~OUoHsP6e\255C44ZQROn4\164ru\03104FN\144wMhD"
     "tg9+W3saM\173ZkL;3KDi\\tmSUMwxY6Y\"PLkM27]fXyN9,'"
-    "The quick brown fox jumps over the lazy dog." |}]
+    "The quick brown fox jumps over the lazy dog."
+    |}]
 ;;
 
 let bytes = Generator.bytes
@@ -1714,7 +1803,8 @@ let%expect_test "bytes" =
     {|
     (generator
      ("generated 8_583 distinct values in 10_000 iterations"
-      ("did not generate these values" (" " "\000\000" "  " 00 AA __ zz)))) |}]
+      ("did not generate these values" (" " "\000\000" "  " 00 AA __ zz))))
+    |}]
 ;;
 
 let sexp = Generator.sexp
@@ -1726,7 +1816,8 @@ let%expect_test "sexp" =
     (generator
      ("generated 7_175 distinct values in 10_000 iterations"
       ("did not generate these values"
-       (bc def (a bc def) (a bc def (a) (bc) (def) (a bc def)) (bc) (def))))) |}]
+       (bc def (a bc def) (a bc def (a) (bc) (def) (a bc def)) (bc) (def)))))
+    |}]
 ;;
 
 let sexp_of = Generator.sexp_of
@@ -1741,7 +1832,8 @@ let%expect_test "sexp_of" =
     (generator
      ("generated 4_917 distinct values in 10_000 iterations"
       ("did not generate these values"
-       ((a bc def) (a bc def (a) (bc) (def) (a bc def)))))) |}]
+       ((a bc def) (a bc def (a) (bc) (def) (a bc def))))))
+    |}]
 ;;
 
 let list = Generator.list
@@ -1762,7 +1854,8 @@ let%expect_test "list_non_empty" =
     {|
     (generator
      ("generated 2_672 distinct values in 10_000 iterations"
-      ("did not generate these values" (())))) |}]
+      ("did not generate these values" (()))))
+    |}]
 ;;
 
 let list_with_length = Generator.list_with_length
@@ -1776,7 +1869,8 @@ let%expect_test "list_with_length" =
     {|
     (generator
      ("generated 4 distinct values in 10_000 iterations"
-      ("did not generate these values" (() (false) (true))))) |}]
+      ("did not generate these values" (() (false) (true)))))
+    |}]
 ;;
 
 let list_filtered = Generator.list_filtered
@@ -1963,7 +2057,8 @@ module Debug = struct
       {|
       ("Base_quickcheck.Test.run: insufficient size values for test count"
        (test_count 10000)
-       (number_of_size_values 10)) |}]
+       (number_of_size_values 10))
+      |}]
   ;;
 
   let monitor = Generator.Debug.monitor

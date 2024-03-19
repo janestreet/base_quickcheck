@@ -30,7 +30,8 @@ let%expect_test "create & shrink" =
      (6 (5))
      (7 (6))
      (8 (7))
-     (9 (8))) |}]
+     (9 (8)))
+    |}]
 ;;
 
 let atomic = Shrinker.atomic
@@ -59,7 +60,8 @@ let%expect_test "shrinker" =
       (7 => 6)
       (8 => 7)
       (9 => 8)
-      (10 => 9))) |}]
+      (10 => 9)))
+    |}]
 ;;
 
 let filter = Shrinker.filter
@@ -88,7 +90,8 @@ let%expect_test "shrinker" =
       ((2 1) => (2 0))
       ((3 0) => (0))
       ((3 0) => (2 0))
-      ((3 0) => (3)))) |}]
+      ((3 0) => (3))))
+    |}]
 ;;
 
 let filter_map = Shrinker.filter_map
@@ -124,7 +127,8 @@ let%expect_test "shrinker" =
       ((3 0) => (0))
       ((3 0) => (2 0))
       ((3 0) => (3))
-      ((3 0) => (3 -1)))) |}]
+      ((3 0) => (3 -1))))
+    |}]
 ;;
 
 let fixed_point = Shrinker.fixed_point
@@ -153,7 +157,8 @@ let%expect_test "fixed_point" =
       (4 => 0)
       (4 => 1)
       (4 => 2)
-      (4 => 3))) |}]
+      (4 => 3)))
+    |}]
 ;;
 
 let both = Shrinker.both
@@ -204,7 +209,8 @@ let%expect_test "both" =
       ((4 3) => (3 3))
       ((4 3) => (4 2))
       ((4 4) => (3 4))
-      ((4 4) => (4 3)))) |}]
+      ((4 4) => (4 3))))
+    |}]
 ;;
 
 let unit = Shrinker.unit
@@ -252,7 +258,8 @@ let%expect_test "string" =
       ("  " => " ")
       ("  " => " ")
       ("\000\000" => "\000")
-      ("\000\000" => "\000"))) |}]
+      ("\000\000" => "\000")))
+    |}]
 ;;
 
 let bytes = Shrinker.bytes
@@ -279,7 +286,8 @@ let%expect_test "bytes" =
       (__ => _)
       (__ => _)
       (zz => z)
-      (zz => z))) |}]
+      (zz => z)))
+    |}]
 ;;
 
 let int = Shrinker.int
@@ -370,7 +378,8 @@ let%expect_test "sexp" =
       ((a bc def (a) (bc) (def) (a bc def)) => (a bc def (a) (bc) (def) (a def)))
       ((a bc def (a) (bc) (def) (a bc def)) => (a bc def (a) (bc) (def) bc))
       ((a bc def (a) (bc) (def) (a bc def)) => (a bc def (a) (bc) (def) (a bc)))
-      ((a bc def (a) (bc) (def) (a bc def)) => (a bc def (a) (bc) (def) def)))) |}]
+      ((a bc def (a) (bc) (def) (a bc def)) => (a bc def (a) (bc) (def) def))))
+    |}]
 ;;
 
 let option = Shrinker.option
@@ -388,7 +397,8 @@ let%expect_test "option" =
       ((3) => ())
       ((3) => (2))
       ((4) => ())
-      ((4) => (3)))) |}]
+      ((4) => (3))))
+    |}]
 ;;
 
 let list = Shrinker.list
@@ -424,7 +434,8 @@ let%expect_test "list" =
       ((3 1) => (3 0))
       ((4 0) => (0))
       ((4 0) => (3 0))
-      ((4 0) => (4)))) |}]
+      ((4 0) => (4))))
+    |}]
 ;;
 
 let array = Shrinker.array
@@ -460,7 +471,8 @@ let%expect_test "array" =
       ((3 1) => (3 0))
       ((4 0) => (0))
       ((4 0) => (3 0))
-      ((4 0) => (4)))) |}]
+      ((4 0) => (4))))
+    |}]
 ;;
 
 let ref = Shrinker.ref
@@ -493,7 +505,8 @@ let%expect_test "either" =
       ((Second 1) => (Second 0))
       ((Second 2) => (Second 1))
       ((Second 3) => (Second 2))
-      ((Second 4) => (Second 3)))) |}]
+      ((Second 4) => (Second 3))))
+    |}]
 ;;
 
 let result = Shrinker.result
@@ -512,7 +525,8 @@ let%expect_test "result" =
       ((Error 1) => (Error 0))
       ((Error 2) => (Error 1))
       ((Error 3) => (Error 2))
-      ((Error 4) => (Error 3)))) |}]
+      ((Error 4) => (Error 3))))
+    |}]
 ;;
 
 let map_t = Shrinker.map_t
@@ -539,7 +553,8 @@ let%expect_test "map_t" =
       (((0 2) (1 2) (2 2)) => ((0 2) (2 2)))
       (((0 2) (1 2) (2 2)) => ((0 2) (1 1) (2 2)))
       (((0 2) (1 2) (2 2)) => ((0 2) (1 2)))
-      (((0 2) (1 2) (2 2)) => ((0 2) (1 2) (2 1))))) |}]
+      (((0 2) (1 2) (2 2)) => ((0 2) (1 2) (2 1)))))
+    |}]
 ;;
 
 let set_t = Shrinker.set_t
@@ -572,7 +587,8 @@ let%expect_test "set_t" =
       ((1 4) => (1 3))
       ((2 3) => (3))
       ((2 3) => (1 3))
-      ((2 3) => (2)))) |}]
+      ((2 3) => (2))))
+    |}]
 ;;
 
 let of_lazy = Shrinker.of_lazy
@@ -599,7 +615,8 @@ let%expect_test "of_lazy, forced" =
       ("  " => " ")
       ("  " => " ")
       ("\000\000" => "\000")
-      ("\000\000" => "\000"))) |}]
+      ("\000\000" => "\000")))
+    |}]
 ;;
 
 let%expect_test "of_lazy, unforced" =
@@ -631,7 +648,8 @@ let%expect_test "of_lazy, unforced" =
       (__ => _)
       (__ => _)
       (zz => z)
-      (zz => z))) |}]
+      (zz => z)))
+    |}]
 ;;
 
 let bigstring = Shrinker.bigstring
@@ -703,7 +721,8 @@ let%expect_test "[float32_mat]" =
         (((11 12) (21 22)) => ((21 22)))
         (((11 12) (21 22)) => ((12) (22)))
         (((11 12) (21 22)) => ((11 12)))
-        (((11 12) (21 22)) => ((11) (21))))) |}]
+        (((11 12) (21 22)) => ((11) (21)))))
+      |}]
   in
   test float32_mat Bigarray.Float32;
   [%expect {| |}];

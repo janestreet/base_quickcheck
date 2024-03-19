@@ -36,7 +36,7 @@ type record_mutable =
   }
 [@@deriving quickcheck]
 
-[%%expect {||}]
+[%%expect {| |}]
 
 type ('a, 'b) fn = 'a -> 'b [@@deriving quickcheck]
 
