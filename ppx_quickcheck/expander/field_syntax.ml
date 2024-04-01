@@ -12,6 +12,25 @@ module Tuple = struct
   let expression _ ~loc expr_list = pexp_tuple ~loc expr_list
 end
 
+module Labeled_tuple = struct
+  type ast = string option * core_type
+  type t = ast
+
+  let create = Fn.id
+  let location (_, t) = t.ptyp_loc
+  let core_type (_, t) = t
+
+  let pattern list ~loc pat_list =
+    let alist = List.map2_exn list pat_list ~f:(fun (label, _) pat -> label, pat) in
+    Ppxlib_jane.Jane_syntax.Pattern.pat_of ~loc ~attrs:[] (Jpat_tuple (alist, Closed))
+  ;;
+
+  let expression list ~loc expr_list =
+    let alist = List.map2_exn list expr_list ~f:(fun (label, _) expr -> label, expr) in
+    Ppxlib_jane.Jane_syntax.Expression.expr_of ~loc ~attrs:[] (Jexp_tuple alist)
+  ;;
+end
+
 module Record = struct
   type ast = label_declaration
   type t = ast
