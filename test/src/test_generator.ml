@@ -15,7 +15,7 @@ let%expect_test "create & generate" =
   |> [%sexp_of: int list]
   |> print_s;
   [%expect {| (0 1 1 1 1 1 3 0 8 7 1 8 11 13 12 7 6 6 0 8 16 4 15 2 6 14 4 24 16 11) |}];
-  require_does_raise [%here] (fun () ->
+  require_does_raise (fun () ->
     Generator.generate int_up_to_size ~size:(-1) ~random:(Splittable_random.of_int 0));
   [%expect {| ("Base_quickcheck.Generator.generate: size < 0" (size -1)) |}]
 ;;
@@ -303,8 +303,8 @@ let%expect_test "fixed_point" =
        Int.incr recursive_calls;
        Generator.unit));
   print_s [%message "" (recursive_calls : int ref) (values_generated : int ref)];
-  require_equal [%here] (module Int) !recursive_calls 1;
-  require_equal [%here] (module Int) !values_generated 10_000;
+  require_equal (module Int) !recursive_calls 1;
+  require_equal (module Int) !values_generated 10_000;
   [%expect {| ((recursive_calls 1) (values_generated 10000)) |}]
 ;;
 
@@ -336,8 +336,8 @@ let%expect_test "recursive_union" =
        Int.incr recursive_calls;
        [ Generator.unit ]));
   print_s [%message "" (recursive_calls : int ref) (values_generated : int ref)];
-  require_equal [%here] (module Int) !recursive_calls 1;
-  require_equal [%here] (module Int) !values_generated 10_000;
+  require_equal (module Int) !recursive_calls 1;
+  require_equal (module Int) !values_generated 10_000;
   [%expect {| ((recursive_calls 1) (values_generated 10000)) |}]
 ;;
 
@@ -372,8 +372,8 @@ let%expect_test "weighted_recursive_union" =
          Int.incr recursive_calls;
          [ 2., Generator.unit ]));
   print_s [%message "" (recursive_calls : int ref) (values_generated : int ref)];
-  require_equal [%here] (module Int) !recursive_calls 1;
-  require_equal [%here] (module Int) !values_generated 10_000;
+  require_equal (module Int) !recursive_calls 1;
+  require_equal (module Int) !values_generated 10_000;
   [%expect {| ((recursive_calls 1) (values_generated 10000)) |}]
 ;;
 
@@ -605,7 +605,7 @@ let%expect_test "int_geometric" =
     |}];
   (* test a very low [p] *)
   test 1 Float.min_positive_subnormal_value;
-  expect_test_output [%here]
+  expect_test_output ()
   |> replace ~pattern:(Int.to_string Int.max_value) ~with_:"MAX_VALUE"
   |> print_string;
   [%expect
@@ -616,11 +616,11 @@ let%expect_test "int_geometric" =
     ((1x MAX_VALUE))
     |}];
   (* test bounds checking *)
-  require_does_raise [%here] (fun () -> Generator.int_geometric 0 ~p:Float.nan);
+  require_does_raise (fun () -> Generator.int_geometric 0 ~p:Float.nan);
   [%expect {| ("geometric distribution: p must be between 0 and 1" (p NAN)) |}];
-  require_does_raise [%here] (fun () -> Generator.int_geometric 0 ~p:(-1.));
+  require_does_raise (fun () -> Generator.int_geometric 0 ~p:(-1.));
   [%expect {| ("geometric distribution: p must be between 0 and 1" (p -1)) |}];
-  require_does_raise [%here] (fun () -> Generator.int_geometric 0 ~p:2.);
+  require_does_raise (fun () -> Generator.int_geometric 0 ~p:2.);
   [%expect {| ("geometric distribution: p must be between 0 and 1" (p 2)) |}]
 ;;
 
@@ -779,11 +779,11 @@ let%expect_test "int32_geometric" =
     ((1x 2147483647))
     |}];
   (* test bounds checking *)
-  require_does_raise [%here] (fun () -> Generator.int32_geometric 0l ~p:Float.nan);
+  require_does_raise (fun () -> Generator.int32_geometric 0l ~p:Float.nan);
   [%expect {| ("geometric distribution: p must be between 0 and 1" (p NAN)) |}];
-  require_does_raise [%here] (fun () -> Generator.int32_geometric 0l ~p:(-1.));
+  require_does_raise (fun () -> Generator.int32_geometric 0l ~p:(-1.));
   [%expect {| ("geometric distribution: p must be between 0 and 1" (p -1)) |}];
-  require_does_raise [%here] (fun () -> Generator.int32_geometric 0l ~p:2.);
+  require_does_raise (fun () -> Generator.int32_geometric 0l ~p:2.);
   [%expect {| ("geometric distribution: p must be between 0 and 1" (p 2)) |}]
 ;;
 
@@ -955,11 +955,11 @@ let%expect_test "int63_geometric" =
     ((1x 4611686018427387903))
     |}];
   (* test bounds checking *)
-  require_does_raise [%here] (fun () -> Generator.int63_geometric Int63.zero ~p:Float.nan);
+  require_does_raise (fun () -> Generator.int63_geometric Int63.zero ~p:Float.nan);
   [%expect {| ("geometric distribution: p must be between 0 and 1" (p NAN)) |}];
-  require_does_raise [%here] (fun () -> Generator.int63_geometric Int63.zero ~p:(-1.));
+  require_does_raise (fun () -> Generator.int63_geometric Int63.zero ~p:(-1.));
   [%expect {| ("geometric distribution: p must be between 0 and 1" (p -1)) |}];
-  require_does_raise [%here] (fun () -> Generator.int63_geometric Int63.zero ~p:2.);
+  require_does_raise (fun () -> Generator.int63_geometric Int63.zero ~p:2.);
   [%expect {| ("geometric distribution: p must be between 0 and 1" (p 2)) |}]
 ;;
 
@@ -1119,11 +1119,11 @@ let%expect_test "int64_geometric" =
     ((1x 9223372036854775807))
     |}];
   (* test bounds checking *)
-  require_does_raise [%here] (fun () -> Generator.int64_geometric 0L ~p:Float.nan);
+  require_does_raise (fun () -> Generator.int64_geometric 0L ~p:Float.nan);
   [%expect {| ("geometric distribution: p must be between 0 and 1" (p NAN)) |}];
-  require_does_raise [%here] (fun () -> Generator.int64_geometric 0L ~p:(-1.));
+  require_does_raise (fun () -> Generator.int64_geometric 0L ~p:(-1.));
   [%expect {| ("geometric distribution: p must be between 0 and 1" (p -1)) |}];
-  require_does_raise [%here] (fun () -> Generator.int64_geometric 0L ~p:2.);
+  require_does_raise (fun () -> Generator.int64_geometric 0L ~p:2.);
   [%expect {| ("geometric distribution: p must be between 0 and 1" (p 2)) |}]
 ;;
 
@@ -1282,7 +1282,7 @@ let%expect_test "nativeint_geometric" =
     |}];
   (* test a very low [p] *)
   test 1 Float.min_positive_subnormal_value;
-  expect_test_output [%here]
+  expect_test_output ()
   |> replace ~pattern:(Nativeint.to_string Nativeint.max_value) ~with_:"MAX_VALUE"
   |> print_string;
   [%expect
@@ -1293,11 +1293,11 @@ let%expect_test "nativeint_geometric" =
     ((1x MAX_VALUE))
     |}];
   (* test bounds checking *)
-  require_does_raise [%here] (fun () -> Generator.nativeint_geometric 0n ~p:Float.nan);
+  require_does_raise (fun () -> Generator.nativeint_geometric 0n ~p:Float.nan);
   [%expect {| ("geometric distribution: p must be between 0 and 1" (p NAN)) |}];
-  require_does_raise [%here] (fun () -> Generator.nativeint_geometric 0n ~p:(-1.));
+  require_does_raise (fun () -> Generator.nativeint_geometric 0n ~p:(-1.));
   [%expect {| ("geometric distribution: p must be between 0 and 1" (p -1)) |}];
-  require_does_raise [%here] (fun () -> Generator.nativeint_geometric 0n ~p:2.);
+  require_does_raise (fun () -> Generator.nativeint_geometric 0n ~p:2.);
   [%expect {| ("geometric distribution: p must be between 0 and 1" (p 2)) |}]
 ;;
 
@@ -1758,8 +1758,8 @@ let%expect_test "string_like" =
   Test.with_sample_exn
     (Generator.string_like "The quick brown fox jumps over the lazy dog.")
     ~f:(fun sequence ->
-    Sequence.take sequence 30
-    |> Sequence.iter ~f:(fun string -> print_s (sexp_of_string string)));
+      Sequence.take sequence 30
+      |> Sequence.iter ~f:(fun string -> print_s (sexp_of_string string)));
   [%expect
     {|
     "The quick uick brown fox jumps over the lazy dog."
@@ -1993,7 +1993,6 @@ let%expect_test "[bigstring_with_length], [float32_vec_with_length], \
       ~f:
         (Sequence.iter ~f:(fun (sample, expected_length) ->
            Expect_test_helpers_base.require_equal
-             [%here]
              (module Int)
              (Bigarray.Array1.dim sample)
              expected_length))
@@ -2038,8 +2037,8 @@ module Debug = struct
     let test config =
       Generator.string_of (Generator.return '.')
       |> Test.with_sample_exn ~config ~f:(fun sample ->
-           let counts = coverage (module Int) (Sequence.map sample ~f:String.length) in
-           counts |> [%sexp_of: int Map.M(Int).t] |> print_s)
+        let counts = coverage (module Int) (Sequence.map sample ~f:String.length) in
+        counts |> [%sexp_of: int Map.M(Int).t] |> print_s)
     in
     (* small sample size *)
     test { config with test_count = 3 };
@@ -2051,8 +2050,7 @@ module Debug = struct
     test { config with sizes = Sequence.cycle_list_exn [ 1; 2 ] };
     [%expect {| ((0 2466) (1 2534) (2 3304) (3 1696)) |}];
     (* not enough sizes *)
-    require_does_raise [%here] (fun () ->
-      test { config with sizes = Sequence.init 10 ~f:Fn.id });
+    require_does_raise (fun () -> test { config with sizes = Sequence.init 10 ~f:Fn.id });
     [%expect
       {|
       ("Base_quickcheck.Test.run: insufficient size values for test count"

@@ -20,15 +20,15 @@ module type Test = sig
 
     type t =
       { seed : Seed.t
-          (** [seed] is used to initialize the pseudo-random state before running tests of a
+      (** [seed] is used to initialize the pseudo-random state before running tests of a
           property. *)
       ; test_count : int
-          (** [test_count] determines how many random values to test a property with. *)
+      (** [test_count] determines how many random values to test a property with. *)
       ; shrink_count : int
-          (** [shrink_count] determines the maximum number of attempts to find a smaller
+      (** [shrink_count] determines the maximum number of attempts to find a smaller
           version of a value that fails a test. *)
       ; sizes : int Sequence.t
-          (** [sizes] determines the progression of value sizes to generate while testing.
+      (** [sizes] determines the progression of value sizes to generate while testing.
           Testing fails if [sizes] is not of length at least [test_count]. *)
       }
     [@@deriving sexp_of]

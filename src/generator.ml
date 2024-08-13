@@ -73,12 +73,12 @@ let all_unit list =
 ;;
 
 module For_applicative = Applicative.Make (struct
-  type nonrec 'a t = 'a t
+    type nonrec 'a t = 'a t
 
-  let return = return
-  let apply = apply
-  let map = `Custom map
-end)
+    let return = return
+    let apply = apply
+    let map = `Custom map
+  end)
 
 let both = For_applicative.both
 let map2 = For_applicative.map2
@@ -88,12 +88,12 @@ module Applicative_infix = For_applicative.Applicative_infix
 include Applicative_infix
 
 module For_monad = Monad.Make (struct
-  type nonrec 'a t = 'a t
+    type nonrec 'a t = 'a t
 
-  let return = return
-  let bind = bind
-  let map = `Custom map
-end)
+    let return = return
+    let bind = bind
+    let map = `Custom map
+  end)
 
 let ignore_m = For_monad.ignore_m
 let join = For_monad.join
@@ -386,11 +386,11 @@ module For_integer (Integer : Int_with_random) = struct
 end
 
 module For_int = For_integer (struct
-  include Int
+    include Int
 
-  let uniform = Splittable_random.int
-  let log_uniform = Splittable_random.Log_uniform.int
-end)
+    let uniform = Splittable_random.int
+    let log_uniform = Splittable_random.Log_uniform.int
+  end)
 
 let int = For_int.all
 let int_uniform = For_int.uniform_all
@@ -401,11 +401,11 @@ let int_log_uniform_inclusive = For_int.log_uniform_inclusive
 let int_geometric = For_int.geometric
 
 module For_int32 = For_integer (struct
-  include Int32
+    include Int32
 
-  let uniform = Splittable_random.int32
-  let log_uniform = Splittable_random.Log_uniform.int32
-end)
+    let uniform = Splittable_random.int32
+    let log_uniform = Splittable_random.Log_uniform.int32
+  end)
 
 let int32 = For_int32.all
 let int32_uniform = For_int32.uniform_all
@@ -416,11 +416,11 @@ let int32_log_uniform_inclusive = For_int32.log_uniform_inclusive
 let int32_geometric = For_int32.geometric
 
 module For_int63 = For_integer (struct
-  include Int63
+    include Int63
 
-  let uniform = Splittable_random.int63
-  let log_uniform = Splittable_random.Log_uniform.int63
-end)
+    let uniform = Splittable_random.int63
+    let log_uniform = Splittable_random.Log_uniform.int63
+  end)
 
 let int63 = For_int63.all
 let int63_uniform = For_int63.uniform_all
@@ -431,11 +431,11 @@ let int63_log_uniform_inclusive = For_int63.log_uniform_inclusive
 let int63_geometric = For_int63.geometric
 
 module For_int64 = For_integer (struct
-  include Int64
+    include Int64
 
-  let uniform = Splittable_random.int64
-  let log_uniform = Splittable_random.Log_uniform.int64
-end)
+    let uniform = Splittable_random.int64
+    let log_uniform = Splittable_random.Log_uniform.int64
+  end)
 
 let int64 = For_int64.all
 let int64_uniform = For_int64.uniform_all
@@ -446,11 +446,11 @@ let int64_log_uniform_inclusive = For_int64.log_uniform_inclusive
 let int64_geometric = For_int64.geometric
 
 module For_nativeint = For_integer (struct
-  include Nativeint
+    include Nativeint
 
-  let uniform = Splittable_random.nativeint
-  let log_uniform = Splittable_random.Log_uniform.nativeint
-end)
+    let uniform = Splittable_random.nativeint
+    let log_uniform = Splittable_random.Log_uniform.nativeint
+  end)
 
 let nativeint = For_nativeint.all
 let nativeint_uniform = For_nativeint.uniform_all

@@ -19,6 +19,22 @@ let generator_attribute =
     (fun x -> x)
 ;;
 
+let shrinker_attribute =
+  Attribute.declare
+    "quickcheck.shrinker"
+    Attribute.Context.core_type
+    Ast_pattern.(pstr (pstr_eval __ nil ^:: nil))
+    (fun x -> x)
+;;
+
+let observer_attribute =
+  Attribute.declare
+    "quickcheck.observer"
+    Attribute.Context.core_type
+    Ast_pattern.(pstr (pstr_eval __ nil ^:: nil))
+    (fun x -> x)
+;;
+
 let rec generator_of_core_type core_type ~gen_env ~obs_env =
   let loc = { core_type.ptyp_loc with loc_ghost = true } in
   match Attribute.get generator_attribute core_type with
@@ -76,88 +92,98 @@ let rec generator_of_core_type core_type ~gen_env ~obs_env =
 
 and observer_of_core_type core_type ~obs_env ~gen_env =
   let loc = { core_type.ptyp_loc with loc_ghost = true } in
-  match Ppxlib_jane.Jane_syntax.Core_type.of_ast core_type with
-  | Some (Jtyp_tuple fields, _attrs) ->
-    Ppx_observer_expander.compound
-      ~observer_of_core_type:(observer_of_core_type ~obs_env ~gen_env)
-      ~loc
-      ~fields
-      (module Field_syntax.Labeled_tuple)
-  | Some (Jtyp_layout _, _) | None ->
-    (match core_type.ptyp_desc with
-     | Ptyp_constr (constr, args) ->
-       type_constr_conv
-         ~loc
-         ~f:observer_name
-         constr
-         (List.map args ~f:(observer_of_core_type ~obs_env ~gen_env))
-     | Ptyp_var tyvar -> Environment.lookup obs_env ~loc ~tyvar
-     | Ptyp_arrow (arg_label, input_type, output_type) ->
-       Ppx_observer_expander.arrow
-         ~observer_of_core_type:(observer_of_core_type ~obs_env ~gen_env)
-         ~generator_of_core_type:(generator_of_core_type ~obs_env ~gen_env)
-         ~loc
-         ~arg_label
-         ~input_type
-         ~output_type
-     | Ptyp_tuple fields ->
+  match Attribute.get observer_attribute core_type with
+  | Some expr -> expr
+  | None ->
+    (match Ppxlib_jane.Jane_syntax.Core_type.of_ast core_type with
+     | Some (Jtyp_tuple fields, _attrs) ->
        Ppx_observer_expander.compound
          ~observer_of_core_type:(observer_of_core_type ~obs_env ~gen_env)
          ~loc
          ~fields
-         (module Field_syntax.Tuple)
-     | Ptyp_variant (clauses, Closed, None) ->
-       Ppx_observer_expander.variant
-         ~observer_of_core_type:(observer_of_core_type ~obs_env ~gen_env)
-         ~loc
-         ~clauses
-         (module Clause_syntax.Polymorphic_variant)
-     | Ptyp_variant (_, Open, _) -> unsupported ~loc "polymorphic variant type with [>]"
-     | Ptyp_variant (_, _, Some _) -> unsupported ~loc "polymorphic variant type with [<]"
-     | Ptyp_extension (tag, payload) -> custom_extension ~loc tag payload
-     | Ptyp_any -> Ppx_observer_expander.any ~loc
-     | Ptyp_object _ | Ptyp_class _ | Ptyp_alias _ | Ptyp_poly _ | Ptyp_package _ ->
-       unsupported ~loc "%s" (short_string_of_core_type core_type))
+         (module Field_syntax.Labeled_tuple)
+     | Some (Jtyp_layout _, _) | None ->
+       (match core_type.ptyp_desc with
+        | Ptyp_constr (constr, args) ->
+          type_constr_conv
+            ~loc
+            ~f:observer_name
+            constr
+            (List.map args ~f:(observer_of_core_type ~obs_env ~gen_env))
+        | Ptyp_var tyvar -> Environment.lookup obs_env ~loc ~tyvar
+        | Ptyp_arrow (arg_label, input_type, output_type) ->
+          Ppx_observer_expander.arrow
+            ~observer_of_core_type:(observer_of_core_type ~obs_env ~gen_env)
+            ~generator_of_core_type:(generator_of_core_type ~obs_env ~gen_env)
+            ~loc
+            ~arg_label
+            ~input_type
+            ~output_type
+        | Ptyp_tuple fields ->
+          Ppx_observer_expander.compound
+            ~observer_of_core_type:(observer_of_core_type ~obs_env ~gen_env)
+            ~loc
+            ~fields
+            (module Field_syntax.Tuple)
+        | Ptyp_variant (clauses, Closed, None) ->
+          Ppx_observer_expander.variant
+            ~observer_of_core_type:(observer_of_core_type ~obs_env ~gen_env)
+            ~loc
+            ~clauses
+            (module Clause_syntax.Polymorphic_variant)
+        | Ptyp_variant (_, Open, _) ->
+          unsupported ~loc "polymorphic variant type with [>]"
+        | Ptyp_variant (_, _, Some _) ->
+          unsupported ~loc "polymorphic variant type with [<]"
+        | Ptyp_extension (tag, payload) -> custom_extension ~loc tag payload
+        | Ptyp_any -> Ppx_observer_expander.any ~loc
+        | Ptyp_object _ | Ptyp_class _ | Ptyp_alias _ | Ptyp_poly _ | Ptyp_package _ ->
+          unsupported ~loc "%s" (short_string_of_core_type core_type)))
 ;;
 
 let rec shrinker_of_core_type core_type ~env =
   let loc = { core_type.ptyp_loc with loc_ghost = true } in
-  match Ppxlib_jane.Jane_syntax.Core_type.of_ast core_type with
-  | Some (Jtyp_tuple fields, _attrs) ->
-    Ppx_shrinker_expander.compound
-      ~shrinker_of_core_type:(shrinker_of_core_type ~env)
-      ~loc
-      ~fields
-      (module Field_syntax.Labeled_tuple)
-  | Some (Jtyp_layout _, _) | None ->
-    (match core_type.ptyp_desc with
-     | Ptyp_constr (constr, args) ->
-       type_constr_conv
-         ~loc
-         ~f:shrinker_name
-         constr
-         (List.map args ~f:(shrinker_of_core_type ~env))
-     | Ptyp_var tyvar -> Environment.lookup env ~loc ~tyvar
-     | Ptyp_arrow _ -> Ppx_shrinker_expander.arrow ~loc
-     | Ptyp_tuple fields ->
+  match Attribute.get shrinker_attribute core_type with
+  | Some expr -> expr
+  | None ->
+    (match Ppxlib_jane.Jane_syntax.Core_type.of_ast core_type with
+     | Some (Jtyp_tuple fields, _attrs) ->
        Ppx_shrinker_expander.compound
          ~shrinker_of_core_type:(shrinker_of_core_type ~env)
          ~loc
          ~fields
-         (module Field_syntax.Tuple)
-     | Ptyp_variant (clauses, Closed, None) ->
-       Ppx_shrinker_expander.variant
-         ~shrinker_of_core_type:(shrinker_of_core_type ~env)
-         ~loc
-         ~variant_type:core_type
-         ~clauses
-         (module Clause_syntax.Polymorphic_variant)
-     | Ptyp_variant (_, Open, _) -> unsupported ~loc "polymorphic variant type with [>]"
-     | Ptyp_variant (_, _, Some _) -> unsupported ~loc "polymorphic variant type with [<]"
-     | Ptyp_extension (tag, payload) -> custom_extension ~loc tag payload
-     | Ptyp_any -> Ppx_shrinker_expander.any ~loc
-     | Ptyp_object _ | Ptyp_class _ | Ptyp_alias _ | Ptyp_poly _ | Ptyp_package _ ->
-       unsupported ~loc "%s" (short_string_of_core_type core_type))
+         (module Field_syntax.Labeled_tuple)
+     | Some (Jtyp_layout _, _) | None ->
+       (match core_type.ptyp_desc with
+        | Ptyp_constr (constr, args) ->
+          type_constr_conv
+            ~loc
+            ~f:shrinker_name
+            constr
+            (List.map args ~f:(shrinker_of_core_type ~env))
+        | Ptyp_var tyvar -> Environment.lookup env ~loc ~tyvar
+        | Ptyp_arrow _ -> Ppx_shrinker_expander.arrow ~loc
+        | Ptyp_tuple fields ->
+          Ppx_shrinker_expander.compound
+            ~shrinker_of_core_type:(shrinker_of_core_type ~env)
+            ~loc
+            ~fields
+            (module Field_syntax.Tuple)
+        | Ptyp_variant (clauses, Closed, None) ->
+          Ppx_shrinker_expander.variant
+            ~shrinker_of_core_type:(shrinker_of_core_type ~env)
+            ~loc
+            ~variant_type:core_type
+            ~clauses
+            (module Clause_syntax.Polymorphic_variant)
+        | Ptyp_variant (_, Open, _) ->
+          unsupported ~loc "polymorphic variant type with [>]"
+        | Ptyp_variant (_, _, Some _) ->
+          unsupported ~loc "polymorphic variant type with [<]"
+        | Ptyp_extension (tag, payload) -> custom_extension ~loc tag payload
+        | Ptyp_any -> Ppx_shrinker_expander.any ~loc
+        | Ptyp_object _ | Ptyp_class _ | Ptyp_alias _ | Ptyp_poly _ | Ptyp_package _ ->
+          unsupported ~loc "%s" (short_string_of_core_type core_type)))
 ;;
 
 type impl =
@@ -343,15 +369,25 @@ let maybe_mutually_recursive decls ~loc ~rec_flag ~of_lazy ~impl =
             ~pat:inner.pat
             ~expr:(close_the_loop ~of_lazy decl inner))
       in
-      let rec wrap exp =
-        match exp.pexp_desc with
-        | Pexp_fun (arg_label, default, pat, body) ->
-          { exp with pexp_desc = Pexp_fun (arg_label, default, pat, wrap body) }
-        | _ ->
-          List.fold impls ~init:exp ~f:(fun acc impl ->
-            let ign = [%expr ignore [%e impl.var]] in
-            pexp_sequence ~loc ign acc)
-          |> pexp_let ~loc Nonrecursive inner_bindings
+      let wrap_body exp =
+        List.fold impls ~init:exp ~f:(fun acc impl ->
+          let ign = [%expr ignore [%e impl.var]] in
+          pexp_sequence ~loc ign acc)
+        |> pexp_let ~loc Nonrecursive inner_bindings
+      in
+      let wrap exp =
+        match
+          Ppxlib_jane.Shim.Pexp_function.of_parsetree exp.pexp_desc ~loc:exp.pexp_loc
+        with
+        | Some (params, function_constraint, Pfunction_body body) ->
+          let body = wrap_body body in
+          Ppxlib_jane.Ast_builder.Default.Latest.pexp_function
+            params
+            function_constraint
+            (Pfunction_body body)
+            ~loc:exp.pexp_loc
+            ~attrs:exp.pexp_attributes
+        | Some (_, _, Pfunction_cases _) | None -> wrap_body exp
       in
       List.map2_exn decls impls ~f:(fun decl impl ->
         let body = wrap impl.exp in
@@ -428,13 +464,13 @@ let intf type_decl ~f ~covar ~contravar =
       type_decl.ptype_params
       ~init:result
       ~f:(fun (core_type, (variance, _)) result ->
-      let id =
-        match variance with
-        | NoVariance | Covariant -> covar
-        | Contravariant -> contravar
-      in
-      let arg = ptyp_constr ~loc { loc; txt = id } [ core_type ] in
-      [%type: [%t arg] -> [%t result]])
+        let id =
+          match variance with
+          | NoVariance | Covariant -> covar
+          | Contravariant -> contravar
+        in
+        let arg = ptyp_constr ~loc { loc; txt = id } [ core_type ] in
+        [%type: [%t arg] -> [%t result]])
   in
   psig_value ~loc (value_description ~loc ~name ~type_ ~prim:[])
 ;;
@@ -498,38 +534,40 @@ let sig_type_decl =
   Deriving.Generator.make
     (args ())
     (fun ~loc ~path:_ (_, decls) incl_generator incl_observer incl_shrinker ->
-    let incl_generator, incl_observer, incl_shrinker =
-      flags ~incl_generator ~incl_observer ~incl_shrinker
-    in
-    match try_include_decl ~loc ~incl_generator ~incl_observer ~incl_shrinker decls with
-    | Some decl -> [ decl ]
-    | None ->
-      create
-        ~incl_generator
-        ~incl_observer
-        ~incl_shrinker
-        ~make_generator_list:generator_intf_list
-        ~make_observer_list:observer_intf_list
-        ~make_shrinker_list:shrinker_intf_list
-        decls)
+       let incl_generator, incl_observer, incl_shrinker =
+         flags ~incl_generator ~incl_observer ~incl_shrinker
+       in
+       match
+         try_include_decl ~loc ~incl_generator ~incl_observer ~incl_shrinker decls
+       with
+       | Some decl -> [ decl ]
+       | None ->
+         create
+           ~incl_generator
+           ~incl_observer
+           ~incl_shrinker
+           ~make_generator_list:generator_intf_list
+           ~make_observer_list:observer_intf_list
+           ~make_shrinker_list:shrinker_intf_list
+           decls)
 ;;
 
 let str_type_decl =
   Deriving.Generator.make
     (args ())
     (fun ~loc ~path:_ (rec_flag, decls) incl_generator incl_observer incl_shrinker ->
-    let rec_flag = really_recursive rec_flag decls in
-    let incl_generator, incl_observer, incl_shrinker =
-      flags ~incl_generator ~incl_observer ~incl_shrinker
-    in
-    create
-      ~incl_generator
-      ~incl_observer
-      ~incl_shrinker
-      ~make_generator_list:(generator_impl_list ~rec_flag ~loc)
-      ~make_observer_list:(observer_impl_list ~rec_flag ~loc)
-      ~make_shrinker_list:(shrinker_impl_list ~rec_flag ~loc)
-      decls)
+       let rec_flag = really_recursive rec_flag decls in
+       let incl_generator, incl_observer, incl_shrinker =
+         flags ~incl_generator ~incl_observer ~incl_shrinker
+       in
+       create
+         ~incl_generator
+         ~incl_observer
+         ~incl_shrinker
+         ~make_generator_list:(generator_impl_list ~rec_flag ~loc)
+         ~make_observer_list:(observer_impl_list ~rec_flag ~loc)
+         ~make_shrinker_list:(shrinker_impl_list ~rec_flag ~loc)
+         decls)
 ;;
 
 let generator_extension ~loc:_ ~path:_ core_type =

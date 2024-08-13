@@ -1,6 +1,7 @@
 (library
  (name test_base_quickcheck)
- (libraries base base_quickcheck base_quickcheck_test_helpers
-   expect_test_helpers_core)
+ (libraries base base_bigstring base_quickcheck base_quickcheck_test_helpers
+   core expect_test_helpers_core.expect_test_helpers_base
+   expect_test_helpers_core splittable_random)
  (preprocess
   (pps ppx_jane)))

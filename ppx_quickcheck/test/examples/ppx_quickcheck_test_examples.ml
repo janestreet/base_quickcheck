@@ -267,10 +267,10 @@ module Escaped = struct
 end
 
 module Wildcard (Elt : sig
-  type t
+    type t
 
-  val examples : t list
-end) =
+    val examples : t list
+  end) =
 struct
   type t = Elt.t list
 
@@ -282,7 +282,11 @@ end
 module Attribute_override = struct
   type t =
     | Null [@quickcheck.weight 0.1]
-    | Text of (string[@quickcheck.generator Generator.string_of Generator.char_lowercase])
+    | Text of
+        (string
+        [@quickcheck.generator Generator.string_of Generator.char_lowercase]
+        [@quickcheck.observer Observer.string]
+        [@quickcheck.shrinker Shrinker.string])
     | Number of (float[@quickcheck.generator Generator.float_strictly_positive])
   [@@deriving quickcheck ~generator ~observer ~shrinker]
 end

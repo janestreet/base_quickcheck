@@ -153,9 +153,9 @@ module Instance_with_variance : sig
 end
 
 module Poly_with_phantom : sig
-  type _ t [@@deriving quickcheck ~generator ~observer ~shrinker]
-end
-with type _ t = unit option
+    type _ t [@@deriving quickcheck ~generator ~observer ~shrinker]
+  end
+  with type _ t = unit option
 
 module Instance_with_phantom : sig
   type t = [ `phantom ] Poly_with_phantom.t
@@ -227,10 +227,10 @@ module Escaped : sig
 end
 
 module Wildcard (Elt : sig
-  type t
+    type t
 
-  val examples : t list
-end) : sig
+    val examples : t list
+  end) : sig
   type t = Elt.t list [@@deriving quickcheck ~generator ~observer ~shrinker]
 end
 

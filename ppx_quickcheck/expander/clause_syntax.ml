@@ -48,7 +48,7 @@ module Variant = struct
 
   let core_type_list t =
     match t.ast.pcd_args with
-    | Pcstr_tuple list -> list
+    | Pcstr_tuple list -> List.map list ~f:Ppxlib_jane.Shim.Pcstr_tuple_arg.to_core_type
     | Pcstr_record label_decl_list ->
       List.map label_decl_list ~f:(fun label_decl -> label_decl.pld_type)
   ;;

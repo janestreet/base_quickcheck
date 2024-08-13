@@ -14,13 +14,13 @@ let compound_sequence ~loc ~make_compound_expr ~field_pats ~field_exprs ~shrinke
              field_exprs
              shrinker_exprs
              ~f:(fun field_pat field_expr shrinker ->
-             let loc = { shrinker.pexp_loc with loc_ghost = true } in
-             [%expr
-               Ppx_quickcheck_runtime.Base.Sequence.map
-                 (Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.shrink
-                    [%e shrinker]
-                    [%e field_expr])
-                 ~f:(fun [%p field_pat] -> [%e make_compound_expr ~loc field_exprs])]))]]
+               let loc = { shrinker.pexp_loc with loc_ghost = true } in
+               [%expr
+                 Ppx_quickcheck_runtime.Base.Sequence.map
+                   (Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.shrink
+                      [%e shrinker]
+                      [%e field_expr])
+                   ~f:(fun [%p field_pat] -> [%e make_compound_expr ~loc field_exprs])]))]]
 ;;
 
 let compound
@@ -38,13 +38,13 @@ let compound
   [%expr
     Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.create
       (fun [%p Field.pattern fields ~loc field_pats] ->
-      [%e
-        compound_sequence
-          ~loc
-          ~make_compound_expr:(Field.expression fields)
-          ~field_pats
-          ~field_exprs
-          ~shrinker_exprs])]
+         [%e
+           compound_sequence
+             ~loc
+             ~make_compound_expr:(Field.expression fields)
+             ~field_pats
+             ~field_exprs
+             ~shrinker_exprs])]
 ;;
 
 let variant

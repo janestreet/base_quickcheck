@@ -56,10 +56,8 @@ let%expect_test "run_exn" =
   in
   (* success *)
   let count = ref 0 in
-  require_does_not_raise [%here] (fun () ->
-    Test.run_exn (module M) ~f:(fun _ -> Int.incr count));
+  require_does_not_raise (fun () -> Test.run_exn (module M) ~f:(fun _ -> Int.incr count));
   require
-    [%here]
     (!count = Test.default_config.test_count)
     ~if_false_then_print_s:(lazy [%message (!count : int)]);
   [%expect {| |}];
@@ -70,7 +68,7 @@ let%expect_test "run_exn" =
     { Test.default_config with sizes = Sequence.cycle_list_exn [ 10; 20; 30 ] }
   in
   (* simple failure *)
-  require_does_raise [%here] ~hide_positions:true (fun () ->
+  require_does_raise ~hide_positions:true (fun () ->
     Test.run_exn ~config ~f:failure (module M));
   [%expect
     {|
@@ -79,7 +77,7 @@ let%expect_test "run_exn" =
      (error "Assert_failure test_test.ml:LINE:COL"))
     |}];
   (* failure without shrinking *)
-  require_does_raise [%here] ~hide_positions:true (fun () ->
+  require_does_raise ~hide_positions:true (fun () ->
     Test.run_exn ~config ~f:failure (module M_without_shrinker));
   [%expect
     {|
@@ -88,7 +86,7 @@ let%expect_test "run_exn" =
      (error "Assert_failure test_test.ml:LINE:COL"))
     |}];
   (* failure from examples *)
-  require_does_raise [%here] ~hide_positions:true (fun () ->
+  require_does_raise ~hide_positions:true (fun () ->
     Test.run_exn
       ~config
       ~f:failure
@@ -101,7 +99,7 @@ let%expect_test "run_exn" =
      (error "Assert_failure test_test.ml:LINE:COL"))
     |}];
   (* failure from examples without shrinking *)
-  require_does_raise [%here] ~hide_positions:true (fun () ->
+  require_does_raise ~hide_positions:true (fun () ->
     Test.run_exn
       ~config
       ~f:failure
@@ -124,7 +122,8 @@ let%expect_test "with_sample_exn" =
     generator
     ~config:{ Test.default_config with test_count = 20 }
     ~f:(fun sample ->
-    Sequence.iter sample ~f:(fun value -> Core.print_s [%sexp (value : bool option list)]));
+      Sequence.iter sample ~f:(fun value ->
+        Core.print_s [%sexp (value : bool option list)]));
   [%expect
     {|
     ()

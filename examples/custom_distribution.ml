@@ -39,11 +39,11 @@ end = struct
       quickcheck_generator
       ~config:{ Test.default_config with test_count = 20 }
       ~f:(fun sequence ->
-      sequence
-      |> Sequence.to_list
-      |> List.sort ~compare
-      |> List.map ~f:sexp_of_t
-      |> List.iter ~f:print_s);
+        sequence
+        |> Sequence.to_list
+        |> List.sort ~compare
+        |> List.map ~f:sexp_of_t
+        |> List.iter ~f:print_s);
     [%expect
       {|
       Nullary
@@ -101,13 +101,13 @@ end = struct
       quickcheck_generator
       ~config:{ Test.default_config with test_count = 20 }
       ~f:(fun sequence ->
-      sequence
-      |> Sequence.to_list
-      |> List.sort ~compare
-      |> List.stable_sort ~compare:(fun a b ->
-           Comparable.lift Int.ascending ~f:(fun t -> List.length t.rationals) a b)
-      |> List.map ~f:sexp_of_t
-      |> List.iter ~f:print_s);
+        sequence
+        |> Sequence.to_list
+        |> List.sort ~compare
+        |> List.stable_sort ~compare:(fun a b ->
+          Comparable.lift Int.ascending ~f:(fun t -> List.length t.rationals) a b)
+        |> List.map ~f:sexp_of_t
+        |> List.iter ~f:print_s);
     [%expect
       {|
       ((rationals (2.8280262305352377E-308)) (index 0))

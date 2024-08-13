@@ -7,9 +7,9 @@ module Initial_example = struct
       (List.quickcheck_generator Int.quickcheck_generator)
       ~sexp_of:[%sexp_of: int list]
       ~f:(fun list ->
-      [%test_eq: int]
-        (List.fold_left ~init:0 ~f:( + ) list)
-        (List.fold_right ~init:0 ~f:( + ) list))
+        [%test_eq: int]
+          (List.fold_left ~init:0 ~f:( + ) list)
+          (List.fold_right ~init:0 ~f:( + ) list))
   ;;
 end
 

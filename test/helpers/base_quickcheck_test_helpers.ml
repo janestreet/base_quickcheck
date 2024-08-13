@@ -139,13 +139,11 @@ let test_generator (type a) ?config ?(mode = `exhaustive) ?cr generator m =
     match mode with
     | `exhaustive ->
       require
-        [%here]
         ?cr
         (Set.is_empty failed_to_generate)
         ~if_false_then_print_s:(lazy [%message "failed to generate all known values"])
     | `inexhaustive ->
       require
-        [%here]
         ?cr
         (not (Set.is_empty failed_to_generate))
         ~if_false_then_print_s:
@@ -159,7 +157,6 @@ let test_observer (type a) ?config ?(mode = `transparent) ?cr observer m =
      performance bound based on the current implementation that all callsites should
      observe. *)
   require
-    [%here]
     (number_of_examples <= 20)
     ~if_false_then_print_s:
       (lazy
@@ -191,7 +188,6 @@ let test_observer (type a) ?config ?(mode = `transparent) ?cr observer m =
     match mode with
     | `transparent ->
       require
-        [%here]
         ?cr
         (List.exists partitionings ~f:Partitioning.is_complete)
         ~if_false_then_print_s:
@@ -200,7 +196,6 @@ let test_observer (type a) ?config ?(mode = `transparent) ?cr observer m =
               "did not generate any single function that distinguishes all values"])
     | `opaque ->
       require
-        [%here]
         ?cr
         (Partitioning.is_singleton partitions)
         ~if_false_then_print_s:
@@ -227,13 +222,11 @@ let test_shrinker (type a) ?config:_ ?(mode = `compound) ?cr shrinker m =
   match mode with
   | `atomic ->
     require
-      [%here]
       ?cr
       (List.is_empty alist)
       ~if_false_then_print_s:(lazy [%message "atomic shrinker should not shrink values"])
   | `compound ->
     require
-      [%here]
       ?cr
       (not (List.is_empty alist))
       ~if_false_then_print_s:(lazy [%message "compound shrinker should shrink values"])
@@ -355,8 +348,8 @@ let m_arrow
             let pair = a, b in
             List.map alists ~f:(fun alist -> pair :: alist)))
         |> List.map ~f:(fun alist a ->
-             List.Assoc.find alist a ~equal:[%compare.equal: A.t]
-             |> Option.value ~default:(List.hd_exn B.examples))
+          List.Assoc.find alist a ~equal:[%compare.equal: A.t]
+          |> Option.value ~default:(List.hd_exn B.examples))
       else List.map B.examples ~f:Fn.const
     ;;
   end : With_examples
@@ -560,7 +553,7 @@ let m_map
     let examples =
       [ Map.empty (module Cmp) ]
       @ List.map Data.examples ~f:(fun data ->
-          Map.of_alist_exn (module Cmp) (List.map Key.examples ~f:(fun key -> key, data)))
+        Map.of_alist_exn (module Cmp) (List.map Key.examples ~f:(fun key -> key, data)))
     ;;
   end : With_examples
     with type t = (key, data, cmp) Map.t)

@@ -62,16 +62,16 @@ module Generator = struct
     let quickcheck_generator _observer__001_ _generator__002_ =
       Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
         (fun ~size:_size__003_ ~random:_random__004_ ->
-        ( Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-            _generator__002_
-            ~size:_size__003_
-            ~random:_random__004_
-        , Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
-            (Ppx_quickcheck_runtime.Base_quickcheck.Generator.fn
-               _observer__001_
-               _generator__002_)
-            ~size:_size__003_
-            ~random:_random__004_ ))
+           ( Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+               _generator__002_
+               ~size:_size__003_
+               ~random:_random__004_
+           , Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+               (Ppx_quickcheck_runtime.Base_quickcheck.Generator.fn
+                  _observer__001_
+                  _generator__002_)
+               ~size:_size__003_
+               ~random:_random__004_ ))
     ;;
 
     let _ = quickcheck_generator
@@ -133,24 +133,24 @@ module Observer = struct
     let quickcheck_observer _generator__005_ _observer__006_ =
       Ppx_quickcheck_runtime.Base_quickcheck.Observer.create
         (fun _x__007_ ~size:_size__010_ ~hash:_hash__011_ ->
-        let _x__008_, _x__009_ = _x__007_ in
-        let _hash__011_ =
-          Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-            _observer__006_
-            _x__008_
-            ~size:_size__010_
-            ~hash:_hash__011_
-        in
-        let _hash__011_ =
-          Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
-            (Ppx_quickcheck_runtime.Base_quickcheck.Observer.fn
-               _generator__005_
-               _observer__006_)
-            _x__009_
-            ~size:_size__010_
-            ~hash:_hash__011_
-        in
-        _hash__011_)
+           let _x__008_, _x__009_ = _x__007_ in
+           let _hash__011_ =
+             Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+               _observer__006_
+               _x__008_
+               ~size:_size__010_
+               ~hash:_hash__011_
+           in
+           let _hash__011_ =
+             Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+               (Ppx_quickcheck_runtime.Base_quickcheck.Observer.fn
+                  _generator__005_
+                  _observer__006_)
+               _x__009_
+               ~size:_size__010_
+               ~hash:_hash__011_
+           in
+           _hash__011_)
     ;;
 
     let _ = quickcheck_observer
