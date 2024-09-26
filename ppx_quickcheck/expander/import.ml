@@ -11,11 +11,12 @@ let unsupported ~loc fmt = error ~loc ("unsupported: " ^^ fmt)
 let internal_error ~loc fmt = error ~loc ("internal error: " ^^ fmt)
 
 let short_string_of_core_type core_type =
-  match core_type.ptyp_desc with
+  match Ppxlib_jane.Shim.Core_type_desc.of_parsetree core_type.ptyp_desc with
   | Ptyp_any -> "wildcard type"
   | Ptyp_var _ -> "type variable"
   | Ptyp_arrow _ -> "function type"
   | Ptyp_tuple _ -> "tuple type"
+  | Ptyp_unboxed_tuple _ -> "unboxed tuple type"
   | Ptyp_constr _ -> "type name"
   | Ptyp_object _ -> "object type"
   | Ptyp_class _ -> "class type"

@@ -725,13 +725,13 @@ let bytes = map string ~f:Bytes.of_string
 
 let sexp_of atom =
   fixed_point (fun self ->
-    let%bind size = size in
+    let%bind size in
     (* choose a number weighted low so we have a decreasing, but not vanishing, chance
        to generate atoms as size grows *)
     match%bind For_int.log_uniform_inclusive 0 (size + 1) with
     (* generate an atom using the given size *)
     | 0 ->
-      let%map atom = atom in
+      let%map atom in
       Sexp.Atom atom
     (* relying on [List.gen] to distribute [size] over sub-sexps *)
     | _ ->

@@ -48,7 +48,7 @@ let rec generator_of_core_type core_type ~gen_env ~obs_env =
          ~fields
          (module Field_syntax.Labeled_tuple)
      | Some (Jtyp_layout _, _) | None ->
-       (match core_type.ptyp_desc with
+       (match Ppxlib_jane.Shim.Core_type_desc.of_parsetree core_type.ptyp_desc with
         | Ptyp_constr (constr, args) ->
           type_constr_conv
             ~loc
@@ -56,7 +56,7 @@ let rec generator_of_core_type core_type ~gen_env ~obs_env =
             constr
             (List.map args ~f:(generator_of_core_type ~gen_env ~obs_env))
         | Ptyp_var tyvar -> Environment.lookup gen_env ~loc ~tyvar
-        | Ptyp_arrow (arg_label, input_type, output_type) ->
+        | Ptyp_arrow (arg_label, input_type, output_type, _, _) ->
           Ppx_generator_expander.arrow
             ~generator_of_core_type:(generator_of_core_type ~gen_env ~obs_env)
             ~observer_of_core_type:(observer_of_core_type ~gen_env ~obs_env)
@@ -83,6 +83,7 @@ let rec generator_of_core_type core_type ~gen_env ~obs_env =
         | Ptyp_variant (_, _, Some _) ->
           unsupported ~loc "polymorphic variant type with [<]"
         | Ptyp_extension (tag, payload) -> custom_extension ~loc tag payload
+        | Ptyp_unboxed_tuple _
         | Ptyp_any
         | Ptyp_object _
         | Ptyp_class _
@@ -103,7 +104,7 @@ and observer_of_core_type core_type ~obs_env ~gen_env =
          ~fields
          (module Field_syntax.Labeled_tuple)
      | Some (Jtyp_layout _, _) | None ->
-       (match core_type.ptyp_desc with
+       (match Ppxlib_jane.Shim.Core_type_desc.of_parsetree core_type.ptyp_desc with
         | Ptyp_constr (constr, args) ->
           type_constr_conv
             ~loc
@@ -111,7 +112,7 @@ and observer_of_core_type core_type ~obs_env ~gen_env =
             constr
             (List.map args ~f:(observer_of_core_type ~obs_env ~gen_env))
         | Ptyp_var tyvar -> Environment.lookup obs_env ~loc ~tyvar
-        | Ptyp_arrow (arg_label, input_type, output_type) ->
+        | Ptyp_arrow (arg_label, input_type, output_type, _, _) ->
           Ppx_observer_expander.arrow
             ~observer_of_core_type:(observer_of_core_type ~obs_env ~gen_env)
             ~generator_of_core_type:(generator_of_core_type ~obs_env ~gen_env)
@@ -137,8 +138,12 @@ and observer_of_core_type core_type ~obs_env ~gen_env =
           unsupported ~loc "polymorphic variant type with [<]"
         | Ptyp_extension (tag, payload) -> custom_extension ~loc tag payload
         | Ptyp_any -> Ppx_observer_expander.any ~loc
-        | Ptyp_object _ | Ptyp_class _ | Ptyp_alias _ | Ptyp_poly _ | Ptyp_package _ ->
-          unsupported ~loc "%s" (short_string_of_core_type core_type)))
+        | Ptyp_unboxed_tuple _
+        | Ptyp_object _
+        | Ptyp_class _
+        | Ptyp_alias _
+        | Ptyp_poly _
+        | Ptyp_package _ -> unsupported ~loc "%s" (short_string_of_core_type core_type)))
 ;;
 
 let rec shrinker_of_core_type core_type ~env =
@@ -154,7 +159,7 @@ let rec shrinker_of_core_type core_type ~env =
          ~fields
          (module Field_syntax.Labeled_tuple)
      | Some (Jtyp_layout _, _) | None ->
-       (match core_type.ptyp_desc with
+       (match Ppxlib_jane.Shim.Core_type_desc.of_parsetree core_type.ptyp_desc with
         | Ptyp_constr (constr, args) ->
           type_constr_conv
             ~loc
@@ -182,8 +187,12 @@ let rec shrinker_of_core_type core_type ~env =
           unsupported ~loc "polymorphic variant type with [<]"
         | Ptyp_extension (tag, payload) -> custom_extension ~loc tag payload
         | Ptyp_any -> Ppx_shrinker_expander.any ~loc
-        | Ptyp_object _ | Ptyp_class _ | Ptyp_alias _ | Ptyp_poly _ | Ptyp_package _ ->
-          unsupported ~loc "%s" (short_string_of_core_type core_type)))
+        | Ptyp_unboxed_tuple _
+        | Ptyp_object _
+        | Ptyp_class _
+        | Ptyp_alias _
+        | Ptyp_poly _
+        | Ptyp_package _ -> unsupported ~loc "%s" (short_string_of_core_type core_type)))
 ;;
 
 type impl =
