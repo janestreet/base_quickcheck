@@ -33,56 +33,53 @@ module Sorted_list = struct
   let merge t_a t_b = List.merge t_a t_b ~compare:Int.compare
 end
 
-let%test_module "sorted list" =
-  (module struct
-    let sorted_list_tuple_gen =
-      let int_gen = Int.gen_incl (-100) 100 in
-      let sorted_list_gen = Sorted_list.quickcheck_generator int_gen in
-      Generator.tuple2 sorted_list_gen sorted_list_gen
-    ;;
+module%test [@name "sorted list"] _ = struct
+  let sorted_list_tuple_gen =
+    let int_gen = Int.gen_incl (-100) 100 in
+    let sorted_list_gen = Sorted_list.quickcheck_generator int_gen in
+    Generator.tuple2 sorted_list_gen sorted_list_gen
+  ;;
 
-    let sorted_list_tuple_shrinker =
-      Shrinker.tuple2 Sorted_list.quickcheck_shrinker Sorted_list.quickcheck_shrinker
-    ;;
+  let sorted_list_tuple_shrinker =
+    Shrinker.tuple2 Sorted_list.quickcheck_shrinker Sorted_list.quickcheck_shrinker
+  ;;
 
-    let test f (a, b) = f a b |> Sorted_list.invariant
-    let sexp_of_sorted_list_tuple = [%sexp_of: Sorted_list.t * Sorted_list.t]
+  let test f (a, b) = f a b |> Sorted_list.invariant
+  let sexp_of_sorted_list_tuple = [%sexp_of: Sorted_list.t * Sorted_list.t]
 
-    let%test_unit "Invalid merge \"should\" produce a valid sorted list (without \
-                   shrinking)"
-      =
-      let run () =
-        Quickcheck.test
-          ~sexp_of:sexp_of_sorted_list_tuple
-          sorted_list_tuple_gen
-          ~f:(test Sorted_list.invalid_merge)
-      in
-      (* Swap which line is commented below to see error message with shrinking. *)
-      assert (does_raise run)
-    ;;
+  let%test_unit "Invalid merge \"should\" produce a valid sorted list (without shrinking)"
+    =
+    let run () =
+      Quickcheck.test
+        ~sexp_of:sexp_of_sorted_list_tuple
+        sorted_list_tuple_gen
+        ~f:(test Sorted_list.invalid_merge)
+    in
+    (* Swap which line is commented below to see error message with shrinking. *)
+    assert (does_raise run)
+  ;;
 
-    (* run () *)
+  (* run () *)
 
-    let%test_unit "Invalid merge \"should\" produce a valid sorted list (with shrinking)" =
-      let run () =
-        Quickcheck.test
-          ~shrinker:sorted_list_tuple_shrinker
-          ~sexp_of:sexp_of_sorted_list_tuple
-          sorted_list_tuple_gen
-          ~f:(test Sorted_list.invalid_merge)
-      in
-      (* Swap which line is commented below to see error message with shrinking. *)
-      assert (does_raise run)
-    ;;
-
-    (* run () *)
-
-    let%test_unit "Valid merge should produce a valid sorted list (with shrinking)" =
+  let%test_unit "Invalid merge \"should\" produce a valid sorted list (with shrinking)" =
+    let run () =
       Quickcheck.test
         ~shrinker:sorted_list_tuple_shrinker
         ~sexp_of:sexp_of_sorted_list_tuple
         sorted_list_tuple_gen
-        ~f:(test Sorted_list.merge)
-    ;;
-  end)
-;;
+        ~f:(test Sorted_list.invalid_merge)
+    in
+    (* Swap which line is commented below to see error message with shrinking. *)
+    assert (does_raise run)
+  ;;
+
+  (* run () *)
+
+  let%test_unit "Valid merge should produce a valid sorted list (with shrinking)" =
+    Quickcheck.test
+      ~shrinker:sorted_list_tuple_shrinker
+      ~sexp_of:sexp_of_sorted_list_tuple
+      sorted_list_tuple_gen
+      ~f:(test Sorted_list.merge)
+  ;;
+end

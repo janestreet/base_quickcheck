@@ -83,13 +83,11 @@ let rec generator_of_core_type core_type ~gen_env ~obs_env =
         | Ptyp_variant (_, _, Some _) ->
           unsupported ~loc "polymorphic variant type with [<]"
         | Ptyp_extension (tag, payload) -> custom_extension ~loc tag payload
-        | Ptyp_unboxed_tuple _
-        | Ptyp_any
-        | Ptyp_object _
-        | Ptyp_class _
-        | Ptyp_alias _
-        | Ptyp_poly _
-        | Ptyp_package _ -> unsupported ~loc "%s" (short_string_of_core_type core_type)))
+        | core_type ->
+          unsupported
+            ~loc
+            "%s"
+            (Ppxlib_jane.Language_feature_name.of_core_type_desc core_type)))
 
 and observer_of_core_type core_type ~obs_env ~gen_env =
   let loc = { core_type.ptyp_loc with loc_ghost = true } in
@@ -138,12 +136,11 @@ and observer_of_core_type core_type ~obs_env ~gen_env =
           unsupported ~loc "polymorphic variant type with [<]"
         | Ptyp_extension (tag, payload) -> custom_extension ~loc tag payload
         | Ptyp_any -> Ppx_observer_expander.any ~loc
-        | Ptyp_unboxed_tuple _
-        | Ptyp_object _
-        | Ptyp_class _
-        | Ptyp_alias _
-        | Ptyp_poly _
-        | Ptyp_package _ -> unsupported ~loc "%s" (short_string_of_core_type core_type)))
+        | core_type ->
+          unsupported
+            ~loc
+            "%s"
+            (Ppxlib_jane.Language_feature_name.of_core_type_desc core_type)))
 ;;
 
 let rec shrinker_of_core_type core_type ~env =
@@ -187,12 +184,11 @@ let rec shrinker_of_core_type core_type ~env =
           unsupported ~loc "polymorphic variant type with [<]"
         | Ptyp_extension (tag, payload) -> custom_extension ~loc tag payload
         | Ptyp_any -> Ppx_shrinker_expander.any ~loc
-        | Ptyp_unboxed_tuple _
-        | Ptyp_object _
-        | Ptyp_class _
-        | Ptyp_alias _
-        | Ptyp_poly _
-        | Ptyp_package _ -> unsupported ~loc "%s" (short_string_of_core_type core_type)))
+        | core_type ->
+          unsupported
+            ~loc
+            "%s"
+            (Ppxlib_jane.Language_feature_name.of_core_type_desc core_type)))
 ;;
 
 type impl =
