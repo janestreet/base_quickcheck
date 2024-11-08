@@ -10,22 +10,6 @@ let invalid ~loc fmt = error ~loc ("invalid syntax: " ^^ fmt)
 let unsupported ~loc fmt = error ~loc ("unsupported: " ^^ fmt)
 let internal_error ~loc fmt = error ~loc ("internal error: " ^^ fmt)
 
-let short_string_of_core_type core_type =
-  match core_type.ptyp_desc with
-  | Ptyp_any -> "wildcard type"
-  | Ptyp_var _ -> "type variable"
-  | Ptyp_arrow _ -> "function type"
-  | Ptyp_tuple _ -> "tuple type"
-  | Ptyp_constr _ -> "type name"
-  | Ptyp_object _ -> "object type"
-  | Ptyp_class _ -> "class type"
-  | Ptyp_alias _ -> "type variable alias"
-  | Ptyp_variant _ -> "polymorphic variant"
-  | Ptyp_poly _ -> "explicit polymorphic type"
-  | Ptyp_package _ -> "first-class module type"
-  | Ptyp_extension _ -> "ppx extension type"
-;;
-
 (* little syntax helpers *)
 
 let loc_map { loc; txt } ~f = { loc; txt = f txt }

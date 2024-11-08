@@ -20,8 +20,8 @@ depends: [
   "ppxlib_jane"
   "splittable_random"
   "dune"                {>= "3.11.0"}
-  "ocaml-compiler-libs" {>= "v0.11.0"}
-  "ppxlib"              {>= "0.28.0"}
+  "ocaml-compiler-libs" {= "v0.17.0+jst"}
+  "ppxlib"              {= "0.33.0+jst"}
 ]
 available: arch != "arm32" & arch != "x86_32"
 synopsis: "Randomized testing framework, designed for compatibility with Base"
