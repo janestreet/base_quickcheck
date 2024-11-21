@@ -22,12 +22,12 @@ module Labeled_tuple = struct
 
   let pattern list ~loc pat_list =
     let alist = List.map2_exn list pat_list ~f:(fun (label, _) pat -> label, pat) in
-    Ppxlib_jane.Jane_syntax.Pattern.pat_of ~loc ~attrs:[] (Jpat_tuple (alist, Closed))
+    Ppxlib_jane.Ast_builder.Default.ppat_tuple ~loc ~attrs:[] alist Closed
   ;;
 
   let expression list ~loc expr_list =
     let alist = List.map2_exn list expr_list ~f:(fun (label, _) expr -> label, expr) in
-    Ppxlib_jane.Jane_syntax.Expression.expr_of ~loc ~attrs:[] (Jexp_tuple alist)
+    Ppxlib_jane.Ast_builder.Default.pexp_tuple ~loc ~attrs:[] alist
   ;;
 end
 
