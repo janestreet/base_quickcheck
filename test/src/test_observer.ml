@@ -1,8 +1,9 @@
 open! Import
+module Via_thunk = Observer.Via_thunk
 
-type 'a t = 'a Observer.t
+type ('a : any) t = 'a Observer.t
 
-let create = Observer.create
+let%template create = (Observer.create [@mode p]) [@@mode p = (portable, nonportable)]
 let observe = Observer.observe
 
 let%expect_test ("observe & create" [@tags "64-bits-only"]) =
@@ -39,14 +40,16 @@ let%expect_test "opaque" =
   [%expect {| (observer opaque) |}]
 ;;
 
-let unmap = Observer.unmap
+let%template unmap = (Observer.unmap [@mode p]) [@@mode p = (portable, nonportable)]
 
 let%expect_test "unmap" =
   test_observer (Observer.unmap Observer.int64 ~f:Int.to_int64) (m_int (module Int));
   [%expect {| (observer transparent) |}]
 ;;
 
-let of_hash_fold = Observer.of_hash_fold
+let%template of_hash_fold = (Observer.of_hash_fold [@mode p])
+[@@mode p = (portable, nonportable)]
+;;
 
 let%expect_test "of_hash_fold" =
   test_observer (Observer.of_hash_fold Sexp.hash_fold_t) m_sexp;
@@ -90,7 +93,7 @@ let%expect_test "fn" =
   [%expect {| (observer transparent) |}]
 ;;
 
-let both = Observer.both
+let%template both = (Observer.both [@mode p]) [@@mode p = (portable, nonportable)]
 
 let%expect_test "both" =
   test_observer (Observer.both Observer.bool Observer.bool) (m_pair m_bool m_bool);
@@ -181,7 +184,7 @@ let%expect_test "sexp" =
   [%expect {| (observer transparent) |}]
 ;;
 
-let option = Observer.option
+let%template option = (Observer.option [@mode p]) [@@mode p = (portable, nonportable)]
 
 let%expect_test "option" =
   [%expect {| |}];
@@ -189,42 +192,42 @@ let%expect_test "option" =
   [%expect {| (observer transparent) |}]
 ;;
 
-let list = Observer.list
+let%template list = (Observer.list [@mode p]) [@@mode p = (portable, nonportable)]
 
 let%expect_test "list" =
   test_observer (Observer.list Observer.bool) (m_list m_bool);
   [%expect {| (observer transparent) |}]
 ;;
 
-let array = Observer.array
+let%template array = (Observer.array [@mode p]) [@@mode p = (portable, nonportable)]
 
 let%expect_test "array" =
   test_observer (Observer.array Observer.bool) (m_array m_bool);
   [%expect {| (observer transparent) |}]
 ;;
 
-let ref = Observer.ref
+let%template ref = (Observer.ref [@mode p]) [@@mode p = (portable, nonportable)]
 
 let%expect_test "ref" =
   test_observer (Observer.ref Observer.bool) (m_ref m_bool);
   [%expect {| (observer transparent) |}]
 ;;
 
-let lazy_t = Observer.lazy_t
+let%template lazy_t = (Observer.lazy_t [@mode p]) [@@mode p = (portable, nonportable)]
 
 let%expect_test "lazy_t" =
   test_observer (Observer.lazy_t Observer.bool) (m_lazy_t m_bool);
   [%expect {| (observer transparent) |}]
 ;;
 
-let either = Observer.either
+let%template either = (Observer.either [@mode p]) [@@mode p = (portable, nonportable)]
 
 let%expect_test "either" =
   test_observer (Observer.either Observer.bool Observer.bool) (m_either m_bool m_bool);
   [%expect {| (observer transparent) |}]
 ;;
 
-let result = Observer.result
+let%template result = (Observer.result [@mode p]) [@@mode p = (portable, nonportable)]
 
 let%expect_test "result" =
   test_observer (Observer.result Observer.bool Observer.bool) (m_result m_bool m_bool);

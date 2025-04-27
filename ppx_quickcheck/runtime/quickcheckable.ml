@@ -1,7 +1,7 @@
 open Base_quickcheck
 
 module type S = sig
-  type t
+  type t : any
 
   val quickcheck_generator : t Generator.t
   val quickcheck_observer : t Observer.t
@@ -9,7 +9,7 @@ module type S = sig
 end
 
 module type S1 = sig
-  type 'a t
+  type 'a t : any
 
   val quickcheck_generator : 'a Generator.t -> 'a t Generator.t
   val quickcheck_observer : 'a Observer.t -> 'a t Observer.t
@@ -17,7 +17,7 @@ module type S1 = sig
 end
 
 module type S2 = sig
-  type ('a, 'b) t
+  type ('a, 'b) t : any
 
   val quickcheck_generator : 'a Generator.t -> 'b Generator.t -> ('a, 'b) t Generator.t
   val quickcheck_observer : 'a Observer.t -> 'b Observer.t -> ('a, 'b) t Observer.t
@@ -25,7 +25,7 @@ module type S2 = sig
 end
 
 module type S3 = sig
-  type ('a, 'b, 'c) t
+  type ('a, 'b, 'c) t : any
 
   val quickcheck_generator
     :  'a Generator.t

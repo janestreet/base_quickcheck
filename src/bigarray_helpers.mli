@@ -1,3 +1,5 @@
+@@ portable
+
 open! Base
 
 (** Helpers for working with Bigarrays.

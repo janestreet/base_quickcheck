@@ -1,8 +1,8 @@
 (library
  (name ppx_quickcheck_expander)
  (public_name base_quickcheck.ppx_quickcheck.expander)
- (libraries base ppxlib ppxlib_jane ocaml-compiler-libs.common
-   compiler-libs.common)
+ (libraries base ocaml-compiler-libs.common compiler-libs.common ppx_template
+   ppxlib ppxlib_jane)
  (ppx_runtime_libraries base_quickcheck.ppx_quickcheck.runtime
    base_quickcheck)
  (preprocess

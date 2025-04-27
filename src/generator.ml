@@ -1,25 +1,80 @@
 open! Base
 
-module T : sig
-  type +'a t
+type ('a : any) thunk = unit -> 'a
 
-  val create : (size:int -> random:Splittable_random.t -> 'a) -> 'a t
+module T : sig @@ portable
+  type (+'a : any) t : value mod contended
+
+  val%template create : (size:int -> random:Splittable_random.t -> 'a) @ p -> 'a t @ p
+  [@@mode p = (nonportable, portable)]
+
   val generate : 'a t -> size:int -> random:Splittable_random.t -> 'a
+
+  module Via_thunk : sig
+    val%template create
+      : ('a : any).
+      (size:int -> random:Splittable_random.t -> 'a thunk) @ p -> 'a t @ p
+    [@@mode p = (nonportable, portable)]
+
+    val generate : ('a : any). 'a t -> size:int -> random:Splittable_random.t -> 'a thunk
+  end
 end = struct
-  type 'a t = (size:int -> random:Splittable_random.t -> 'a) Staged.t
+  type ('a : any) t = size:int -> random:Splittable_random.t -> (unit -> 'a)
 
-  let create f : _ t = Staged.stage f
-
-  let generate (t : _ t) ~size ~random =
+  let check_size ~size =
     if size < 0
     then raise_s [%message "Base_quickcheck.Generator.generate: size < 0" (size : int)]
-    else Staged.unstage t ~size ~random
   ;;
+
+  module Via_thunk = struct
+    let%template create f = f [@@mode __ = (nonportable, portable)]
+
+    let generate t ~size ~random =
+      check_size ~size;
+      t ~size ~random
+    ;;
+  end
+
+  let%template create f =
+    (Via_thunk.create [@mode p]) (fun ~size ~random ->
+      let x = f ~size ~random in
+      fun () -> x)
+  [@@mode p = (nonportable, portable)]
+  ;;
+
+  let generate t ~size ~random = Via_thunk.generate t ~size ~random ()
 end
 
 include T
 
-let size = create (fun ~size ~random:_ -> size)
+module Via_thunk = struct
+  include Via_thunk
+
+  let%template map t ~f =
+    (create [@mode p]) (fun ~size ~random -> f (generate t ~size ~random))
+  [@@mode p = (nonportable, portable)]
+  ;;
+end
+
+let%template size = (create [@mode portable]) (fun ~size ~random:_ -> size)
+
+include struct
+  let return x = create (fun ~size:_ ~random:_ -> x)
+
+  let%template return (type a : value mod contended) (x : a) =
+    (create [@mode portable]) (fun ~size:_ ~random:_ -> x)
+  [@@mode portable]
+  ;;
+end
+
+[%%template
+[@@@mode p = (nonportable, portable)]
+
+open struct
+  let create = (create [@mode p])
+end
+
+[@@@mode.default p]
 
 let fn dom rng =
   create (fun ~size ~random ->
@@ -49,8 +104,7 @@ let filter_map t ~f =
   create loop
 ;;
 
-let filter t ~f = filter_map t ~f:(fun x -> if f x then Some x else None)
-let return x = create (fun ~size:_ ~random:_ -> x)
+let filter t ~f = (filter_map [@mode p]) t ~f:(fun x -> if f x then Some x else None)
 let map t ~f = create (fun ~size ~random -> f (generate t ~size ~random))
 
 let apply tf tx =
@@ -66,107 +120,207 @@ let bind t ~f =
     generate (f x) ~size ~random)
 ;;
 
-let all list = create (fun ~size ~random -> List.map list ~f:(generate ~size ~random))
+let all (list : _ t list) =
+  create (fun ~size ~random -> List.map list ~f:(generate ~size ~random))
+;;
 
-let all_unit list =
+let all_unit (list : unit t list) =
   create (fun ~size ~random -> List.iter list ~f:(generate ~size ~random))
 ;;
 
-module For_applicative = Applicative.Make (struct
-    type nonrec 'a t = 'a t
-
-    let return = return
-    let apply = apply
-    let map = `Custom map
-  end)
-
-let both = For_applicative.both
-let map2 = For_applicative.map2
-let map3 = For_applicative.map3
-
-module Applicative_infix = For_applicative.Applicative_infix
-include Applicative_infix
-
-module For_monad = Monad.Make (struct
-    type nonrec 'a t = 'a t
-
-    let return = return
-    let bind = bind
-    let map = `Custom map
-  end)
-
-let ignore_m = For_monad.ignore_m
-let join = For_monad.join
-
-module Monad_infix = For_monad.Monad_infix
-include Monad_infix
-module Let_syntax = For_monad.Let_syntax
-open Let_syntax
-
-let of_list list =
-  if List.is_empty list
-  then Error.raise_s [%message "Base_quickcheck.Generator.of_list: empty list"];
-  let array = Array.of_list list in
-  let lo = 0 in
-  let hi = Array.length array - 1 in
-  create (fun ~size:_ ~random ->
-    let index = Splittable_random.int random ~lo ~hi in
-    array.(index))
+let map2 ta tb ~f =
+  create (fun ~size ~random ->
+    let a = generate ta ~size ~random in
+    let b = generate tb ~size ~random in
+    f a b)
 ;;
 
-let union list = join (of_list list)
+let map3 ta tb tc ~f =
+  create (fun ~size ~random ->
+    let a = generate ta ~size ~random in
+    let b = generate tb ~size ~random in
+    let c = generate tc ~size ~random in
+    f a b c)
+;;
 
-let of_weighted_list alist =
-  if List.is_empty alist
+let both a b = (map2 [@mode p]) a b ~f:(fun x y -> x, y)
+let join t = (bind [@mode p]) t ~f:Fn.id
+let ignore_m t = (map [@mode p]) t ~f:ignore]
+
+let (_ : _) = apply__portable, all_unit__portable, map3__portable, ignore_m__portable
+let ( >>| ) t f = map t ~f
+let ( >>= ) t f = bind t ~f
+let ( <*> ) = apply
+let ( <* ) ta tb = map2 ta tb ~f:(fun a () -> a)
+let ( *> ) ta tb = map2 ta tb ~f:(fun () b -> b)
+
+module Applicative_infix = struct
+  let ( >>| ) = ( >>| )
+  let ( <*> ) = ( <*> )
+  let ( <* ) = ( <* )
+  let ( *> ) = ( *> )
+end
+
+module Monad_infix = struct
+  let ( >>| ) = ( >>| )
+  let ( >>= ) = ( >>= )
+end
+
+module Syntax = struct
+  module%template [@mode p = (nonportable, portable)] Let_syntax = struct
+    let return = (return [@mode p])
+    let ( >>= ) t f = (bind [@mode p]) t ~f
+    let ( >>| ) t f = (map [@mode p]) t ~f
+
+    module Let_syntax = struct
+      let return = (return [@mode p])
+      let bind = (bind [@mode p])
+      let map = (map [@mode p])
+      let both = (both [@mode p])
+
+      module Open_on_rhs = struct end
+    end
+  end
+end
+
+module Portable = struct
+  module%template Let_syntax = Syntax.Let_syntax [@mode portable]
+end
+
+include Syntax
+open Syntax.Let_syntax
+
+include struct
+  let of_list list =
+    if List.is_empty list
+    then Error.raise_s [%message "Base_quickcheck.Generator.of_list: empty list"];
+    let iarray = Iarray.of_list list in
+    let lo = 0 in
+    let hi = Iarray.length iarray - 1 in
+    create (fun ~size:_ ~random ->
+      let index = Splittable_random.int random ~lo ~hi in
+      iarray.:(index))
+  ;;
+
+  let%template of_list (type a : value mod contended) (list : a list) =
+    if List.is_empty list
+    then Error.raise_s [%message "Base_quickcheck.Generator.of_list: empty list"];
+    let list = list |> Modes.Portable.wrap_list in
+    let iarray = Iarray.of_list list in
+    let iarray = iarray |> Modes.Portable.unwrap_iarray in
+    let lo = 0 in
+    let hi = Iarray.length iarray - 1 in
+    (create [@mode portable]) (fun ~size:_ ~random ->
+      let index = Splittable_random.int random ~lo ~hi in
+      iarray.:(index))
+  [@@mode portable]
+  ;;
+end
+
+let%template union list = (join [@mode p]) ((of_list [@mode p]) list)
+[@@mode p = (nonportable, portable)]
+;;
+
+let weighted_tally weights =
+  if List.is_empty weights
   then Error.raise_s [%message "Base_quickcheck.Generator.of_weighted_list: empty list"];
-  let weights, values = List.unzip alist in
-  let value_array = Array.of_list values in
-  let total_weight, cumulative_weight_array =
-    let array = Array.init (Array.length value_array) ~f:(fun _ -> 0.) in
-    let sum =
-      List.foldi weights ~init:0. ~f:(fun index acc weight ->
-        if not (Float.is_finite weight)
-        then
-          Error.raise_s
-            [%message
-              "Base_quickcheck.Generator.of_weighted_list: weight is not finite"
-                (weight : float)];
-        if Float.( < ) weight 0.
-        then
-          Error.raise_s
-            [%message
-              "Base_quickcheck.Generator.of_weighted_list: weight is negative"
-                (weight : float)];
-        let cumulative = acc +. weight in
-        array.(index) <- cumulative;
-        cumulative)
-    in
-    if Float.( <= ) sum 0.
-    then
-      Error.raise_s
-        [%message "Base_quickcheck.Generator.of_weighted_list: total weight is zero"];
-    sum, array
+  let array = Array.init (List.length weights) ~f:(fun _ -> 0.) in
+  let sum =
+    List.foldi weights ~init:0. ~f:(fun index acc weight ->
+      if not (Float.is_finite weight)
+      then
+        Error.raise_s
+          [%message
+            "Base_quickcheck.Generator.of_weighted_list: weight is not finite"
+              (weight : float)];
+      if Float.( < ) weight 0.
+      then
+        Error.raise_s
+          [%message
+            "Base_quickcheck.Generator.of_weighted_list: weight is negative"
+              (weight : float)];
+      let cumulative = acc +. weight in
+      array.(index) <- cumulative;
+      cumulative)
   in
-  create (fun ~size:_ ~random ->
-    let choice = Splittable_random.float random ~lo:0. ~hi:total_weight in
-    match
-      Array.binary_search
-        cumulative_weight_array
-        ~compare:Float.compare
-        `First_greater_than_or_equal_to
-        choice
-    with
-    | Some index -> value_array.(index)
-    | None -> assert false)
+  if Float.( <= ) sum 0.
+  then
+    Error.raise_s
+      [%message "Base_quickcheck.Generator.of_weighted_list: total weight is zero"];
+  sum, Iarray.unsafe_of_array__promise_no_mutation array
 ;;
 
-let weighted_union alist = join (of_weighted_list alist)
+let weighted_index cumulative_weight_array choice =
+  match
+    Iarray.binary_search
+      cumulative_weight_array
+      ~compare:Float.compare
+      `First_greater_than_or_equal_to
+      choice
+  with
+  | Some index -> index
+  | None -> assert false
+;;
+
+include struct
+  let of_weighted_list alist =
+    let weights, values = List.unzip alist in
+    let value_iarray = Iarray.of_list values in
+    let total_weight, cumulative_weights = weighted_tally weights in
+    create (fun ~size:_ ~random ->
+      let choice = Splittable_random.float random ~lo:0. ~hi:total_weight in
+      let index = weighted_index cumulative_weights choice in
+      value_iarray.:(index))
+  ;;
+
+  let%template of_weighted_list
+    (type a : value mod contended)
+    (alist : (float, a) List.Assoc.t)
+    =
+    let alist =
+      alist
+      |> Modes.Portable.wrap_list
+      |> List.map ~f:(fun { Modes.Portable.portable = weight, t } ->
+        weight, { Modes.Portable.portable = t })
+    in
+    let weights, values = List.unzip alist in
+    let value_iarray = Iarray.of_list values in
+    let value_iarray = value_iarray |> Modes.Portable.unwrap_iarray in
+    let total_weight, cumulative_weights = weighted_tally weights in
+    (create [@mode portable]) (fun ~size:_ ~random ->
+      let choice = Splittable_random.float random ~lo:0. ~hi:total_weight in
+      let index = weighted_index cumulative_weights choice in
+      value_iarray.:(index))
+  [@@mode portable]
+  ;;
+end
+
+let%template weighted_union alist = (join [@mode p]) ((of_weighted_list [@mode p]) alist)
+[@@mode p = (nonportable, portable)]
+;;
+
 let of_lazy lazy_t = create (fun ~size ~random -> generate (force lazy_t) ~size ~random)
 
-let fixed_point of_generator =
-  let rec lazy_t = lazy (of_generator (of_lazy lazy_t)) in
-  force lazy_t
+let%template of_portable_lazy portable_lazy_t =
+  (create [@mode portable]) (fun ~size ~random ->
+    generate (Portable_lazy.force portable_lazy_t) ~size ~random)
 ;;
+
+include struct
+  let fixed_point of_generator =
+    let rec lazy_t = lazy (of_generator (of_lazy lazy_t)) in
+    force lazy_t
+  ;;
+
+  let%template fixed_point of_generator =
+    let portable_lazy_t =
+      Portable_lazy.from_fun_fixed (fun portable_lazy_t ->
+        of_generator (of_portable_lazy portable_lazy_t))
+    in
+    Portable_lazy.force portable_lazy_t
+  [@@mode p = portable]
+  ;;
+end
 
 let weighted_recursive_union nonrec_list ~f =
   fixed_point (fun self ->
@@ -193,8 +347,8 @@ let recursive_union nonrec_list ~f =
   weighted_recursive_union (weighted nonrec_list) ~f:(fun self -> weighted (f self))
 ;;
 
-let sizes ?(min_length = 0) ?(max_length = Int.max_value) () =
-  create (fun ~size ~random ->
+let%template sizes ?(min_length = 0) ?(max_length = Int.max_value) () =
+  (create [@mode portable]) (fun ~size ~random ->
     assert (min_length <= max_length);
     let upper_bound = min_length + size in
     let max_length =
@@ -226,28 +380,54 @@ let sizes ?(min_length = 0) ?(max_length = Int.max_value) () =
       Array.to_list sizes))
 ;;
 
-let unit = return ()
-let bool = create (fun ~size:_ ~random -> Splittable_random.bool random)
-let option value_t = union [ return None; map value_t ~f:Option.return ]
-let either fst_t snd_t = union [ map fst_t ~f:Either.first; map snd_t ~f:Either.second ]
+let%template unit = (return [@mode portable]) ()
+
+let%template bool =
+  (create [@mode portable]) (fun ~size:_ ~random -> Splittable_random.bool random)
+;;
+
+[%%template
+[@@@mode.default p = (nonportable, portable)]
+
+let option value_t =
+  (union [@mode p])
+    [ (map [@mode p]) unit ~f:(fun () -> None); (map [@mode p]) value_t ~f:Option.return ]
+;;
+
+let either fst_t snd_t =
+  (union [@mode p])
+    [ (map [@mode p]) fst_t ~f:Either.first; (map [@mode p]) snd_t ~f:Either.second ]
+;;
 
 let result ok_t err_t =
-  map (either ok_t err_t) ~f:(function
-    | First ok -> Ok ok
-    | Second err -> Error err)
-;;
+  (map [@mode p]) ((either [@mode p]) ok_t err_t) ~f:Result.of_either
+;;]
 
-let list_generic ?min_length ?max_length elt_gen =
-  let%bind sizes = sizes ?min_length ?max_length () in
-  List.map sizes ~f:(fun size -> with_size ~size elt_gen) |> all
-;;
+include struct
+  let list_generic ?min_length ?max_length elt_gen =
+    let%bind sizes = sizes ?min_length ?max_length () in
+    List.map sizes ~f:(fun size -> with_size ~size elt_gen) |> all
+  ;;
 
-let list elt_gen = list_generic elt_gen
-let list_non_empty elt_gen = list_generic ~min_length:1 elt_gen
+  let%template list_generic ?min_length ?max_length elt_gen =
+    let%bind.Portable sizes = sizes ?min_length ?max_length () in
+    List.map sizes ~f:(fun size ->
+      (with_size [@mode portable]) ~size elt_gen |> Modes.Portable.wrap)
+    |> Modes.Portable.unwrap_list
+    |> (all [@mode portable])
+  [@@mode portable]
+  ;;
+end
+
+[%%template
+[@@@mode.default p = (nonportable, portable)]
+
+let list elt_gen = (list_generic [@mode p]) elt_gen
+let list_non_empty elt_gen = (list_generic [@mode p]) ~min_length:1 elt_gen
 
 let list_with_length elt_gen ~length =
-  list_generic ~min_length:length ~max_length:length elt_gen
-;;
+  (list_generic [@mode p]) ~min_length:length ~max_length:length elt_gen
+;;]
 
 let list_filtered elts =
   let elts = Array.of_list elts in
@@ -276,12 +456,28 @@ let list_permutations list =
     Array.to_list array)
 ;;
 
-let array t = map (list t) ~f:Array.of_list
-let ref t = map t ~f:Ref.create
-let lazy_t t = map t ~f:Lazy.from_val
+let fold_until ?min_length ?max_length ~init ~f ~finish () =
+  let%bind sizes = sizes ?min_length ?max_length () in
+  let rec loop acc sizes =
+    match sizes with
+    | [] -> return (finish acc)
+    | size :: sizes ->
+      (match%bind with_size ~size (f acc) with
+       | (Stop acc : _ Continue_or_stop.t) -> return acc
+       | Continue acc -> loop acc sizes)
+  in
+  loop init sizes
+;;
 
-let char_uniform_inclusive lo hi =
-  create (fun ~size:_ ~random ->
+[%%template
+[@@@mode.default p = (nonportable, portable)]
+
+let array t = (map [@mode p]) ((list [@mode p]) t) ~f:Array.of_list
+let ref t = (map [@mode p]) t ~f:Ref.create
+let lazy_t t = (map [@mode p]) t ~f:Lazy.from_val]
+
+let%template char_uniform_inclusive lo hi =
+  (create [@mode portable]) (fun ~size:_ ~random ->
     Splittable_random.int random ~lo:(Char.to_int lo) ~hi:(Char.to_int hi)
     |> Char.unsafe_of_int)
 ;;
@@ -291,32 +487,37 @@ let char_lowercase = char_uniform_inclusive 'a' 'z'
 let char_digit = char_uniform_inclusive '0' '9'
 let char_print_uniform = char_uniform_inclusive ' ' '~'
 let char_uniform = char_uniform_inclusive Char.min_value Char.max_value
-let char_alpha = union [ char_lowercase; char_uppercase ]
+let%template char_alpha = (union [@mode portable]) [ char_lowercase; char_uppercase ]
 
-let char_alphanum =
-  weighted_union
+let%template char_alphanum =
+  (weighted_union [@mode portable])
     (* Most people probably expect this to be a uniform distribution, not weighted
        toward digits like we would get with [union] (since there are fewer digits than
        letters). *)
     [ 52., char_alpha; 10., char_digit ]
 ;;
 
-let char_whitespace = of_list (List.filter Char.all ~f:Char.is_whitespace)
-let char_print = weighted_union [ 10., char_alphanum; 1., char_print_uniform ]
+let%template char_whitespace =
+  (of_list [@mode portable]) (List.filter Char.all ~f:Char.is_whitespace)
+;;
 
-let char =
-  weighted_union
+let%template char_print =
+  (weighted_union [@mode portable]) [ 10., char_alphanum; 1., char_print_uniform ]
+;;
+
+let%template char =
+  (weighted_union [@mode portable])
     [ 100., char_print
     ; 10., char_uniform
-    ; 1., return Char.min_value
-    ; 1., return Char.max_value
+    ; 1., (return [@mode portable]) Char.min_value
+    ; 1., (return [@mode portable]) Char.max_value
     ]
 ;;
 
 (* Produces a number from 0 or 1 to size + 1, weighted high. We have found this
    distribution empirically useful for string lengths. *)
-let small_int ~allow_zero =
-  create (fun ~size ~random ->
+let%template small_int ~allow_zero =
+  (create [@mode portable]) (fun ~size ~random ->
     let lower_bound = if allow_zero then 0 else 1 in
     let upper_bound = size + 1 in
     let weighted_low =
@@ -329,28 +530,33 @@ let small_int ~allow_zero =
 let small_positive_or_zero_int = small_int ~allow_zero:true
 let small_strictly_positive_int = small_int ~allow_zero:false
 
-module type Int_with_random = sig
-  include Int.S
+module type Int_with_random = sig @@ portable
+  type t : value mod contended portable
+
+  include Int.S with type t := t
 
   val uniform : Splittable_random.t -> lo:t -> hi:t -> t
   val log_uniform : Splittable_random.t -> lo:t -> hi:t -> t
 end
 
-module For_integer (Integer : Int_with_random) = struct
-  let geometric lo ~p =
+module%template For_integer (Integer : Int_with_random) = struct
+  let geometric (lo : Integer.t) ~p =
     if Float.equal p 1.
-    then return lo
+    then (return [@mode portable]) lo
     else if Float.equal p 0.
-    then return Integer.max_value
+    then (return [@mode portable]) Integer.max_value
     else if Float.( < ) p 0. || Float.( > ) p 1. || Float.is_nan p
-    then
-      raise_s [%message "geometric distribution: p must be between 0 and 1" (p : float)]
+    then (
+      match
+        raise_s [%message "geometric distribution: p must be between 0 and 1" (p : float)]
+      with
+      | (_ : Nothing.t) -> .)
     else (
       (* We start with a uniform distribution. We convert to exponential distribution
          using [log]. We convert to geometric with [round_down]. Then we bounds check and
          return. *)
       let denominator = Float.log1p (-.p) in
-      create (fun ~size:_ ~random ->
+      (create [@mode portable]) (fun ~size:_ ~random ->
         let uniform = Splittable_random.unit_float random in
         let exponential = Float.log uniform /. denominator in
         let float = Float.round_down exponential in
@@ -362,15 +568,19 @@ module For_integer (Integer : Int_with_random) = struct
   ;;
 
   let uniform_inclusive lo hi =
-    create (fun ~size:_ ~random -> Integer.uniform random ~lo ~hi)
+    (create [@mode portable]) (fun ~size:_ ~random -> Integer.uniform random ~lo ~hi)
   ;;
 
   let log_uniform_inclusive lo hi =
-    create (fun ~size:_ ~random -> Integer.log_uniform random ~lo ~hi)
+    (create [@mode portable]) (fun ~size:_ ~random -> Integer.log_uniform random ~lo ~hi)
   ;;
 
   let non_uniform f lo hi =
-    weighted_union [ 0.05, return lo; 0.05, return hi; 0.9, f lo hi ]
+    (weighted_union [@mode portable])
+      [ 0.05, (return [@mode portable]) lo
+      ; 0.05, (return [@mode portable]) hi
+      ; 0.9, f lo hi
+      ]
   ;;
 
   let inclusive = non_uniform uniform_inclusive
@@ -378,10 +588,9 @@ module For_integer (Integer : Int_with_random) = struct
   let uniform_all = uniform_inclusive Integer.min_value Integer.max_value
 
   let all =
-    [%map
-      let negative = bool
-      and magnitude = log_inclusive Integer.zero Integer.max_value in
-      if negative then Integer.bit_not magnitude else magnitude]
+    let%map.Portable negative = bool
+    and magnitude = log_inclusive Integer.zero Integer.max_value in
+    if negative then Integer.bit_not magnitude else magnitude
   ;;
 end
 
@@ -483,43 +692,43 @@ let float_num_mantissa_bits = 52
 (* We weight mantissas so that "integer-like" values, and values with only a few digits
    past the decimal, are reasonably common. *)
 let float_normal_mantissa =
-  let%bind num_bits = For_int.uniform_inclusive 0 float_num_mantissa_bits in
-  let%map bits =
+  let%bind.Portable num_bits = For_int.uniform_inclusive 0 float_num_mantissa_bits in
+  let%map.Portable bits =
     For_int63.inclusive Int63.zero (Int63.pred (Int63.shift_left Int63.one num_bits))
   in
   Int63.shift_left bits (Int.( - ) float_num_mantissa_bits num_bits)
 ;;
 
 let float_exponent_weighted_low lower_bound upper_bound =
-  let%map offset = For_int.log_inclusive 0 (Int.( - ) upper_bound lower_bound) in
+  let%map.Portable offset = For_int.log_inclusive 0 (Int.( - ) upper_bound lower_bound) in
   Int.( + ) lower_bound offset
 ;;
 
 let float_exponent_weighted_high lower_bound upper_bound =
-  let%map offset = For_int.log_inclusive 0 (Int.( - ) upper_bound lower_bound) in
+  let%map.Portable offset = For_int.log_inclusive 0 (Int.( - ) upper_bound lower_bound) in
   Int.( - ) upper_bound offset
 ;;
 
 (* We weight exponents such that values near 1 are more likely. *)
-let float_exponent =
+let%template float_exponent =
   let midpoint = Float.ieee_exponent 1. in
-  union
+  (union [@mode portable])
     [ float_exponent_weighted_high float_min_normal_exponent midpoint
     ; float_exponent_weighted_low midpoint float_max_normal_exponent
     ]
 ;;
 
 let float_zero =
-  let%map negative = bool in
+  let%map.Portable negative = bool in
   Float.create_ieee_exn
     ~negative
     ~exponent:float_zero_exponent
     ~mantissa:float_zero_mantissa
 ;;
 
-let float_subnormal =
-  let%map negative = bool
-  and exponent = return float_subnormal_exponent
+let%template float_subnormal =
+  let%map.Portable negative = bool
+  and exponent = (return [@mode portable]) float_subnormal_exponent
   and mantissa =
     For_int63.log_inclusive float_min_subnormal_mantissa float_max_subnormal_mantissa
   in
@@ -527,23 +736,23 @@ let float_subnormal =
 ;;
 
 let float_normal =
-  let%map negative = bool
+  let%map.Portable negative = bool
   and exponent = float_exponent
   and mantissa = float_normal_mantissa in
   Float.create_ieee_exn ~negative ~exponent ~mantissa
 ;;
 
 let float_infinite =
-  let%map negative = bool in
+  let%map.Portable negative = bool in
   Float.create_ieee_exn
     ~negative
     ~exponent:float_inf_exponent
     ~mantissa:float_inf_mantissa
 ;;
 
-let float_nan =
-  let%map negative = bool
-  and exponent = return float_nan_exponent
+let%template float_nan =
+  let%map.Portable negative = bool
+  and exponent = (return [@mode portable]) float_nan_exponent
   and mantissa = For_int63.inclusive float_min_nan_mantissa float_max_nan_mantissa in
   Float.create_ieee_exn ~negative ~exponent ~mantissa
 ;;
@@ -566,10 +775,13 @@ let float_weight_of_class c =
   | Nan -> 1.
 ;;
 
-let float_matching_classes filter =
+let%template float_matching_classes filter =
   List.filter_map Float.Class.all ~f:(fun c ->
-    if filter c then Some (float_weight_of_class c, float_of_class c) else None)
-  |> weighted_union
+    if filter c
+    then Some { Modes.Portable.portable = float_weight_of_class c, float_of_class c }
+    else None)
+  |> Modes.Portable.unwrap_list
+  |> (weighted_union [@mode portable])
 ;;
 
 let float_finite =
@@ -593,26 +805,26 @@ let float_finite_non_zero =
 ;;
 
 let float_strictly_positive =
-  let%map t = float_finite_non_zero in
+  let%map.Portable t = float_finite_non_zero in
   Float.abs t
 ;;
 
 let float_strictly_negative =
-  let%map t = float_finite_non_zero in
+  let%map.Portable t = float_finite_non_zero in
   ~-.(Float.abs t)
 ;;
 
 let float_positive_or_zero =
-  let%map t = float_finite in
+  let%map.Portable t = float_finite in
   Float.abs t
 ;;
 
 let float_negative_or_zero =
-  let%map t = float_finite in
+  let%map.Portable t = float_finite in
   ~-.(Float.abs t)
 ;;
 
-let float_uniform_exclusive lower_bound upper_bound =
+let%template float_uniform_exclusive lower_bound upper_bound =
   let open Float.O in
   if (not (Float.is_finite lower_bound)) || not (Float.is_finite upper_bound)
   then
@@ -630,40 +842,48 @@ let float_uniform_exclusive lower_bound upper_bound =
         "Float.uniform_exclusive: requested range is empty"
           (lower_bound : float)
           (upper_bound : float)];
-  create (fun ~size:_ ~random ->
+  (create [@mode portable]) (fun ~size:_ ~random ->
     Splittable_random.float random ~lo:lower_inclusive ~hi:upper_inclusive)
 ;;
 
-let float_inclusive lower_bound upper_bound =
+let%template float_inclusive lower_bound upper_bound =
   if Float.equal lower_bound upper_bound
-  then return lower_bound
+  then (return [@mode portable]) lower_bound
   else if Float.( = ) (Float.one_ulp `Up lower_bound) upper_bound
-  then union [ return lower_bound; return upper_bound ]
+  then
+    (union [@mode portable])
+      [ (return [@mode portable]) lower_bound; (return [@mode portable]) upper_bound ]
   else
-    weighted_union
-      [ 0.05, return lower_bound
-      ; 0.05, return upper_bound
+    (weighted_union [@mode portable])
+      [ 0.05, (return [@mode portable]) lower_bound
+      ; 0.05, (return [@mode portable]) upper_bound
       ; 0.9, float_uniform_exclusive lower_bound upper_bound
       ]
 ;;
 
+[%%template
+[@@@mode.default p = (nonportable, portable)]
+
 let string_with_length_of char_gen ~length =
-  list_with_length char_gen ~length |> map ~f:String.of_char_list
+  (list_with_length [@mode p]) char_gen ~length |> (map [@mode p]) ~f:String.of_char_list
 ;;
 
 let string_of char_gen =
-  bind small_positive_or_zero_int ~f:(fun length ->
-    string_with_length_of char_gen ~length)
+  (bind [@mode p]) small_positive_or_zero_int ~f:(fun length ->
+    (string_with_length_of [@mode p]) char_gen ~length)
 ;;
 
 let string_non_empty_of char_gen =
-  bind small_strictly_positive_int ~f:(fun length ->
-    string_with_length_of char_gen ~length)
-;;
+  (bind [@mode p]) small_strictly_positive_int ~f:(fun length ->
+    (string_with_length_of [@mode p]) char_gen ~length)
+;;]
 
-let string = string_of char
-let string_non_empty = string_non_empty_of char
-let string_with_length ~length = string_with_length_of char ~length
+let%template string = (string_of [@mode portable]) char
+let%template string_non_empty = (string_non_empty_of [@mode portable]) char
+
+let%template string_with_length ~length =
+  (string_with_length_of [@mode portable]) char ~length
+;;
 
 module Edit_string = struct
   let edit_insert string =
@@ -717,17 +937,19 @@ module Edit_string = struct
 end
 
 let string_like string =
-  let%bind n_times = int_geometric 0 ~p:0.5 in
+  let%bind.Portable n_times = int_geometric 0 ~p:0.5 in
   Edit_string.edit string n_times
 ;;
 
-let bytes = map string ~f:Bytes.of_string
+let%template bytes = (map [@mode portable]) string ~f:Bytes.of_string
 
-let sexp_of atom =
-  fixed_point (fun self ->
+let%template sexp_of atom =
+  (fixed_point [@mode p]) (fun self ->
+    let open Syntax.Let_syntax [@mode p] in
     let%bind size in
     (* choose a number weighted low so we have a decreasing, but not vanishing, chance
        to generate atoms as size grows *)
+    let open Syntax.Let_syntax in
     match%bind For_int.log_uniform_inclusive 0 (size + 1) with
     (* generate an atom using the given size *)
     | 0 ->
@@ -737,9 +959,10 @@ let sexp_of atom =
     | _ ->
       let%map list = list self in
       Sexp.List list)
+[@@mode p = (nonportable, portable)]
 ;;
 
-let sexp = sexp_of string
+let%template sexp = (sexp_of [@mode portable]) string
 
 let map_tree_using_comparator ~comparator key_gen data_gen =
   let%bind keys = list key_gen in
@@ -771,21 +994,23 @@ let set_t_m m elt_gen =
   |> map ~f:(Set.Using_comparator.of_tree ~comparator)
 ;;
 
-let bigarray1 t kind layout ~length =
+let%template bigarray1 t kind layout ~length =
+  let open Syntax.Let_syntax [@mode p] in
   let%map elts =
     match length with
-    | None -> list t
-    | Some length -> list_with_length t ~length
+    | None -> (list [@mode p]) t
+    | Some length -> (list_with_length [@mode p]) t ~length
   in
   let elts = Array.of_list elts in
   let dim = Array.length elts in
   let offset = Bigarray_helpers.Layout.offset layout in
   Bigarray_helpers.Array1.init kind layout dim ~f:(fun i -> elts.(i - offset))
+[@@mode p = (nonportable, portable)]
 ;;
 
-let bigstring_gen = bigarray1 char Char C_layout
-let float32_vec_gen = bigarray1 float Float32 Fortran_layout
-let float64_vec_gen = bigarray1 float Float64 Fortran_layout
+let%template bigstring_gen = (bigarray1 [@mode portable]) char Char C_layout
+let%template float32_vec_gen = (bigarray1 [@mode portable]) float Float32 Fortran_layout
+let%template float64_vec_gen = (bigarray1 [@mode portable]) float Float64 Fortran_layout
 let bigstring = bigstring_gen ~length:None
 let float32_vec = float32_vec_gen ~length:None
 let float64_vec = float64_vec_gen ~length:None
@@ -793,8 +1018,8 @@ let bigstring_with_length ~length = bigstring_gen ~length:(Some length)
 let float32_vec_with_length ~length = float32_vec_gen ~length:(Some length)
 let float64_vec_with_length ~length = float64_vec_gen ~length:(Some length)
 
-let bigarray2_dim =
-  match%bind size with
+let%template bigarray2_dim =
+  match%bind.Portable size with
   | 0 -> return (0, 0)
   | max_total_size ->
     let%bind a =
@@ -813,9 +1038,13 @@ let bigarray2_dim =
     if%map bool then a, b else b, a
 ;;
 
-let bigarray2 t kind layout =
-  let%bind dim1, dim2 = bigarray2_dim in
-  let%map elts = list_with_length ~length:dim1 (list_with_length ~length:dim2 t) in
+let%template bigarray2 t kind layout =
+  let%bind.Portable dim1, dim2 = bigarray2_dim in
+  let%map.Portable elts =
+    (list_with_length [@mode portable])
+      ~length:dim1
+      ((list_with_length [@mode portable]) ~length:dim2 t)
+  in
   let elts = Array.of_list_map ~f:Array.of_list elts in
   let offset = Bigarray_helpers.Layout.offset layout in
   Bigarray_helpers.Array2.init kind layout dim1 dim2 ~f:(fun i j ->

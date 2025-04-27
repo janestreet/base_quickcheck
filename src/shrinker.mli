@@ -1,14 +1,16 @@
+@@ portable
+
 (** Shrinkers produce small values from large values. When a random test case fails, a
     shrinker finds the simplest version of the problem. *)
 
 open! Base
 
-type 'a t
+type ('a : any) t : value mod contended
 
 (** {2 Basic Shrinkers} *)
 
 (** This shrinker treats a type as atomic, never attempting to produce smaller values. *)
-val atomic : _ t
+val atomic : ('a : any). 'a t
 
 include With_basic_types.S with type 'a t := 'a t (** @inline *)
 
@@ -28,12 +30,19 @@ val set_tree_using_comparator
 
 (** {2 Modifying Shrinkers} *)
 
-val map : 'a t -> f:('a -> 'b) -> f_inverse:('b -> 'a) -> 'b t
-val filter : 'a t -> f:('a -> bool) -> 'a t
+[%%template:
+[@@@mode.default p = (nonportable, portable)]
+
+val map : 'a t @ p -> f:('a -> 'b) @ p -> f_inverse:('b -> 'a) @ p -> 'b t @ p
+val filter : 'a t @ p -> f:('a -> bool) @ p -> 'a t @ p
 
 (** Filters and maps according to [f], and provides input to [t] via [f_inverse]. Only the
     [f] direction produces options, intentionally. *)
-val filter_map : 'a t -> f:('a -> 'b option) -> f_inverse:('b -> 'a) -> 'b t
+val filter_map
+  :  'a t @ p
+  -> f:('a -> 'b option) @ p
+  -> f_inverse:('b -> 'a) @ p
+  -> 'b t @ p]
 
 (** {2 Shrinkers for Recursive Types} *)
 
@@ -52,8 +61,8 @@ val filter_map : 'a t -> f:('a -> 'b option) -> f_inverse:('b -> 'a) -> 'b t
                ~f_inverse:(function
                  | `Leaf leaf -> First leaf
                  | `Node (l, r) -> Second (l, r)))
-    ]}
-*)
+      ;;
+    ]} *)
 val fixed_point : ('a t -> 'a t) -> 'a t
 
 (** Creates a [t] that forces the lazy argument as necessary. Can be used to tie
@@ -62,8 +71,26 @@ val of_lazy : 'a t Lazy.t -> 'a t
 
 (** {2 Low-level functions}
 
-    Most users will not need to call these.
-*)
+    Most users will not need to call these. *)
 
-val create : ('a -> 'a Sequence.t) -> 'a t
+val%template create : ('a -> 'a Sequence.t) @ p -> 'a t @ p
+[@@mode p = (nonportable, portable)]
+
 val shrink : 'a t -> 'a -> 'a Sequence.t
+
+module Via_thunk : sig
+  type ('a : any) thunk := unit -> 'a
+
+  val%template create : ('a : any). ('a thunk -> 'a thunk Sequence.t) @ p -> 'a t @ p
+  [@@mode p = (nonportable, portable)]
+
+  val shrink : ('a : any). 'a t -> 'a thunk -> 'a thunk Sequence.t
+
+  val%template map
+    : ('a : any) ('b : any).
+    'a t @ p
+    -> f:('a thunk -> 'b thunk) @ p
+    -> f_inverse:('b thunk -> 'a thunk) @ p
+    -> 'b t @ p
+  [@@mode p = (nonportable, portable)]
+end

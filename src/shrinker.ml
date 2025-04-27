@@ -1,42 +1,91 @@
 open! Base
 
-module T : sig
-  type 'a t
+type ('a : any) thunk = unit -> 'a
 
-  val atomic : _ t
-  val create : ('a -> 'a Sequence.t) -> 'a t
+module T : sig @@ portable
+  type ('a : any) t : value mod contended
+
+  val atomic : ('a : any). 'a t
+
+  val%template create : ('a -> 'a Sequence.t) @ p -> 'a t @ p
+  [@@mode p = (nonportable, portable)]
+
   val shrink : 'a t -> 'a -> 'a Sequence.t
-end = struct
-  type 'a t = 'a -> 'a Sequence.t
 
-  let atomic _ = Sequence.empty
-  let create = Fn.id
-  let shrink = Fn.id
+  module Via_thunk : sig
+    val%template create : ('a : any). ('a thunk -> 'a thunk Sequence.t) @ p -> 'a t @ p
+    [@@mode p = (nonportable, portable)]
+
+    val shrink : ('a : any). 'a t -> 'a thunk -> 'a thunk Sequence.t
+  end
+end = struct
+  type ('a : any) t = 'a thunk -> 'a thunk Sequence.t
+
+  let atomic _ = Sequence.get_empty ()
+
+  let%template create (f @ p) thunk = Sequence.map (f (thunk ())) ~f:(fun x () -> x)
+  [@@mode p = (nonportable, portable)]
+  ;;
+
+  let shrink t x = Sequence.map (t (fun () -> x)) ~f:(fun thunk -> thunk ())
+
+  module Via_thunk = struct
+    let%template create t = t [@@mode __ = (nonportable, portable)]
+    let shrink = Fn.id
+  end
 end
 
 include T
 
-let map t ~f ~f_inverse = create (fun x -> Sequence.map ~f (shrink t (f_inverse x)))
-let filter t ~f = create (fun x -> Sequence.filter ~f (shrink t x))
+module Via_thunk = struct
+  include Via_thunk
 
-let filter_map t ~f ~f_inverse =
-  create (fun x -> Sequence.filter_map ~f (shrink t (f_inverse x)))
+  let%template map t ~f ~f_inverse =
+    (create [@mode p]) (fun thunk -> Sequence.map ~f (shrink t (f_inverse thunk)))
+  [@@mode p = (nonportable, portable)]
+  ;;
+end
+
+[%%template
+[@@@mode.default p = (nonportable, portable)]
+
+let map t ~f ~f_inverse =
+  (create [@mode p]) (fun x -> Sequence.map ~f (shrink t (f_inverse x)))
 ;;
 
-let of_lazy lazy_t = create (fun x -> Sequence.of_lazy (lazy (shrink (force lazy_t) x)))
+let filter t ~f = (create [@mode p]) (fun x -> Sequence.filter ~f (shrink t x))
 
-let fixed_point of_shrinker =
-  let rec lazy_t = lazy (of_shrinker (of_lazy lazy_t)) in
-  of_lazy lazy_t
+let filter_map t ~f ~f_inverse =
+  (create [@mode p]) (fun x -> Sequence.filter_map ~f (shrink t (f_inverse x)))
 ;;
 
 let both fst_t snd_t =
-  create (fun (fst, snd) ->
+  (create [@mode p]) (fun (fst, snd) ->
     Sequence.round_robin
       [ Sequence.map (shrink fst_t fst) ~f:(fun fst -> fst, snd)
       ; Sequence.map (shrink snd_t snd) ~f:(fun snd -> fst, snd)
       ])
+;;]
+
+let of_lazy lazy_t = create (fun x -> Sequence.of_lazy (lazy (shrink (force lazy_t) x)))
+
+let%template of_portable_lazy portable_lazy_t =
+  (create [@mode portable]) (fun x -> shrink (Portable_lazy.force portable_lazy_t) x)
 ;;
+
+include struct
+  let fixed_point of_shrinker =
+    let rec lazy_t = lazy (of_shrinker (of_lazy lazy_t)) in
+    of_lazy lazy_t
+  ;;
+
+  let%template fixed_point of_shrinker =
+    of_portable_lazy
+      (Portable_lazy.from_fun_fixed (fun portable_lazy_t ->
+         of_shrinker (of_portable_lazy portable_lazy_t)))
+  [@@mode portable]
+  ;;
+end
 
 let unit = atomic
 let bool = atomic
@@ -51,7 +100,7 @@ let float = atomic
 let bigarray1 src =
   let dim = Bigarray.Array1.dim src in
   match dim with
-  | 0 -> Sequence.empty
+  | 0 -> Sequence.get_empty ()
   | _ ->
     let kind = Bigarray.Array1.kind src in
     let layout = Bigarray.Array1.layout src in
@@ -62,9 +111,9 @@ let bigarray1 src =
         src.{if i < to_skip then i else i + 1}))
 ;;
 
-let bigstring = create bigarray1
-let float32_vec = create bigarray1
-let float64_vec = create bigarray1
+let%template bigstring = (create [@mode portable]) bigarray1
+let%template float32_vec = (create [@mode portable]) bigarray1
+let%template float64_vec = (create [@mode portable]) bigarray1
 
 let bigarray2 =
   let module Dims = struct
@@ -80,7 +129,7 @@ let bigarray2 =
   let shrink field src =
     let dims = Dims.create src in
     match Field.get field dims with
-    | 0 -> Sequence.empty
+    | 0 -> Sequence.get_empty ()
     | _ ->
       let kind = Bigarray.Array2.kind src in
       let layout = Bigarray.Array2.layout src in
@@ -97,12 +146,15 @@ let bigarray2 =
     Sequence.round_robin [ shrink Dims.Fields.dim1 src; shrink Dims.Fields.dim2 src ]
 ;;
 
-let float32_mat = create bigarray2
-let float64_mat = create bigarray2
+let%template float32_mat = (create [@mode portable]) bigarray2
+let%template float64_mat = (create [@mode portable]) bigarray2
+
+[%%template
+[@@@mode.default p = (nonportable, portable)]
 
 let option value_t =
-  create (function
-    | None -> Sequence.empty
+  (create [@mode p]) (function
+    | None -> Sequence.get_empty ()
     | Some value ->
       Sequence.append
         (Sequence.singleton None)
@@ -110,9 +162,9 @@ let option value_t =
 ;;
 
 let list elt_t =
-  fixed_point (fun list_t ->
-    create (function
-      | [] -> Sequence.empty
+  (fixed_point [@mode p]) (fun list_t ->
+    (create [@mode p]) (function
+      | [] -> Sequence.get_empty ()
       | head :: tail ->
         Sequence.round_robin
           [ Sequence.singleton tail
@@ -121,40 +173,48 @@ let list elt_t =
           ]))
 ;;
 
-let string = map (list char) ~f:String.of_char_list ~f_inverse:String.to_list
-let bytes = map string ~f:Bytes.of_string ~f_inverse:Bytes.to_string
-let array t = map (list t) ~f:Array.of_list ~f_inverse:Array.to_list
-let ref t = map t ~f:Ref.create ~f_inverse:Ref.( ! )
-let lazy_t t = map t ~f:Lazy.from_val ~f_inverse:Lazy.force
-
-let sexp =
-  fixed_point (fun shrinker ->
-    create (function
-      | Sexp.Atom _ -> Sequence.empty
-      | Sexp.List l ->
-        let shrink_list =
-          shrink (list shrinker) l |> Sequence.map ~f:(fun l -> Sexp.List l)
-        in
-        let shrink_tree = Sequence.of_list l in
-        Sequence.round_robin [ shrink_list; shrink_tree ]))
+let array t =
+  (map [@mode p]) ((list [@mode p]) t) ~f:Array.of_list ~f_inverse:Array.to_list
 ;;
 
+let ref t = (map [@mode p]) t ~f:Ref.create ~f_inverse:Ref.( ! )
+let lazy_t t = (map [@mode p]) t ~f:Lazy.from_val ~f_inverse:Lazy.force
+
 let either fst_t snd_t =
-  create (fun either ->
+  (create [@mode p]) (fun either ->
     match (either : _ Either.t) with
     | First fst -> Sequence.map (shrink fst_t fst) ~f:Either.first
     | Second snd -> Sequence.map (shrink snd_t snd) ~f:Either.second)
 ;;
 
 let result ok_t err_t =
-  map
-    (either ok_t err_t)
-    ~f:(function
-      | First ok -> Ok ok
-      | Second err -> Error err)
-    ~f_inverse:(function
-      | Ok ok -> First ok
-      | Error err -> Second err)
+  (map [@mode p])
+    ((either [@mode p]) ok_t err_t)
+    ~f:Result.of_either
+    ~f_inverse:Result.to_either
+;;]
+
+let%template string =
+  (map [@mode portable])
+    ((list [@mode portable]) char)
+    ~f:String.of_char_list
+    ~f_inverse:String.to_list
+;;
+
+let%template bytes =
+  (map [@mode portable]) string ~f:Bytes.of_string ~f_inverse:Bytes.to_string
+;;
+
+let%template sexp =
+  (fixed_point [@mode portable]) (fun shrinker ->
+    (create [@mode portable]) (function
+      | Sexp.Atom _ -> Sequence.get_empty ()
+      | Sexp.List l ->
+        let shrink_list =
+          shrink (list shrinker) l |> Sequence.map ~f:(fun l -> Sexp.List l)
+        in
+        let shrink_tree = Sequence.of_list l in
+        Sequence.round_robin [ shrink_list; shrink_tree ]))
 ;;
 
 let map_tree_using_comparator ~comparator key_t data_t =
