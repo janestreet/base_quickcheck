@@ -28,6 +28,10 @@ module type S = sig
   val nativeint : nativeint t
   val float : float t
   val sexp : Sexp.t t
+
+  [%%template:
+  [@@@mode.default p = (portable, nonportable)]
+
   val option : 'a t -> 'a option t
   val list : 'a t -> 'a list t
   val array : 'a t -> 'a array t
@@ -35,7 +39,7 @@ module type S = sig
   val lazy_t : 'a t -> 'a Lazy.t t
   val both : 'a t -> 'b t -> ('a * 'b) t
   val either : 'a t -> 'b t -> ('a, 'b) Either.t t
-  val result : 'a t -> 'b t -> ('a, 'b) Result.t t
+  val result : 'a t -> 'b t -> ('a, 'b) Result.t t]
 
   include S_bigarray with type 'a t := 'a t (** @inline *)
 end

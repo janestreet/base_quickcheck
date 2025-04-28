@@ -1,5 +1,5 @@
-(** Observers create random functions. {!Generator.fn} creates a random function
-    using an observer for the input type and a generator for the output type. *)
+(** Observers create random functions. {!Generator.fn} creates a random function using an
+    observer for the input type and a generator for the output type. *)
 
 open! Base
 
@@ -26,11 +26,12 @@ val set_tree : 'elt t -> ('elt, 'cmp) Set.Using_comparator.Tree.t t
 
 (** Creates an observer that just calls a hash function. This is a good default for most
     hashable types not covered by the basic observers above. *)
-val of_hash_fold : (Hash.state -> 'a -> Hash.state) -> 'a t
+val%template of_hash_fold : (Hash.state -> 'a -> Hash.state) -> 'a t
+[@@mode p = (nonportable, portable)]
 
 (** {2 Modifying Observers} *)
 
-val unmap : 'a t -> f:('b -> 'a) -> 'b t
+val%template unmap : 'a t -> f:('b -> 'a) -> 'b t [@@mode p = (nonportable, portable)]
 
 (** {2 Observers for Recursive Types} *)
 
@@ -45,8 +46,8 @@ val unmap : 'a t -> f:('b -> 'a) -> 'b t
           |> unmap ~f:(function
             | `Leaf leaf -> First leaf
             | `Node (l, r) -> Second (l, r)))
-    ]}
-*)
+      ;;
+    ]} *)
 val fixed_point : ('a t -> 'a t) -> 'a t
 
 (** Creates a [t] that forces the lazy argument as necessary. Can be used to tie
@@ -55,8 +56,23 @@ val of_lazy : 'a t Lazy.t -> 'a t
 
 (** {2 Low-Level functions}
 
-    Most users do not need to call these functions.
-*)
+    Most users do not need to call these functions. *)
 
-val create : ('a -> size:int -> hash:Hash.state -> Hash.state) -> 'a t
+val%template create : ('a -> size:int -> hash:Hash.state -> Hash.state) -> 'a t
+[@@mode p = (nonportable, portable)]
+
 val observe : 'a t -> 'a -> size:int -> hash:Hash.state -> Hash.state
+
+module Via_thunk : sig
+  type 'a thunk := unit -> 'a
+
+  val%template create
+    : 'a.
+    ('a thunk -> size:int -> hash:Hash.state -> Hash.state) -> 'a t
+  [@@mode p = (nonportable, portable)]
+
+  val observe : 'a. 'a t -> 'a thunk -> size:int -> hash:Hash.state -> Hash.state
+
+  val%template unmap : 'a 'b. 'a t -> f:('b thunk -> 'a thunk) -> 'b t
+  [@@mode p = (nonportable, portable)]
+end

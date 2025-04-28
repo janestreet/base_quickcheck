@@ -1,4 +1,5 @@
 open! Import
+module Via_thunk = Shrinker.Via_thunk
 
 module Example = struct
   let natural_number_shrinker =
@@ -12,7 +13,7 @@ open Example
 
 type 'a t = 'a Shrinker.t
 
-let create = Shrinker.create
+let%template create = (Shrinker.create [@mode p]) [@@mode p = (portable, nonportable)]
 let shrink = Shrinker.shrink
 
 let%expect_test "create & shrink" =
@@ -41,7 +42,7 @@ let%expect_test "atomic" =
   [%expect {| (shrinker atomic) |}]
 ;;
 
-let map = Shrinker.map
+let%template map = (Shrinker.map [@mode p]) [@@mode p = (portable, nonportable)]
 
 let%expect_test "shrinker" =
   test_shrinker
@@ -64,7 +65,7 @@ let%expect_test "shrinker" =
     |}]
 ;;
 
-let filter = Shrinker.filter
+let%template filter = (Shrinker.filter [@mode p]) [@@mode p = (portable, nonportable)]
 
 let%expect_test "shrinker" =
   test_shrinker
@@ -94,7 +95,9 @@ let%expect_test "shrinker" =
     |}]
 ;;
 
-let filter_map = Shrinker.filter_map
+let%template filter_map = (Shrinker.filter_map [@mode p])
+[@@mode p = (portable, nonportable)]
+;;
 
 let%expect_test "shrinker" =
   test_shrinker
@@ -161,7 +164,7 @@ let%expect_test "fixed_point" =
     |}]
 ;;
 
-let both = Shrinker.both
+let%template both = (Shrinker.both [@mode p]) [@@mode p = (portable, nonportable)]
 
 let%expect_test "both" =
   test_shrinker
@@ -382,7 +385,7 @@ let%expect_test "sexp" =
     |}]
 ;;
 
-let option = Shrinker.option
+let%template option = (Shrinker.option [@mode p]) [@@mode p = (portable, nonportable)]
 
 let%expect_test "option" =
   test_shrinker (Shrinker.option natural_number_shrinker) (m_option (m_nat ~up_to:4));
@@ -401,7 +404,7 @@ let%expect_test "option" =
     |}]
 ;;
 
-let list = Shrinker.list
+let%template list = (Shrinker.list [@mode p]) [@@mode p = (portable, nonportable)]
 
 let%expect_test "list" =
   test_shrinker (Shrinker.list natural_number_shrinker) (m_list (m_nat ~up_to:4));
@@ -438,7 +441,7 @@ let%expect_test "list" =
     |}]
 ;;
 
-let array = Shrinker.array
+let%template array = (Shrinker.array [@mode p]) [@@mode p = (portable, nonportable)]
 
 let%expect_test "array" =
   test_shrinker (Shrinker.array natural_number_shrinker) (m_array (m_nat ~up_to:4));
@@ -475,21 +478,21 @@ let%expect_test "array" =
     |}]
 ;;
 
-let ref = Shrinker.ref
+let%template ref = (Shrinker.ref [@mode p]) [@@mode p = (portable, nonportable)]
 
 let%expect_test "ref" =
   test_shrinker (Shrinker.ref natural_number_shrinker) (m_ref (m_nat ~up_to:4));
   [%expect {| (shrinker ((1 => 0) (2 => 1) (3 => 2) (4 => 3))) |}]
 ;;
 
-let lazy_t = Shrinker.lazy_t
+let%template lazy_t = (Shrinker.lazy_t [@mode p]) [@@mode p = (portable, nonportable)]
 
 let%expect_test "lazy_t" =
   test_shrinker (Shrinker.lazy_t natural_number_shrinker) (m_lazy_t (m_nat ~up_to:4));
   [%expect {| (shrinker ((1 => 0) (2 => 1) (3 => 2) (4 => 3))) |}]
 ;;
 
-let either = Shrinker.either
+let%template either = (Shrinker.either [@mode p]) [@@mode p = (portable, nonportable)]
 
 let%expect_test "either" =
   test_shrinker
@@ -509,7 +512,7 @@ let%expect_test "either" =
     |}]
 ;;
 
-let result = Shrinker.result
+let%template result = (Shrinker.result [@mode p]) [@@mode p = (portable, nonportable)]
 
 let%expect_test "result" =
   test_shrinker

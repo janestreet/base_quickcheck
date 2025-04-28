@@ -15,23 +15,39 @@ let internal_error ~loc fmt = error ~loc ("internal error: " ^^ fmt)
 let loc_map { loc; txt } ~f = { loc; txt = f txt }
 let lident_loc = loc_map ~f:lident
 
-let prefixed_type_name prefix type_name =
+let prefixed_type_name ~name_is_portable prefix type_name =
+  let suffix = if name_is_portable then "__portable" else "" in
   match type_name with
-  | "t" -> prefix
-  | _ -> prefix ^ "_" ^ type_name
+  | "t" -> prefix ^ suffix
+  | _ -> prefix ^ "_" ^ type_name ^ suffix
 ;;
 
-let generator_name type_name = prefixed_type_name "quickcheck_generator" type_name
-let observer_name type_name = prefixed_type_name "quickcheck_observer" type_name
-let shrinker_name type_name = prefixed_type_name "quickcheck_shrinker" type_name
+let generator_name ~name_is_portable type_name =
+  prefixed_type_name ~name_is_portable "quickcheck_generator" type_name
+;;
+
+let observer_name ~name_is_portable type_name =
+  prefixed_type_name ~name_is_portable "quickcheck_observer" type_name
+;;
+
+let shrinker_name ~name_is_portable type_name =
+  prefixed_type_name ~name_is_portable "quickcheck_shrinker" type_name
+;;
+
 let pname { loc; txt } ~f = pvar ~loc (f txt)
 let ename { loc; txt } ~f = evar ~loc (f txt)
-let pgenerator = pname ~f:generator_name
-let pobserver = pname ~f:observer_name
-let pshrinker = pname ~f:shrinker_name
-let egenerator = ename ~f:generator_name
-let eobserver = ename ~f:observer_name
-let eshrinker = ename ~f:shrinker_name
+let pgenerator ~name_is_portable = pname ~f:(generator_name ~name_is_portable)
+let pobserver ~name_is_portable = pname ~f:(observer_name ~name_is_portable)
+let pshrinker ~name_is_portable = pname ~f:(shrinker_name ~name_is_portable)
+let egenerator ~name_is_portable = ename ~f:(generator_name ~name_is_portable)
+let eobserver ~name_is_portable = ename ~f:(observer_name ~name_is_portable)
+let eshrinker ~name_is_portable = ename ~f:(shrinker_name ~name_is_portable)
+
+let portability_mode ~loc ~portable_value =
+  if portable_value then [%expr portable] else [%expr nonportable]
+;;
+
+let name_is_portable ~portable_value args = portable_value && not (List.is_empty args)
 
 let ptuple ~loc list =
   match list with

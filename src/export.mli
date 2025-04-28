@@ -33,6 +33,10 @@ val quickcheck_shrinker_int32 : int32 Shrinker.t
 val quickcheck_shrinker_int64 : int64 Shrinker.t
 val quickcheck_shrinker_nativeint : nativeint Shrinker.t
 val quickcheck_shrinker_float : float Shrinker.t
+
+[%%template:
+[@@@mode.default p = (portable, nonportable)]
+
 val quickcheck_generator_option : 'a Generator.t -> 'a option Generator.t
 val quickcheck_generator_list : 'a Generator.t -> 'a list Generator.t
 val quickcheck_generator_array : 'a Generator.t -> 'a array Generator.t
@@ -47,4 +51,4 @@ val quickcheck_shrinker_option : 'a Shrinker.t -> 'a option Shrinker.t
 val quickcheck_shrinker_list : 'a Shrinker.t -> 'a list Shrinker.t
 val quickcheck_shrinker_array : 'a Shrinker.t -> 'a array Shrinker.t
 val quickcheck_shrinker_ref : 'a Shrinker.t -> 'a ref Shrinker.t
-val quickcheck_shrinker_lazy_t : 'a Shrinker.t -> 'a Lazy.t Shrinker.t
+val quickcheck_shrinker_lazy_t : 'a Shrinker.t -> 'a Lazy.t Shrinker.t]

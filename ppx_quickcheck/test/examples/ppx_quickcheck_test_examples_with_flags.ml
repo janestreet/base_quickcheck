@@ -60,18 +60,20 @@ module Generator = struct
     let _ = fun (_ : ('a, 'b) t) -> ()
 
     let quickcheck_generator _observer__001_ _generator__002_ =
-      Ppx_quickcheck_runtime.Base_quickcheck.Generator.create
-        (fun ~size:_size__003_ ~random:_random__004_ ->
-           ( Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+      Ppx_quickcheck_runtime.Base_quickcheck.Generator.Via_thunk.create
+        (fun ~size:_size__003_ ~random:_random__004_ () ->
+           ( Ppx_quickcheck_runtime.Base_quickcheck.Generator.Via_thunk.generate
                _generator__002_
                ~size:_size__003_
                ~random:_random__004_
-           , Ppx_quickcheck_runtime.Base_quickcheck.Generator.generate
+               ()
+           , Ppx_quickcheck_runtime.Base_quickcheck.Generator.Via_thunk.generate
                (Ppx_quickcheck_runtime.Base_quickcheck.Generator.fn
                   _observer__001_
                   _generator__002_)
                ~size:_size__003_
-               ~random:_random__004_ ))
+               ~random:_random__004_
+               () ))
     ;;
 
     let _ = quickcheck_generator
@@ -131,26 +133,27 @@ module Observer = struct
     let _ = fun (_ : ('a, 'b) t) -> ()
 
     let quickcheck_observer _generator__005_ _observer__006_ =
-      Ppx_quickcheck_runtime.Base_quickcheck.Observer.create
-        (fun _x__007_ ~size:_size__010_ ~hash:_hash__011_ ->
-           let _x__008_, _x__009_ = _x__007_ in
-           let _hash__011_ =
-             Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+      Ppx_quickcheck_runtime.Base_quickcheck.Observer.Via_thunk.create
+        (fun _f__008_ ~size:_size__011_ ~hash:_hash__012_ ->
+           let _x__007_ = _f__008_ () in
+           let _x__009_, _x__010_ = _x__007_ in
+           let _hash__012_ =
+             Ppx_quickcheck_runtime.Base_quickcheck.Observer.Via_thunk.observe
                _observer__006_
-               _x__008_
-               ~size:_size__010_
-               ~hash:_hash__011_
+               (fun () -> _x__009_)
+               ~size:_size__011_
+               ~hash:_hash__012_
            in
-           let _hash__011_ =
-             Ppx_quickcheck_runtime.Base_quickcheck.Observer.observe
+           let _hash__012_ =
+             Ppx_quickcheck_runtime.Base_quickcheck.Observer.Via_thunk.observe
                (Ppx_quickcheck_runtime.Base_quickcheck.Observer.fn
                   _generator__005_
                   _observer__006_)
-               _x__009_
-               ~size:_size__010_
-               ~hash:_hash__011_
+               (fun () -> _x__010_)
+               ~size:_size__011_
+               ~hash:_hash__012_
            in
-           _hash__011_)
+           _hash__012_)
     ;;
 
     let _ = quickcheck_observer
@@ -195,19 +198,24 @@ module Shrinker = struct
 
     let _ = fun (_ : ('a, 'b) t) -> ()
 
-    let quickcheck_shrinker _shrinker__012_ _shrinker__013_ =
-      Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.create (fun (_x__014_, _x__015_) ->
+    let quickcheck_shrinker _shrinker__013_ _shrinker__014_ =
+      Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.Via_thunk.create (fun _f__015_ ->
+        let _x__016_, _x__017_ = _f__015_ () in
         Ppx_quickcheck_runtime.Base.Sequence.round_robin
           [ Ppx_quickcheck_runtime.Base.Sequence.map
-              (Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.shrink
-                 _shrinker__013_
-                 _x__014_)
-              ~f:(fun _x__014_ -> _x__014_, _x__015_)
+              (Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.Via_thunk.shrink
+                 _shrinker__014_
+                 (fun () -> _x__016_))
+              ~f:(fun _f__018_ () ->
+                let _x__016_ = _f__018_ () in
+                _x__016_, _x__017_)
           ; Ppx_quickcheck_runtime.Base.Sequence.map
-              (Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.shrink
+              (Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.Via_thunk.shrink
                  Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.atomic
-                 _x__015_)
-              ~f:(fun _x__015_ -> _x__014_, _x__015_)
+                 (fun () -> _x__017_))
+              ~f:(fun _f__018_ () ->
+                let _x__017_ = _f__018_ () in
+                _x__016_, _x__017_)
           ])
     ;;
 

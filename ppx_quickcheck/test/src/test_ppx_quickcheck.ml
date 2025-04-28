@@ -842,3 +842,84 @@ let%expect_test "variant with clauses excluded from generator" =
       ((Cannot_generate (true)) => (Cannot_generate ()))))
     |}]
 ;;
+
+module type Modality = sig
+  type t [@@deriving_inline quickcheck ~portable]
+
+  include sig
+    [@@@ocaml.warning "-32"]
+
+    include Ppx_quickcheck_runtime.Quickcheckable.S with type t := t
+  end
+  [@@ocaml.doc "@inline"]
+
+  [@@@end]
+end
+
+module type Modalities = sig
+  type 'a t [@@deriving_inline quickcheck ~portable]
+
+  include sig
+    [@@@ocaml.warning "-32"]
+
+    val quickcheck_generator__portable
+      :  'a Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
+      -> 'a t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
+
+    val quickcheck_generator
+      :  'a Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
+      -> 'a t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
+
+    val quickcheck_observer__portable
+      :  'a Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
+      -> 'a t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
+
+    val quickcheck_observer
+      :  'a Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
+      -> 'a t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
+
+    val quickcheck_shrinker__portable
+      :  'a Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      -> 'a t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+
+    val quickcheck_shrinker
+      :  'a Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      -> 'a t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+  end
+  [@@ocaml.doc "@inline"]
+
+  [@@@end]
+
+  type g [@@deriving_inline quickcheck ~generator ~portable]
+
+  include sig
+    [@@@ocaml.warning "-32"]
+
+    val quickcheck_generator_g : g Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
+  end
+  [@@ocaml.doc "@inline"]
+
+  [@@@end]
+
+  type o [@@deriving_inline quickcheck ~observer ~portable]
+
+  include sig
+    [@@@ocaml.warning "-32"]
+
+    val quickcheck_observer_o : o Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
+  end
+  [@@ocaml.doc "@inline"]
+
+  [@@@end]
+
+  type s [@@deriving_inline quickcheck ~shrinker ~portable]
+
+  include sig
+    [@@@ocaml.warning "-32"]
+
+    val quickcheck_shrinker_s : s Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+  end
+  [@@ocaml.doc "@inline"]
+
+  [@@@end]
+end

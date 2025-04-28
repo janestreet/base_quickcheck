@@ -1,8 +1,24 @@
 open! Base
 include Observer0
 
-let unmap t ~f = create (fun x ~size ~hash -> observe t (f x) ~size ~hash)
-let of_hash_fold f = create (fun x ~size:_ ~hash -> f hash x)
+module Via_thunk = struct
+  include Via_thunk
+
+  let%template unmap t ~f =
+    (create [@mode p]) (fun thunk ~size ~hash -> observe t (f thunk) ~size ~hash)
+  [@@mode p = (nonportable, portable)]
+  ;;
+end
+
+let%template unmap t ~f =
+  (create [@mode p]) (fun x ~size ~hash -> observe t (f x) ~size ~hash)
+[@@mode p = (nonportable, portable)]
+;;
+
+let%template of_hash_fold f = (create [@mode p]) (fun x ~size:_ ~hash -> f hash x)
+[@@mode p = (nonportable, portable)]
+;;
+
 let of_lazy lazy_t = create (fun x ~size ~hash -> observe (force lazy_t) x ~size ~hash)
 
 let fixed_point wrap =
@@ -11,51 +27,60 @@ let fixed_point wrap =
 ;;
 
 let unit = opaque
-let bool = of_hash_fold Bool.hash_fold_t
-let char = of_hash_fold Char.hash_fold_t
-let int = of_hash_fold Int.hash_fold_t
-let int32 = of_hash_fold Int32.hash_fold_t
-let int63 = of_hash_fold Int63.hash_fold_t
-let int64 = of_hash_fold Int64.hash_fold_t
-let nativeint = of_hash_fold Nativeint.hash_fold_t
-let float = of_hash_fold Float.hash_fold_t
-let string = of_hash_fold String.hash_fold_t
-let sexp = of_hash_fold Sexp.hash_fold_t
-let bigstring = of_hash_fold (Bigarray_helpers.Array1.hash_fold hash_fold_char)
-let float32_vec = of_hash_fold (Bigarray_helpers.Array1.hash_fold hash_fold_float)
-let float64_vec = of_hash_fold (Bigarray_helpers.Array1.hash_fold hash_fold_float)
-let float32_mat = of_hash_fold (Bigarray_helpers.Array2.hash_fold hash_fold_float)
-let float64_mat = of_hash_fold (Bigarray_helpers.Array2.hash_fold hash_fold_float)
-let bytes = unmap string ~f:Bytes.to_string
+
+include struct
+  open struct
+    let%template of_hash_fold = (of_hash_fold [@mode portable])
+  end
+
+  let bool = of_hash_fold Bool.hash_fold_t
+  let char = of_hash_fold Char.hash_fold_t
+  let int = of_hash_fold Int.hash_fold_t
+  let int32 = of_hash_fold Int32.hash_fold_t
+  let int63 = of_hash_fold Int63.hash_fold_t
+  let int64 = of_hash_fold Int64.hash_fold_t
+  let nativeint = of_hash_fold Nativeint.hash_fold_t
+  let float = of_hash_fold Float.hash_fold_t
+  let string = of_hash_fold String.hash_fold_t
+  let sexp = of_hash_fold Sexp.hash_fold_t
+  let bigstring = of_hash_fold [%eta1 Bigarray_helpers.Array1.hash_fold hash_fold_char]
+  let float32_vec = of_hash_fold [%eta1 Bigarray_helpers.Array1.hash_fold hash_fold_float]
+  let float64_vec = of_hash_fold [%eta1 Bigarray_helpers.Array1.hash_fold hash_fold_float]
+  let float32_mat = of_hash_fold [%eta1 Bigarray_helpers.Array2.hash_fold hash_fold_float]
+  let float64_mat = of_hash_fold [%eta1 Bigarray_helpers.Array2.hash_fold hash_fold_float]
+end
+
+let%template bytes = (unmap [@mode portable]) string ~f:Bytes.to_string
+
+[%%template
+[@@@mode.default p = (nonportable, portable)]
 
 let either fst_t snd_t =
-  create (fun either ~size ~hash ->
+  (create [@mode p]) (fun either ~size ~hash ->
     match (either : _ Either.t) with
     | First fst -> observe fst_t fst ~size ~hash:(hash_fold_int hash 1)
     | Second snd -> observe snd_t snd ~size ~hash:(hash_fold_int hash 2))
 ;;
 
 let result ok_t err_t =
-  unmap (either ok_t err_t) ~f:(function
-    | Ok ok -> First ok
-    | Error err -> Second err)
+  (unmap [@mode p]) ((either [@mode p]) ok_t err_t) ~f:Result.to_either
 ;;
 
 let both fst_t snd_t =
-  create (fun (fst, snd) ~size ~hash ->
+  (create [@mode p]) (fun (fst, snd) ~size ~hash ->
     let hash = observe fst_t fst ~size ~hash in
     let hash = observe snd_t snd ~size ~hash in
     hash)
 ;;
 
 let option value_t =
-  unmap (either opaque value_t) ~f:(function
+  (unmap [@mode p]) ((either [@mode p]) opaque value_t) ~f:(function
     | None -> First ()
     | Some value -> Second value)
 ;;
 
 let list elt_t =
-  create (fun list ~size ~hash ->
+  (create [@mode p]) (fun list ~size ~hash ->
     let random = Splittable_random.of_int (Hash.get_hash_value hash) in
     let length = List.length list in
     let sizes =
@@ -66,9 +91,9 @@ let list elt_t =
       observe elt_t elt ~size ~hash:(hash_fold_int hash 1)))
 ;;
 
-let array t = unmap (list t) ~f:Array.to_list
-let ref t = unmap t ~f:Ref.( ! )
-let lazy_t t = unmap t ~f:Lazy.force
+let array t = (unmap [@mode p]) ((list [@mode p]) t) ~f:Array.to_list
+let ref t = (unmap [@mode p]) t ~f:Ref.( ! )
+let lazy_t t = (unmap [@mode p]) t ~f:Lazy.force]
 
 let fn dom rng =
   create (fun f ~size ~hash ->

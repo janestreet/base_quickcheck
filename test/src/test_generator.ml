@@ -1,9 +1,10 @@
 open! Base
 open! Import
+module Via_thunk = Generator.Via_thunk
 
 type 'a t = 'a Generator.t
 
-let create = Generator.create
+let%template create = (Generator.create [@mode p]) [@@mode p = (nonportable, portable)]
 let generate = Generator.generate
 
 let%expect_test "create & generate" =
@@ -20,8 +21,19 @@ let%expect_test "create & generate" =
   [%expect {| ("Base_quickcheck.Generator.generate: size < 0" (size -1)) |}]
 ;;
 
-include (Generator : Applicative.S with type 'a t := 'a t)
-include (Generator : Monad.S with type 'a t := 'a t)
+include (
+  Generator :
+  sig
+    include Applicative.S with type 'a t := 'a t
+  end)
+
+include (
+  Generator :
+  sig
+    include Monad.S with type 'a t := 'a t
+  end)
+
+module Portable = Generator.Portable
 
 open struct
   (* We want to use a consistent test count on 32- and 64-bit targets since these tests
@@ -30,6 +42,8 @@ open struct
   let test_generator ?mode ?cr t m = test_generator ~config ?mode ?cr t m
   let show_distribution ?show t m = show_distribution ~config ?show t m
 end
+
+let%template return = (Generator.return [@mode p]) [@@mode p = portable]
 
 let%expect_test "return" =
   test_generator (Generator.return ()) m_unit;
@@ -43,15 +57,21 @@ let%expect_test "return" =
     |}]
 ;;
 
+let%template map = (Generator.map [@mode p]) [@@mode p = portable]
+
 let%expect_test "map" =
   test_generator (Generator.map Generator.char ~f:Char.is_print) m_bool;
   [%expect {| (generator exhaustive) |}]
 ;;
 
+let%template both = (Generator.both [@mode p]) [@@mode p = portable]
+
 let%expect_test "both" =
   test_generator (Generator.both Generator.bool Generator.bool) (m_pair m_bool m_bool);
   [%expect {| (generator exhaustive) |}]
 ;;
+
+let%template bind = (Generator.bind [@mode p]) [@@mode p = portable]
 
 let%expect_test "bind" =
   test_generator
@@ -68,7 +88,7 @@ let%expect_test "bind" =
     |}]
 ;;
 
-let perturb = Generator.perturb
+let%template perturb = (Generator.perturb [@mode p]) [@@mode p = (nonportable, portable)]
 
 let%expect_test "perturb" =
   let gen =
@@ -205,7 +225,7 @@ let%expect_test "with_size" =
     |}]
 ;;
 
-let filter = Generator.filter
+let%template filter = (Generator.filter [@mode p]) [@@mode p = (nonportable, portable)]
 
 let%expect_test "filter" =
   let is_even int = int % 2 = 0 in
@@ -221,7 +241,9 @@ let%expect_test "filter" =
     |}]
 ;;
 
-let filter_map = Generator.filter_map
+let%template filter_map = (Generator.filter_map [@mode p])
+[@@mode p = (nonportable, portable)]
+;;
 
 let%expect_test "filter_map" =
   let exactly_half int = if int % 2 = 0 then Some (int / 2) else None in
@@ -251,7 +273,7 @@ let%expect_test "of_weighted_list" =
     |}]
 ;;
 
-let union = Generator.union
+let%template union = (Generator.union [@mode p]) [@@mode p = (nonportable, portable)]
 
 let%expect_test "union" =
   test_generator
@@ -260,7 +282,9 @@ let%expect_test "union" =
   [%expect {| (generator exhaustive) |}]
 ;;
 
-let weighted_union = Generator.weighted_union
+let%template weighted_union = (Generator.weighted_union [@mode p])
+[@@mode p = (nonportable, portable)]
+;;
 
 let%expect_test "weighted_union" =
   test_generator
@@ -377,7 +401,7 @@ let%expect_test "weighted_recursive_union" =
   [%expect {| ((recursive_calls 1) (values_generated 10000)) |}]
 ;;
 
-let fn = Generator.fn
+let%template fn = (Generator.fn [@mode p]) [@@mode p = (nonportable, portable)]
 
 let%expect_test "fn" =
   test_generator (Generator.fn Observer.bool Generator.bool) (m_arrow m_bool m_bool);
@@ -398,21 +422,21 @@ let%expect_test "bool" =
   [%expect {| (generator exhaustive) |}]
 ;;
 
-let option = Generator.option
+let%template option = (Generator.option [@mode p]) [@@mode p = (nonportable, portable)]
 
 let%expect_test "option" =
   test_generator (Generator.option Generator.bool) (m_option m_bool);
   [%expect {| (generator exhaustive) |}]
 ;;
 
-let either = Generator.either
+let%template either = (Generator.either [@mode p]) [@@mode p = (nonportable, portable)]
 
 let%expect_test "either" =
   test_generator (Generator.either Generator.bool Generator.bool) (m_either m_bool m_bool);
   [%expect {| (generator exhaustive) |}]
 ;;
 
-let result = Generator.result
+let%template result = (Generator.result [@mode p]) [@@mode p = (nonportable, portable)]
 
 let%expect_test "result" =
   test_generator (Generator.result Generator.bool Generator.bool) (m_result m_bool m_bool);
@@ -1695,7 +1719,9 @@ let%expect_test "string_with_length" =
     |}]
 ;;
 
-let string_of = Generator.string_of
+let%template string_of = (Generator.string_of [@mode p])
+[@@mode p = (nonportable, portable)]
+;;
 
 let%expect_test "string_of" =
   test_generator
@@ -1711,7 +1737,9 @@ let%expect_test "string_of" =
     |}]
 ;;
 
-let string_non_empty_of = Generator.string_non_empty_of
+let%template string_non_empty_of = (Generator.string_non_empty_of [@mode p])
+[@@mode p = (nonportable, portable)]
+;;
 
 let%expect_test "string_non_empty_of" =
   test_generator
@@ -1727,7 +1755,9 @@ let%expect_test "string_non_empty_of" =
     |}]
 ;;
 
-let string_with_length_of = Generator.string_with_length_of
+let%template string_with_length_of = (Generator.string_with_length_of [@mode p])
+[@@mode p = (nonportable, portable)]
+;;
 
 let%expect_test "string_with_length_of" =
   test_generator
@@ -1836,14 +1866,16 @@ let%expect_test "sexp_of" =
     |}]
 ;;
 
-let list = Generator.list
+let%template list = (Generator.list [@mode p]) [@@mode p = (nonportable, portable)]
 
 let%expect_test "list" =
   test_generator (Generator.list Generator.bool) (m_list m_bool);
   [%expect {| (generator "generated 2_248 distinct values in 10_000 iterations") |}]
 ;;
 
-let list_non_empty = Generator.list_non_empty
+let%template list_non_empty = (Generator.list_non_empty [@mode p])
+[@@mode p = (nonportable, portable)]
+;;
 
 let%expect_test "list_non_empty" =
   test_generator
@@ -1858,7 +1890,9 @@ let%expect_test "list_non_empty" =
     |}]
 ;;
 
-let list_with_length = Generator.list_with_length
+let%template list_with_length = (Generator.list_with_length [@mode p])
+[@@mode p = (nonportable, portable)]
+;;
 
 let%expect_test "list_with_length" =
   test_generator
@@ -1871,6 +1905,20 @@ let%expect_test "list_with_length" =
      ("generated 4 distinct values in 10_000 iterations"
       ("did not generate these values" (() (false) (true)))))
     |}]
+;;
+
+let fold_until = Generator.fold_until
+
+let%expect_test "fold_until" =
+  test_generator
+    (Generator.fold_until
+       ~init:[]
+       ~f:(fun l ->
+         map Generator.bool ~f:(fun b : _ Continue_or_stop.t -> Continue (b :: l)))
+       ~finish:Fn.id
+       ())
+    (m_list m_bool);
+  [%expect {| (generator "generated 2_248 distinct values in 10_000 iterations") |}]
 ;;
 
 let list_filtered = Generator.list_filtered
@@ -1901,21 +1949,21 @@ let%expect_test "list_permutations" =
   [%expect {| (generator "generated 24 distinct values in 10_000 iterations") |}]
 ;;
 
-let array = Generator.array
+let%template array = (Generator.array [@mode p]) [@@mode p = (nonportable, portable)]
 
 let%expect_test "array" =
   test_generator (Generator.array Generator.bool) (m_array m_bool);
   [%expect {| (generator "generated 2_248 distinct values in 10_000 iterations") |}]
 ;;
 
-let ref = Generator.ref
+let%template ref = (Generator.ref [@mode p]) [@@mode p = (nonportable, portable)]
 
 let%expect_test "ref" =
   test_generator (Generator.ref Generator.bool) (m_ref m_bool);
   [%expect {| (generator exhaustive) |}]
 ;;
 
-let lazy_t = Generator.lazy_t
+let%template lazy_t = (Generator.lazy_t [@mode p]) [@@mode p = (nonportable, portable)]
 
 let%expect_test "lazy_t" =
   test_generator (Generator.lazy_t Generator.bool) (m_lazy_t m_bool);
