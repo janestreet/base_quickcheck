@@ -966,7 +966,7 @@ let%template sexp = (sexp_of [@mode portable]) string
 
 let map_tree_using_comparator ~comparator key_gen data_gen =
   let%bind keys = list key_gen in
-  let keys = List.dedup_and_sort keys ~compare:comparator.Comparator.compare in
+  let keys = List.dedup_and_sort keys ~compare:(Comparator.compare comparator) in
   let%bind data = list_with_length data_gen ~length:(List.length keys) in
   return (Map.Using_comparator.Tree.of_alist_exn ~comparator (List.zip_exn keys data))
 ;;
