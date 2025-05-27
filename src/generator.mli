@@ -45,6 +45,9 @@ val set_tree_using_comparator
 (** Produces any of the given values, weighted uniformly. *)
 val of_list : 'a list -> 'a t
 
+val%template of_list : ('a : value mod contended). 'a list @ portable -> 'a t @ portable
+[@@mode portable]
+
 (** Chooses among the given generators, weighted uniformly; then chooses a value from that
     generator. *)
 val%template union : 'a t list @ p -> 'a t @ p
@@ -57,7 +60,7 @@ module Portable : sig
   module Let_syntax : sig
     val return : ('a : value mod contended). 'a @ portable -> 'a t @ portable
     val ( >>| ) : 'a t @ portable -> ('a -> 'b) @ portable -> 'b t @ portable
-    val ( >>= ) : 'a t @ portable -> ('a -> 'b t @ portable) @ portable -> 'b t @ portable
+    val ( >>= ) : 'a t @ portable -> ('a -> 'b t) @ portable -> 'b t @ portable
 
     module Let_syntax : sig
       val return : ('a : value mod contended). 'a @ portable -> 'a t @ portable
@@ -69,6 +72,8 @@ module Portable : sig
     end
   end
 end
+
+module%template [@mode portable] Let_syntax = Portable.Let_syntax
 
 val%template return : ('a : value mod contended). 'a @ portable -> 'a t @ portable
 [@@mode portable]

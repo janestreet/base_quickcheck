@@ -37,6 +37,9 @@ include (
 
 module Portable = Generator.Portable
 
+module%template Let_syntax = Generator.Let_syntax [@modality portable]
+[@@modality portable]
+
 open struct
   (* We want to use a consistent test count on 32- and 64-bit targets since these tests
      reflect on the actual trials and distributions. *)
@@ -253,7 +256,7 @@ let%expect_test "filter_map" =
   [%expect {| (generator exhaustive) |}]
 ;;
 
-let of_list = Generator.of_list
+let%template of_list = (Generator.of_list [@mode p]) [@@mode p = (nonportable, portable)]
 
 let%expect_test "of_list" =
   test_generator (Generator.of_list Bool.all) m_bool;

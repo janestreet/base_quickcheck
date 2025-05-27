@@ -1,9 +1,12 @@
 open! Import
 
 val sig_type_decl
-  : (signature_item list, rec_flag * type_declaration list) Deriving.Generator.t
+  :  portable:bool
+  -> (signature_item list, rec_flag * type_declaration list) Deriving.Generator.t
 
-val str_type_decl : (structure, rec_flag * type_declaration list) Deriving.Generator.t
+val str_type_decl
+  :  portable:bool
+  -> (structure, rec_flag * type_declaration list) Deriving.Generator.t
 
 val generator_extension
   :  portable:bool

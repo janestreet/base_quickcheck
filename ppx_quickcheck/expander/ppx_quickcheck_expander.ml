@@ -706,7 +706,7 @@ let create
     ]
 ;;
 
-let sig_type_decl =
+let sig_type_decl ~portable =
   Deriving.Generator.make
     (args ())
     (fun
@@ -718,6 +718,7 @@ let sig_type_decl =
         incl_shrinker
         portable_export
       ->
+       let portable_export = portable_export || portable in
        let incl_generator, incl_observer, incl_shrinker =
          flags ~incl_generator ~incl_observer ~incl_shrinker
        in
@@ -747,7 +748,7 @@ let sig_type_decl =
          items)
 ;;
 
-let str_type_decl =
+let str_type_decl ~portable =
   Deriving.Generator.make
     (args ())
     (fun
@@ -759,6 +760,7 @@ let str_type_decl =
         incl_shrinker
         portable_export
       ->
+       let portable_export = portable_export || portable in
        let rec_flag = really_recursive rec_flag decls in
        let incl_generator, incl_observer, incl_shrinker =
          flags ~incl_generator ~incl_observer ~incl_shrinker
