@@ -24,6 +24,7 @@ let short_string_of_core_type core_type =
   | Ptyp_poly _ -> "explicit polymorphic type"
   | Ptyp_package _ -> "first-class module type"
   | Ptyp_extension _ -> "ppx extension type"
+  | Ptyp_open _ -> "local module open"
 ;;
 
 (* little syntax helpers *)

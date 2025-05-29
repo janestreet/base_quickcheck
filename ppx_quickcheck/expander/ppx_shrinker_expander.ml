@@ -59,7 +59,7 @@ let variant
   [%expr
     Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.create
       [%e
-        pexp_function
+        pexp_function_cases
           ~loc
           (List.map clauses ~f:(fun clause ->
              let loc = { (Clause.location clause) with loc_ghost = true } in

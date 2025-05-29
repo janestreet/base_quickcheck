@@ -72,7 +72,8 @@ let rec generator_of_core_type core_type ~gen_env ~obs_env =
         | Ptyp_class _
         | Ptyp_alias _
         | Ptyp_poly _
-        | Ptyp_package _ -> unsupported ~loc "%s" (short_string_of_core_type core_type)))
+        | Ptyp_package _
+        | Ptyp_open _ -> unsupported ~loc "%s" (short_string_of_core_type core_type)))
 
 and observer_of_core_type core_type ~obs_env ~gen_env =
   let loc = { core_type.ptyp_loc with loc_ghost = true } in
@@ -116,7 +117,7 @@ and observer_of_core_type core_type ~obs_env ~gen_env =
      | Ptyp_variant (_, _, Some _) -> unsupported ~loc "polymorphic variant type with [<]"
      | Ptyp_extension (tag, payload) -> custom_extension ~loc tag payload
      | Ptyp_any -> Ppx_observer_expander.any ~loc
-     | Ptyp_object _ | Ptyp_class _ | Ptyp_alias _ | Ptyp_poly _ | Ptyp_package _ ->
+     | Ptyp_object _ | Ptyp_class _ | Ptyp_alias _ | Ptyp_poly _ | Ptyp_package _ | Ptyp_open _ ->
        unsupported ~loc "%s" (short_string_of_core_type core_type))
 ;;
 
@@ -156,7 +157,7 @@ let rec shrinker_of_core_type core_type ~env =
      | Ptyp_variant (_, _, Some _) -> unsupported ~loc "polymorphic variant type with [<]"
      | Ptyp_extension (tag, payload) -> custom_extension ~loc tag payload
      | Ptyp_any -> Ppx_shrinker_expander.any ~loc
-     | Ptyp_object _ | Ptyp_class _ | Ptyp_alias _ | Ptyp_poly _ | Ptyp_package _ ->
+     | Ptyp_object _ | Ptyp_class _ | Ptyp_alias _ | Ptyp_poly _ | Ptyp_package _ | Ptyp_open _ ->
        unsupported ~loc "%s" (short_string_of_core_type core_type))
 ;;
 
@@ -345,8 +346,8 @@ let maybe_mutually_recursive decls ~loc ~rec_flag ~of_lazy ~impl =
       in
       let rec wrap exp =
         match exp.pexp_desc with
-        | Pexp_fun (arg_label, default, pat, body) ->
-          { exp with pexp_desc = Pexp_fun (arg_label, default, pat, wrap body) }
+        | Pexp_function (params, constr, Pfunction_body body) ->
+          { exp with pexp_desc = Pexp_function (params, constr, Pfunction_body (wrap body)) }
         | _ ->
           List.fold impls ~init:exp ~f:(fun acc impl ->
             let ign = [%expr ignore [%e impl.var]] in
