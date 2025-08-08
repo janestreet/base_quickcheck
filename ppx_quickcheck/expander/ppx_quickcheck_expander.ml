@@ -743,8 +743,8 @@ let sig_type_decl ~portable =
              ~make_shrinker_list:(shrinker_intf_list ~portable_export)
              decls
        in
-       Ppx_template.Export.Monomorphize.t#signature_items
-         Ppx_template.Export.Monomorphize.Context.top
+       Ppx_template_expander.Monomorphize.t_no_inline#signature_items
+         Ppx_template_expander.Monomorphize.Context.top
          items)
 ;;
 
@@ -773,8 +773,8 @@ let str_type_decl ~portable =
          ~make_observer_list:(observer_impl_list ~rec_flag ~loc ~portable_export)
          ~make_shrinker_list:(shrinker_impl_list ~rec_flag ~loc ~portable_export)
          decls
-       |> Ppx_template.Export.Monomorphize.t#structure
-            Ppx_template.Export.Monomorphize.Context.top)
+       |> Ppx_template_expander.Monomorphize.t_no_inline#structure
+            Ppx_template_expander.Monomorphize.Context.top)
 ;;
 
 let generator_extension ~portable:portable_value ~loc:_ ~path:_ core_type =
@@ -783,8 +783,8 @@ let generator_extension ~portable:portable_value ~loc:_ ~path:_ core_type =
     ~gen_env:Environment.empty
     ~obs_env:Environment.empty
     ~portable_value
-  |> Ppx_template.Export.Monomorphize.t#expression
-       Ppx_template.Export.Monomorphize.Context.top
+  |> Ppx_template_expander.Monomorphize.t_no_inline#expression
+       Ppx_template_expander.Monomorphize.Context.top
 ;;
 
 let observer_extension ~portable:portable_value ~loc:_ ~path:_ core_type =
@@ -793,12 +793,12 @@ let observer_extension ~portable:portable_value ~loc:_ ~path:_ core_type =
     ~obs_env:Environment.empty
     ~gen_env:Environment.empty
     ~portable_value
-  |> Ppx_template.Export.Monomorphize.t#expression
-       Ppx_template.Export.Monomorphize.Context.top
+  |> Ppx_template_expander.Monomorphize.t_no_inline#expression
+       Ppx_template_expander.Monomorphize.Context.top
 ;;
 
 let shrinker_extension ~portable:portable_value ~loc:_ ~path:_ core_type =
   shrinker_of_core_type core_type ~env:Environment.empty ~portable_value
-  |> Ppx_template.Export.Monomorphize.t#expression
-       Ppx_template.Export.Monomorphize.Context.top
+  |> Ppx_template_expander.Monomorphize.t_no_inline#expression
+       Ppx_template_expander.Monomorphize.Context.top
 ;;

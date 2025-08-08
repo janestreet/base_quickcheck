@@ -219,12 +219,11 @@ let%template union list = (join [@mode p]) ((of_list [@mode p]) list)
 [@@mode p = (nonportable, portable)]
 ;;
 
-let weighted_tally weights =
-  if List.is_empty weights
+let total_weight alist =
+  if List.is_empty alist
   then Error.raise_s [%message "Base_quickcheck.Generator.of_weighted_list: empty list"];
-  let array = Array.init (List.length weights) ~f:(fun _ -> 0.) in
   let sum =
-    List.foldi weights ~init:0. ~f:(fun index acc weight ->
+    List.fold alist ~init:0. ~f:(fun acc (weight, _) ->
       if not (Float.is_finite weight)
       then
         Error.raise_s
@@ -237,55 +236,37 @@ let weighted_tally weights =
           [%message
             "Base_quickcheck.Generator.of_weighted_list: weight is negative"
               (weight : float)];
-      let cumulative = acc +. weight in
-      array.(index) <- cumulative;
-      cumulative)
+      acc +. weight)
   in
   if Float.( <= ) sum 0.
   then
     Error.raise_s
       [%message "Base_quickcheck.Generator.of_weighted_list: total weight is zero"];
-  sum, Iarray.unsafe_of_array__promise_no_mutation array
+  sum
 ;;
 
-let weighted_index cumulative_weight_array choice =
-  match
-    Iarray.binary_search
-      cumulative_weight_array
-      ~compare:Float.compare
-      `First_greater_than_or_equal_to
-      choice
-  with
-  | Some index -> index
-  | None -> assert false
+let weighted_find alist choice =
+  let rec go alist acc =
+    match alist with
+    | [] -> assert false
+    | (w, x) :: alist -> if Float.( <= ) acc w then x else go alist (acc -. w)
+  in
+  go alist choice
 ;;
 
 include struct
   let of_weighted_list alist =
-    let weights, values = List.unzip alist in
-    let value_iarray = Iarray.of_list values in
-    let total_weight, cumulative_weights = weighted_tally weights in
+    let total_weight = total_weight alist in
     create (fun ~size:_ ~random ->
       let choice = Splittable_random.float random ~lo:0. ~hi:total_weight in
-      let index = weighted_index cumulative_weights choice in
-      value_iarray.:(index))
+      weighted_find alist choice)
   ;;
 
   let%template of_weighted_list (type a) (alist : (float, a) List.Assoc.t) =
-    let alist =
-      alist
-      |> Modes.Portable.wrap_list
-      |> List.map ~f:(fun { Modes.Portable.portable = weight, t } ->
-        weight, { Modes.Portable.portable = t })
-    in
-    let weights, values = List.unzip alist in
-    let value_iarray = Iarray.of_list values in
-    let value_iarray = value_iarray |> Modes.Portable.unwrap_iarray in
-    let total_weight, cumulative_weights = weighted_tally weights in
+    let total_weight = total_weight alist in
     (create [@mode portable]) (fun ~size:_ ~random ->
       let choice = Splittable_random.float random ~lo:0. ~hi:total_weight in
-      let index = weighted_index cumulative_weights choice in
-      value_iarray.:(index))
+      weighted_find alist choice)
   [@@mode portable]
   ;;
 end

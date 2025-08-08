@@ -7,7 +7,7 @@ module Config = Test.Config
 let default_config = Test.default_config
 
 let%expect_test ("default_config" [@tags "64-bits-only"]) =
-  Ref.set_temporarily sexp_style To_string_hum ~f:(fun () ->
+  Dynamic.with_temporarily sexp_style To_string_hum ~f:(fun () ->
     print_s [%sexp (default_config : Config.t)]);
   [%expect
     {|
@@ -22,7 +22,7 @@ let%expect_test ("default_config" [@tags "64-bits-only"]) =
 ;;
 
 let%expect_test ("default_config" [@tags "32-bits-only"]) =
-  Ref.set_temporarily sexp_style To_string_hum ~f:(fun () ->
+  Dynamic.with_temporarily sexp_style To_string_hum ~f:(fun () ->
     print_s [%sexp (default_config : Config.t)]);
   [%expect
     {|
