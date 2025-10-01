@@ -177,4 +177,46 @@ module Shrinker : sig
 
     [@@@end]
   end
+
+  module Portable_recursive : sig
+    type t =
+      | A
+      | B of u
+
+    and u =
+      | C
+      | D of t
+    [@@deriving_inline quickcheck ~portable]
+
+    include sig
+      [@@@ocaml.warning "-32"]
+
+      val quickcheck_generator
+        : t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
+        @@ portable
+
+      val quickcheck_generator_u
+        : u Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
+        @@ portable
+
+      val quickcheck_observer
+        : t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
+        @@ portable
+
+      val quickcheck_observer_u
+        : u Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
+        @@ portable
+
+      val quickcheck_shrinker
+        : t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+        @@ portable
+
+      val quickcheck_shrinker_u
+        : u Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+        @@ portable
+    end
+    [@@ocaml.doc "@inline"]
+
+    [@@@end]
+  end
 end

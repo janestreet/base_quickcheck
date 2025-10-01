@@ -234,8 +234,8 @@ let%expect_test "result" =
   [%expect {| (observer transparent) |}]
 ;;
 
-let map_t = Observer.map_t
-let map_tree = Observer.map_tree
+let%template map_t = (Observer.map_t [@mode p]) [@@mode p = (portable, nonportable)]
+let%template map_tree = (Observer.map_tree [@mode p]) [@@mode p = (portable, nonportable)]
 
 let%expect_test "map_t" =
   test_observer
@@ -262,6 +262,29 @@ let%expect_test "of_lazy, forced" =
 let%expect_test "of_lazy, unforced" =
   test_observer
     (Observer.either Observer.string (Observer.of_lazy (lazy (assert false))))
+    (m_biject
+       m_string
+       ~f:(fun string -> Either.First string)
+       ~f_inverse:(function
+         | Either.First string -> string
+         | Either.Second (_ : Nothing.t) -> .));
+  [%expect {| (observer transparent) |}]
+;;
+
+let of_portable_lazy = Observer.of_portable_lazy
+
+let%expect_test "of_portable_lazy, forced" =
+  test_observer
+    (Observer.of_portable_lazy (Portable_lazy.from_val Observer.string))
+    m_string;
+  [%expect {| (observer transparent) |}]
+;;
+
+let%expect_test "of_portable_lazy, unforced" =
+  test_observer
+    (Observer.either
+       Observer.string
+       (Observer.of_portable_lazy (Portable_lazy.from_fun (fun () -> assert false))))
     (m_biject
        m_string
        ~f:(fun string -> Either.First string)

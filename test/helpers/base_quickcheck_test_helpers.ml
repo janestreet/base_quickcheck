@@ -3,7 +3,7 @@ open Base_quickcheck
 open Expect_test_helpers_core
 include Base_quickcheck_test_helpers_intf
 
-let () = sexp_style := Sexp_style.simple_pretty
+let () = Dynamic.set_root sexp_style Sexp_style.simple_pretty
 let set_is_singleton set = Set.length set = 1
 
 let arbitrary_int_gen =

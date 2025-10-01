@@ -532,8 +532,11 @@ let%expect_test "result" =
     |}]
 ;;
 
-let map_t = Shrinker.map_t
-let map_tree_using_comparator = Shrinker.map_tree_using_comparator
+let%template map_t = (Shrinker.map_t [@mode p]) [@@mode p = (portable, nonportable)]
+
+let%template map_tree_using_comparator = (Shrinker.map_tree_using_comparator [@mode p])
+[@@mode p = (portable, nonportable)]
+;;
 
 let%expect_test "map_t" =
   test_shrinker
@@ -625,6 +628,71 @@ let%expect_test "of_lazy, forced" =
 let%expect_test "of_lazy, unforced" =
   test_shrinker
     (Shrinker.either Shrinker.string (Shrinker.of_lazy (lazy (assert false))))
+    (m_biject
+       m_string
+       ~f:(fun string -> Either.First string)
+       ~f_inverse:(function
+         | Either.First string -> string
+         | Either.Second (_ : Nothing.t) -> .));
+  [%expect
+    {|
+    (shrinker
+     (("\000" => "")
+      (" " => "")
+      (0 => "")
+      (A => "")
+      (_ => "")
+      (z => "")
+      ("\000\000" => "\000")
+      ("\000\000" => "\000")
+      ("  " => " ")
+      ("  " => " ")
+      (00 => 0)
+      (00 => 0)
+      (AA => A)
+      (AA => A)
+      (__ => _)
+      (__ => _)
+      (zz => z)
+      (zz => z)))
+    |}]
+;;
+
+let of_portable_lazy = Shrinker.of_portable_lazy
+
+let%expect_test "of_portable_lazy, forced" =
+  test_shrinker
+    (Shrinker.of_portable_lazy (Portable_lazy.from_val Shrinker.string))
+    m_string;
+  [%expect
+    {|
+    (shrinker
+     ((A => "")
+      (z => "")
+      (0 => "")
+      (_ => "")
+      (" " => "")
+      ("\000" => "")
+      (AA => A)
+      (AA => A)
+      (zz => z)
+      (zz => z)
+      (00 => 0)
+      (00 => 0)
+      (__ => _)
+      (__ => _)
+      ("  " => " ")
+      ("  " => " ")
+      ("\000\000" => "\000")
+      ("\000\000" => "\000")))
+    |}]
+;;
+
+let%expect_test "of_portable_lazy, unforced" =
+  test_shrinker
+    (Shrinker.either
+       Shrinker.string
+       (Shrinker.of_portable_lazy (Portable_lazy.from_fun (fun () -> assert false))))
     (m_biject
        m_string
        ~f:(fun string -> Either.First string)

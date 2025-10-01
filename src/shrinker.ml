@@ -217,8 +217,8 @@ let%template sexp =
         Sequence.round_robin [ shrink_list; shrink_tree ]))
 ;;
 
-let map_tree_using_comparator ~comparator key_t data_t =
-  create (fun tree ->
+let%template map_tree_using_comparator ~comparator key_t data_t =
+  (create [@mode p]) (fun tree ->
     let alist = Map.Using_comparator.Tree.to_alist tree in
     let drop_keys =
       Sequence.map (Sequence.of_list alist) ~f:(fun (k, _) ->
@@ -242,6 +242,7 @@ let map_tree_using_comparator ~comparator key_t data_t =
              Map.Using_comparator.Tree.set ~comparator tree ~key ~data:smaller_data)))
     in
     Sequence.round_robin [ drop_keys; shrink_keys; shrink_data ])
+[@@mode p = (nonportable, portable)]
 ;;
 
 let set_tree_using_comparator ~comparator elt_t =
@@ -263,16 +264,17 @@ let set_tree_using_comparator ~comparator elt_t =
     Sequence.round_robin [ drop_elts; shrink_elts ])
 ;;
 
-let map_t key_t data_t =
-  create (fun map_t ->
+let%template map_t (type cmp : value mod p) key_t data_t =
+  (create [@mode p]) (fun (map_t : (_, _, cmp) Map.t) ->
     let comparator = Map.comparator map_t in
     let t =
-      map
-        (map_tree_using_comparator ~comparator key_t data_t)
-        ~f:(Map.Using_comparator.of_tree ~comparator)
+      (map [@mode p])
+        ((map_tree_using_comparator [@mode p]) ~comparator key_t data_t)
+        ~f:(fun tree -> Map.Using_comparator.of_tree tree ~comparator)
         ~f_inverse:Map.Using_comparator.to_tree
     in
     shrink t map_t)
+[@@mode p = (nonportable, portable)]
 ;;
 
 let set_t elt_t =

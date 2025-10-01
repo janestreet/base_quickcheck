@@ -423,7 +423,7 @@ let shrinker_impl ~rec_names:_ ~portable_value type_decl =
   { loc; typ; pat; var; exp }
 ;;
 
-let close_the_loop ~of_lazy decl impl =
+let close_the_loop ~of_lazy ~portable_export decl impl =
   let loc = impl.loc in
   let exp = impl.var in
   match decl.ptype_params with
@@ -432,20 +432,24 @@ let close_the_loop ~of_lazy decl impl =
     let pats, exps =
       gensyms "recur" (List.map params ~f:(fun (core_type, _) -> core_type.ptyp_loc))
     in
+    let force_exp =
+      if portable_export
+      then [%expr Ppx_quickcheck_runtime.Base.Portable_lazy.force]
+      else [%expr Ppx_quickcheck_runtime.Base.Lazy.force]
+    in
+    let lazify e =
+      if portable_export
+      then (
+        (* Make sure we can expand into [lazy%portable]. Keep this annotation close to the
+           use of [%portable]. *)
+        Ppx_portable.registered;
+        [%expr lazy%portable [%e e]])
+      else [%expr lazy [%e e]]
+    in
     eabstract
       ~loc
       pats
-      (eapply
-         ~loc
-         of_lazy
-         [ [%expr
-             lazy
-               [%e
-                 eapply
-                   ~loc
-                   (eapply ~loc [%expr Ppx_quickcheck_runtime.Base.Lazy.force] [ exp ])
-                   exps]]
-         ])
+      (eapply ~loc of_lazy [ lazify (eapply ~loc (eapply ~loc force_exp [ exp ]) exps) ])
 ;;
 
 let each decls ~portable_export ~f =
@@ -490,7 +494,7 @@ let maybe_mutually_recursive decls ~loc ~portable_export ~rec_flag ~of_lazy ~imp
           value_binding
             ~loc:inner.loc
             ~pat:inner.pat
-            ~expr:(close_the_loop ~of_lazy decl inner))
+            ~expr:(close_the_loop ~of_lazy ~portable_export decl inner))
       in
       let wrap_body exp =
         List.fold impls ~init:exp ~f:(fun acc impl ->
@@ -514,17 +518,40 @@ let maybe_mutually_recursive decls ~loc ~portable_export ~rec_flag ~of_lazy ~imp
       in
       List.map2_exn decls impls ~f:(fun decl impl ->
         let body = wrap impl.exp in
-        let lazy_expr = [%expr lazy [%e body]] in
+        let lazy_expr =
+          if portable_export
+          then (
+            (* Make sure we can expand into [lazy%portable]. Keep this annotation close to
+               the use of [%portable]. *)
+            Ppx_portable.registered;
+            [%expr lazy%portable [%e body]])
+          else [%expr lazy [%e body]]
+        in
         let typed_pat =
-          [%type: [%t impl.typ] Ppx_quickcheck_runtime.Base.Lazy.t]
+          (if portable_export
+           then [%type: [%t impl.typ] Ppx_quickcheck_runtime.Base.Portable_lazy.t]
+           else [%type: [%t impl.typ] Ppx_quickcheck_runtime.Base.Lazy.t])
           |> ptyp_poly ~loc (List.map decl.ptype_params ~f:get_type_param_name)
           |> ppat_constraint ~loc impl.pat
         in
         value_binding ~loc:impl.loc ~pat:typed_pat ~expr:lazy_expr)
     in
+    let closed_loop =
+      match recursive_bindings with
+      | [] -> []
+      | recursive_bindings ->
+        let vb = pstr_value ~loc Recursive recursive_bindings in
+        if portable_export
+        then (
+          (* Make sure we can expand into [let%portable rec]. Keep this annotation close
+             to the use of [%portable]. *)
+          Ppx_portable.registered;
+          [%str [%%portable [%%i vb]]])
+        else [ vb ]
+    in
     [%str
       include struct
-        open [%m pmod_structure ~loc (pstr_value_list ~loc Recursive recursive_bindings)]
+        open [%m pmod_structure ~loc closed_loop]
 
         [%%i
           pstr_value
@@ -534,7 +561,7 @@ let maybe_mutually_recursive decls ~loc ~portable_export ~rec_flag ~of_lazy ~imp
                Ppxlib_jane.Ast_builder.Default.value_binding
                  ~loc
                  ~pat:impl.pat
-                 ~expr:(close_the_loop ~of_lazy decl impl)
+                 ~expr:(close_the_loop ~of_lazy ~portable_export decl impl)
                  ~modes))]
       end]
 ;;
@@ -545,7 +572,10 @@ let generator_impl_list decls ~loc ~rec_flag ~portable_export =
     ~loc
     ~rec_flag
     ~portable_export
-    ~of_lazy:[%expr Ppx_quickcheck_runtime.Base_quickcheck.Generator.of_lazy]
+    ~of_lazy:
+      (if portable_export
+       then [%expr Ppx_quickcheck_runtime.Base_quickcheck.Generator.of_portable_lazy]
+       else [%expr Ppx_quickcheck_runtime.Base_quickcheck.Generator.of_lazy])
     ~impl:generator_impl
 ;;
 
@@ -555,7 +585,10 @@ let observer_impl_list decls ~loc ~rec_flag ~portable_export =
     ~loc
     ~rec_flag
     ~portable_export
-    ~of_lazy:[%expr Ppx_quickcheck_runtime.Base_quickcheck.Observer.of_lazy]
+    ~of_lazy:
+      (if portable_export
+       then [%expr Ppx_quickcheck_runtime.Base_quickcheck.Observer.of_portable_lazy]
+       else [%expr Ppx_quickcheck_runtime.Base_quickcheck.Observer.of_lazy])
     ~impl:observer_impl
 ;;
 
@@ -565,7 +598,10 @@ let shrinker_impl_list decls ~loc ~rec_flag ~portable_export =
     ~loc
     ~rec_flag
     ~portable_export
-    ~of_lazy:[%expr Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.of_lazy]
+    ~of_lazy:
+      (if portable_export
+       then [%expr Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.of_portable_lazy]
+       else [%expr Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.of_lazy])
     ~impl:shrinker_impl
 ;;
 
@@ -743,8 +779,8 @@ let sig_type_decl ~portable =
              ~make_shrinker_list:(shrinker_intf_list ~portable_export)
              decls
        in
-       Ppx_template.Export.Monomorphize.t#signature_items
-         Ppx_template.Export.Monomorphize.Context.top
+       Ppx_template_expander.Monomorphize.t_no_inline#signature_items
+         Ppx_template_expander.Monomorphize.Context.top
          items)
 ;;
 
@@ -773,8 +809,8 @@ let str_type_decl ~portable =
          ~make_observer_list:(observer_impl_list ~rec_flag ~loc ~portable_export)
          ~make_shrinker_list:(shrinker_impl_list ~rec_flag ~loc ~portable_export)
          decls
-       |> Ppx_template.Export.Monomorphize.t#structure
-            Ppx_template.Export.Monomorphize.Context.top)
+       |> Ppx_template_expander.Monomorphize.t_no_inline#structure
+            Ppx_template_expander.Monomorphize.Context.top)
 ;;
 
 let generator_extension ~portable:portable_value ~loc:_ ~path:_ core_type =
@@ -783,8 +819,8 @@ let generator_extension ~portable:portable_value ~loc:_ ~path:_ core_type =
     ~gen_env:Environment.empty
     ~obs_env:Environment.empty
     ~portable_value
-  |> Ppx_template.Export.Monomorphize.t#expression
-       Ppx_template.Export.Monomorphize.Context.top
+  |> Ppx_template_expander.Monomorphize.t_no_inline#expression
+       Ppx_template_expander.Monomorphize.Context.top
 ;;
 
 let observer_extension ~portable:portable_value ~loc:_ ~path:_ core_type =
@@ -793,12 +829,12 @@ let observer_extension ~portable:portable_value ~loc:_ ~path:_ core_type =
     ~obs_env:Environment.empty
     ~gen_env:Environment.empty
     ~portable_value
-  |> Ppx_template.Export.Monomorphize.t#expression
-       Ppx_template.Export.Monomorphize.Context.top
+  |> Ppx_template_expander.Monomorphize.t_no_inline#expression
+       Ppx_template_expander.Monomorphize.Context.top
 ;;
 
 let shrinker_extension ~portable:portable_value ~loc:_ ~path:_ core_type =
   shrinker_of_core_type core_type ~env:Environment.empty ~portable_value
-  |> Ppx_template.Export.Monomorphize.t#expression
-       Ppx_template.Export.Monomorphize.Context.top
+  |> Ppx_template_expander.Monomorphize.t_no_inline#expression
+       Ppx_template_expander.Monomorphize.Context.top
 ;;

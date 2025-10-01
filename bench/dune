@@ -1,0 +1,5 @@
+(library
+ (name base_quickcheck_benchmarks)
+ (libraries base base_quickcheck splittable_random)
+ (preprocess
+  (pps ppx_jane)))
