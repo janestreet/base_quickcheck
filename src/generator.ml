@@ -1,5 +1,18 @@
 open! Base
 
+module%template Maybe_portable = struct
+  let[@mode nonportable] wrap = Fn.id
+  let[@mode portable] wrap = Modes.Portable.wrap
+  let[@mode nonportable] unwrap = Fn.id
+  let[@mode portable] unwrap = Modes.Portable.unwrap
+  let[@mode nonportable] wrap_list = Fn.id
+  let[@mode portable] wrap_list = Modes.Portable.wrap_list
+  let[@mode nonportable] unwrap_list = Fn.id
+  let[@mode portable] unwrap_list = Modes.Portable.unwrap_list
+  let[@mode nonportable] unwrap_iarray = Fn.id
+  let[@mode portable] unwrap_iarray = Modes.Portable.unwrap_iarray
+end
+
 type 'a thunk = unit -> 'a
 
 module T : sig
@@ -56,14 +69,9 @@ end
 
 let%template size = (create [@mode portable]) (fun ~size ~random:_ -> size)
 
-include struct
-  let return x = create (fun ~size:_ ~random:_ -> x)
-
-  let%template return (type a) (x : a) =
-    (create [@mode portable]) (fun ~size:_ ~random:_ -> x)
-  [@@mode portable]
-  ;;
-end
+let%template return (type a) (x : a) = (create [@mode p]) (fun ~size:_ ~random:_ -> x)
+[@@mode (p, c) = ((nonportable, uncontended), (portable, contended))]
+;;
 
 [%%template
 [@@@mode p = (nonportable, portable)]
@@ -164,7 +172,37 @@ module Monad_infix = struct
   let ( >>= ) = ( >>= )
 end
 
+let%template of_list (type a) (list : a list) =
+  if List.is_empty list
+  then Error.raise_s [%message "Base_quickcheck.Generator.of_list: empty list"];
+  let list = list |> (Maybe_portable.wrap_list [@mode p]) in
+  let iarray = Iarray.of_list list in
+  let iarray = iarray |> (Maybe_portable.unwrap_iarray [@mode p]) in
+  let lo = 0 in
+  let hi = Iarray.length iarray - 1 in
+  (create [@mode p]) (fun ~size:_ ~random ->
+    let index = Splittable_random.int random ~lo ~hi in
+    iarray.:(index))
+[@@mode (p, c) = ((nonportable, uncontended), (portable, contended))]
+;;
+
+let%template union list = (join [@mode p]) ((of_list [@mode p]) list)
+[@@mode p = (nonportable, portable)]
+;;
+
 module Syntax = struct
+  open struct
+    module Open_on_rhs = struct end
+
+    module%template [@mode p = portable] Open_on_rhs = struct
+      let map = (map [@mode p])
+      let ( >>| ) t f = (map [@mode p]) t ~f
+      let of_list = (of_list [@mode p])
+      let union = (union [@mode p])
+      let filter = (filter [@mode p])
+    end
+  end
+
   module%template [@mode p = (nonportable, portable)] Let_syntax = struct
     let return = (return [@mode p])
     let ( >>= ) t f = (bind [@mode p]) t ~f
@@ -176,7 +214,7 @@ module Syntax = struct
       let map = (map [@mode p])
       let both = (both [@mode p])
 
-      module Open_on_rhs = struct end
+      module%template Open_on_rhs = Open_on_rhs [@mode p]
     end
   end
 end
@@ -187,37 +225,6 @@ end
 
 include Syntax
 open Syntax.Let_syntax
-
-include struct
-  let of_list list =
-    if List.is_empty list
-    then Error.raise_s [%message "Base_quickcheck.Generator.of_list: empty list"];
-    let iarray = Iarray.of_list list in
-    let lo = 0 in
-    let hi = Iarray.length iarray - 1 in
-    create (fun ~size:_ ~random ->
-      let index = Splittable_random.int random ~lo ~hi in
-      iarray.:(index))
-  ;;
-
-  let%template of_list (type a) (list : a list) =
-    if List.is_empty list
-    then Error.raise_s [%message "Base_quickcheck.Generator.of_list: empty list"];
-    let list = list |> Modes.Portable.wrap_list in
-    let iarray = Iarray.of_list list in
-    let iarray = iarray |> Modes.Portable.unwrap_iarray in
-    let lo = 0 in
-    let hi = Iarray.length iarray - 1 in
-    (create [@mode portable]) (fun ~size:_ ~random ->
-      let index = Splittable_random.int random ~lo ~hi in
-      iarray.:(index))
-  [@@mode portable]
-  ;;
-end
-
-let%template union list = (join [@mode p]) ((of_list [@mode p]) list)
-[@@mode p = (nonportable, portable)]
-;;
 
 let total_weight alist =
   if List.is_empty alist
@@ -298,24 +305,35 @@ include struct
   ;;
 end
 
-let weighted_recursive_union nonrec_list ~f =
-  fixed_point (fun self ->
-    let rec_list =
-      List.map (f self) ~f:(fun (w, t) ->
-        ( w
-        , let%bind n = size in
-          with_size ~size:(n - 1) t ))
+let%template weighted_recursive_union (nonrec_list : (float * 'a t) list) ~f =
+  let open Syntax.Let_syntax [@mode p] in
+  (fixed_point [@mode p]) (fun self ->
+    let rec_list : (float * 'a t) list =
+      (Maybe_portable.wrap_list [@mode p]) (f self)
+      |> List.map ~f:(fun elem ->
+        let w, t = (Maybe_portable.unwrap [@mode p]) elem in
+        (Maybe_portable.wrap [@mode p])
+          ( w
+          , let%bind n = size in
+            with_size ~size:(n - 1) t ))
+      |> (Maybe_portable.unwrap_list [@mode p])
     in
     if List.is_empty nonrec_list || List.is_empty rec_list
     then
       raise_s
         [%message
           "Base_quickcheck.Generator.weighted_recursive_union: lists must be non-empty"];
-    let nonrec_gen = weighted_union nonrec_list in
-    let rec_gen = weighted_union (nonrec_list @ rec_list) in
+    let nonrec_gen = (weighted_union [@mode p]) nonrec_list in
+    let rec_gen =
+      (weighted_union [@mode p])
+        ((Maybe_portable.wrap_list [@mode p]) nonrec_list
+         @ (Maybe_portable.wrap_list [@mode p]) rec_list
+         |> (Maybe_portable.unwrap_list [@mode p]))
+    in
     match%bind size with
     | 0 -> nonrec_gen
     | _ -> rec_gen)
+[@@mode p = (nonportable, portable)]
 ;;
 
 let recursive_union nonrec_list ~f =
@@ -377,26 +395,16 @@ let either fst_t snd_t =
 
 let result ok_t err_t =
   (map [@mode p]) ((either [@mode p]) ok_t err_t) ~f:Result.of_either
-;;]
+;;
 
-include struct
-  let list_generic ?min_length ?max_length elt_gen =
-    let%bind sizes = sizes ?min_length ?max_length () in
-    List.map sizes ~f:(fun size -> with_size ~size elt_gen) |> all
-  ;;
-
-  let%template list_generic ?min_length ?max_length elt_gen =
-    let%bind.Portable sizes = sizes ?min_length ?max_length () in
-    List.map sizes ~f:(fun size ->
-      (with_size [@mode portable]) ~size elt_gen |> Modes.Portable.wrap)
-    |> Modes.Portable.unwrap_list
-    |> (all [@mode portable])
-  [@@mode portable]
-  ;;
-end
-
-[%%template
-[@@@mode.default p = (nonportable, portable)]
+let list_generic ?min_length ?max_length elt_gen =
+  let open Syntax.Let_syntax [@mode p] in
+  let%bind sizes = sizes ?min_length ?max_length () in
+  List.map sizes ~f:(fun size ->
+    (with_size [@mode p]) ~size elt_gen |> (Maybe_portable.wrap [@mode p]))
+  |> (Maybe_portable.unwrap_list [@mode p])
+  |> (all [@mode p])
+;;
 
 let list elt_gen = (list_generic [@mode p]) elt_gen
 let list_non_empty elt_gen = (list_generic [@mode p]) ~min_length:1 elt_gen
@@ -940,32 +948,28 @@ let%template sexp_of atom =
 
 let%template sexp = (sexp_of [@mode portable]) string
 
-let map_tree_using_comparator ~comparator key_gen data_gen =
-  let%bind keys = list key_gen in
-  let keys = List.dedup_and_sort keys ~compare:(Comparator.compare comparator) in
-  let%bind data = list_with_length data_gen ~length:(List.length keys) in
-  return (Map.Using_comparator.Tree.of_alist_exn ~comparator (List.zip_exn keys data))
+let%template map_tree_using_comparator ~comparator key_gen data_gen =
+  (list [@mode p]) key_gen
+  |> (bind [@mode p]) ~f:(fun keys ->
+    let keys = List.dedup_and_sort keys ~compare:(Comparator.compare comparator) in
+    let%bind data = (list_with_length [@mode p]) data_gen ~length:(List.length keys) in
+    return (Map.Using_comparator.Tree.of_alist_exn ~comparator (List.zip_exn keys data)))
+[@@mode p = (nonportable, portable)]
 ;;
 
 let set_tree_using_comparator ~comparator elt_gen =
   map (list elt_gen) ~f:(Set.Using_comparator.Tree.of_list ~comparator)
 ;;
 
-let comparator_of_m
-  (type a c)
-  (module M : Comparator.S with type t = a and type comparator_witness = c)
-  =
-  M.comparator
-;;
-
-let map_t_m m key_gen data_gen =
-  let comparator = comparator_of_m m in
-  map_tree_using_comparator ~comparator key_gen data_gen
-  |> map ~f:(Map.Using_comparator.of_tree ~comparator)
+let%template map_t_m (type cmp) m key_gen data_gen =
+  let (comparator : (_, cmp) Comparator.t) = Comparator.of_module m in
+  (map_tree_using_comparator [@mode p]) ~comparator key_gen data_gen
+  |> (map [@mode p]) ~f:(fun tree -> Map.Using_comparator.of_tree ~comparator tree)
+[@@mode p = (nonportable, portable)]
 ;;
 
 let set_t_m m elt_gen =
-  let comparator = comparator_of_m m in
+  let comparator = Comparator.of_module m in
   set_tree_using_comparator ~comparator elt_gen
   |> map ~f:(Set.Using_comparator.of_tree ~comparator)
 ;;

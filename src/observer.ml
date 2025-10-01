@@ -21,6 +21,11 @@ let%template of_hash_fold f = (create [@mode p]) (fun x ~size:_ ~hash -> f hash 
 
 let of_lazy lazy_t = create (fun x ~size ~hash -> observe (force lazy_t) x ~size ~hash)
 
+let of_portable_lazy lazy_t =
+  (create [@mode portable]) (fun x ~size ~hash ->
+    observe (Portable_lazy.force lazy_t) x ~size ~hash)
+;;
+
 let fixed_point wrap =
   let rec lazy_t = lazy (wrap (of_lazy lazy_t)) in
   of_lazy lazy_t
@@ -108,14 +113,20 @@ let fn dom rng =
       observe rng (f x) ~size ~hash))
 ;;
 
-let map_tree key_obs data_obs =
-  unmap (list (both key_obs data_obs)) ~f:Map.Using_comparator.Tree.to_alist
+let%template map_tree key_obs data_obs =
+  (unmap [@mode p])
+    ((list [@mode p]) ((both [@mode p]) key_obs data_obs))
+    ~f:Map.Using_comparator.Tree.to_alist
+[@@mode p = (nonportable, portable)]
 ;;
 
 let set_tree elt_obs = unmap (list elt_obs) ~f:Set.Using_comparator.Tree.to_list
 
-let map_t key_obs data_obs =
-  unmap (map_tree key_obs data_obs) ~f:Map.Using_comparator.to_tree
+let%template map_t key_obs data_obs =
+  (unmap [@mode p])
+    ((map_tree [@mode p]) key_obs data_obs)
+    ~f:Map.Using_comparator.to_tree
+[@@mode p = (nonportable, portable)]
 ;;
 
 let set_t elt_obs = unmap (set_tree elt_obs) ~f:Set.Using_comparator.to_tree

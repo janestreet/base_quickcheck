@@ -213,12 +213,27 @@ let%expect_test "sizes" =
     |}]
 ;;
 
-let with_size = Generator.with_size
+let%template with_size = (Generator.with_size [@mode p])
+[@@mode p = (portable, nonportable)]
+;;
 
 let%expect_test "with_size" =
   test_generator
     ~mode:`inexhaustive
     (Generator.with_size ~size:0 Generator.size)
+    (m_nat ~up_to:10);
+  [%expect
+    {|
+    (generator
+     ("generated 1 distinct values in 10_000 iterations"
+      ("did not generate these values" (1 2 3 4 5 6 7 8 9 10))))
+    |}]
+;;
+
+let%expect_test "with_size [@mode portable]" =
+  test_generator
+    ~mode:`inexhaustive
+    ((Generator.with_size [@mode portable]) ~size:0 Generator.size)
     (m_nat ~up_to:10);
   [%expect
     {|
@@ -368,7 +383,9 @@ let%expect_test "recursive_union" =
   [%expect {| ((recursive_calls 1) (values_generated 10000)) |}]
 ;;
 
-let weighted_recursive_union = Generator.weighted_recursive_union
+let%template weighted_recursive_union = (Generator.weighted_recursive_union [@mode p])
+[@@mode p = (nonportable, portable)]
+;;
 
 let%expect_test "weighted_recursive_union" =
   test_generator
@@ -446,8 +463,11 @@ let%expect_test "result" =
   [%expect {| (generator exhaustive) |}]
 ;;
 
-let map_t_m = Generator.map_t_m
-let map_tree_using_comparator = Generator.map_tree_using_comparator
+let%template map_t_m = (Generator.map_t_m [@mode p]) [@@mode p = (nonportable, portable)]
+
+let%template map_tree_using_comparator = (Generator.map_tree_using_comparator [@mode p])
+[@@mode p = (nonportable, portable)]
+;;
 
 let%expect_test "map_t_m" =
   test_generator
@@ -1985,6 +2005,26 @@ let%expect_test "of_lazy, unforced" =
     (Generator.weighted_union
        [ Float.max_finite_value, Generator.size
        ; Float.min_positive_subnormal_value, Generator.of_lazy (lazy (assert false))
+       ])
+    (m_nat ~up_to:30);
+  [%expect {| (generator exhaustive) |}]
+;;
+
+let of_portable_lazy = Generator.of_portable_lazy
+
+let%expect_test "of_portable_lazy, forced" =
+  test_generator
+    (Generator.of_portable_lazy (Portable_lazy.from_val Generator.size))
+    (m_nat ~up_to:30);
+  [%expect {| (generator exhaustive) |}]
+;;
+
+let%expect_test "of_portable_lazy, unforced" =
+  test_generator
+    (Generator.weighted_union
+       [ Float.max_finite_value, Generator.size
+       ; ( Float.min_positive_subnormal_value
+         , Generator.of_portable_lazy (Portable_lazy.from_fun (fun () -> assert false)) )
        ])
     (m_nat ~up_to:30);
   [%expect {| (generator exhaustive) |}]

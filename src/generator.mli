@@ -19,19 +19,20 @@ include With_basic_types.S with type 'a t := 'a t (** @inline *)
 val%template fn : 'a Observer0.t -> 'b t -> ('a -> 'b) t
 [@@mode p = (nonportable, portable)]
 
-val map_t_m
-  :  ('key, 'cmp) Comparator.Module.t
-  -> 'key t
-  -> 'data t
-  -> ('key, 'data, 'cmp) Map.t t
+val%template map_t_m
+  : 'key 'data 'cmp.
+  ('key, 'cmp) Comparator.Module.t -> 'key t -> 'data t -> ('key, 'data, 'cmp) Map.t t
+[@@mode p = (nonportable, portable)]
 
 val set_t_m : ('elt, 'cmp) Comparator.Module.t -> 'elt t -> ('elt, 'cmp) Set.t t
 
-val map_tree_using_comparator
-  :  comparator:('key, 'cmp) Comparator.t
+val%template map_tree_using_comparator
+  : 'key 'data 'cmp.
+  comparator:('key, 'cmp) Comparator.t
   -> 'key t
   -> 'data t
   -> ('key, 'data, 'cmp) Map.Using_comparator.Tree.t t
+[@@mode p = (nonportable, portable)]
 
 val set_tree_using_comparator
   :  comparator:('elt, 'cmp) Comparator.t
@@ -65,7 +66,13 @@ module Portable : sig
       val bind : 'a t -> f:('a -> 'b t) -> 'b t
       val both : 'a t -> 'b t -> ('a * 'b) t
 
-      module Open_on_rhs : sig end
+      module Open_on_rhs : sig
+        val map : 'a t -> f:('a -> 'b) -> 'b t
+        val ( >>| ) : 'a t -> ('a -> 'b) -> 'b t
+        val of_list : 'a. 'a list -> 'a t
+        val union : 'a t list -> 'a t
+        val filter : 'a t -> f:('a -> bool) -> 'a t
+      end
     end
   end
 end
@@ -118,7 +125,8 @@ val size : int t
           Some elements
       ;;
     ]} *)
-val with_size : 'a t -> size:int -> 'a t
+val%template with_size : 'a t -> size:int -> 'a t
+[@@mode p = (portable, nonportable)]
 
 (** Produces a list of sizes that distribute the current size among list elements. The
     [min_length] and [max_length] parameters can be used to bound the length of the
@@ -205,6 +213,9 @@ val fixed_point : ('a t -> 'a t) -> 'a t
     (mutually) recursive knots. *)
 val of_lazy : 'a t Lazy.t -> 'a t
 
+(** Like [of_lazy], but for [Portable_lazy.t]. *)
+val of_portable_lazy : 'a t Portable_lazy.t -> 'a t
+
 (** {2 Custom Random Distributions} *)
 
 (** Produces one of the given values, chosen with the corresponding weight. Weights must
@@ -219,10 +230,11 @@ val%template weighted_union : (float * 'a t) list -> 'a t
 
 (** Like [recursive_union], with explicit weights for each clause. Weights must be
     non-negative and the recursive case weights must have a strictly positive sum. *)
-val weighted_recursive_union
+val%template weighted_recursive_union
   :  (float * 'a t) list
   -> f:('a t -> (float * 'a t) list)
   -> 'a t
+[@@mode p = (nonportable, portable)]
 
 (** {3 Integer Distributions} *)
 

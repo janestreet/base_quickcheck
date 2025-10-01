@@ -15,6 +15,7 @@ depends: [
   "ppx_base"
   "ppx_fields_conv"
   "ppx_let"
+  "ppx_portable"
   "ppx_sexp_message"
   "ppx_sexp_value"
   "ppx_shorthand"
