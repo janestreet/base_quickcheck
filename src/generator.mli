@@ -16,7 +16,7 @@ include With_basic_types.S with type 'a t := 'a t (** @inline *)
 (** Generates random functions that use the given observer to perturb the pseudo-random
     state that is then used to generate the output value. The resulting functions are
     therefore deterministic, assuming the observer is deterministic. *)
-val%template fn : 'a Observer0.t -> 'b t -> ('a -> 'b) t
+val%template fn : 'a 'b. 'a Observer0.t -> 'b t -> ('a -> 'b) t
 [@@mode p = (nonportable, portable)]
 
 val%template map_t_m
@@ -51,8 +51,8 @@ val%template of_list : 'a. 'a list -> 'a t [@@mode portable]
 val%template union : 'a t list -> 'a t
 [@@mode p = (nonportable, portable)]
 
-include Applicative.S with type 'a t := 'a t
-include Monad.S with type 'a t := 'a t
+include%template Applicative.S [@kind value_or_null mod maybe_null] with type 'a t := 'a t
+include%template Monad.S [@kind value_or_null mod maybe_null] with type 'a t := 'a t
 
 module Portable : sig
   module Let_syntax : sig
@@ -371,9 +371,9 @@ val sexp_of : string t -> Sexp.t t
 
 (** {3 List Distributions} *)
 
-val%template list_non_empty : 'a t -> 'a list t [@@mode p = (nonportable, portable)]
+val%template list_non_empty : 'a. 'a t -> 'a list t [@@mode p = (nonportable, portable)]
 
-val%template list_with_length : 'a t -> length:int -> 'a list t
+val%template list_with_length : 'a. 'a t -> length:int -> 'a list t
 [@@mode p = (nonportable, portable)]
 
 (** Randomly drops elements from a list. The length of each result is chosen uniformly
@@ -435,7 +435,7 @@ val%template create : (size:int -> random:Splittable_random.t -> 'a) -> 'a t
 
 (** Generates a random value using the given size and pseudorandom state. Useful when
     using [create] and dispatching to other existing generators. *)
-val generate : 'a t -> size:int -> random:Splittable_random.t -> 'a
+val generate : 'a. 'a t -> size:int -> random:Splittable_random.t -> 'a
 
 module Via_thunk : sig
   type 'a thunk := unit -> 'a

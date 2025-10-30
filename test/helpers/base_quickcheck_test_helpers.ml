@@ -307,6 +307,15 @@ let m_option (type value) (module Value : With_examples with type t = value) =
     with type t = value option)
 ;;
 
+let m_or_null (type value) (module Value : With_examples with type t = value) =
+  (module struct
+    type t = Value.t or_null [@@deriving compare, sexp_of]
+
+    let examples = [ Null ] @ List.map Value.examples ~f:Or_null.this
+  end : With_examples
+    with type t = value or_null)
+;;
+
 let m_list (type elt) (module Elt : With_examples with type t = elt) =
   (module struct
     type t = Elt.t list [@@deriving sexp_of]

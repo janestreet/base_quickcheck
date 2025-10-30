@@ -7,9 +7,10 @@ module T : sig
 
   val atomic : 'a. 'a t
 
-  val%template create : ('a -> 'a Sequence.t) -> 'a t [@@mode p = (nonportable, portable)]
+  val%template create : 'a. ('a -> 'a Sequence.t) -> 'a t
+  [@@mode p = (nonportable, portable)]
 
-  val shrink : 'a t -> 'a -> 'a Sequence.t
+  val shrink : 'a. 'a t -> 'a -> 'a Sequence.t
 
   module Via_thunk : sig
     val%template create : 'a. ('a thunk -> 'a thunk Sequence.t) -> 'a t
@@ -158,6 +159,15 @@ let option value_t =
       Sequence.append
         (Sequence.singleton None)
         (Sequence.map ~f:Option.return (shrink value_t value)))
+;;
+
+let or_null value_t =
+  (create [@mode p]) (function
+    | Null -> Sequence.get_empty ()
+    | This value ->
+      Sequence.append
+        (Sequence.singleton Null)
+        (Sequence.map ~f:Or_null.this (shrink value_t value)))
 ;;
 
 let list elt_t =

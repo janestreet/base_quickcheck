@@ -35,7 +35,7 @@ val set_tree_using_comparator
 [%%template:
 [@@@mode.default p = (nonportable, portable)]
 
-val map : 'a t -> f:('a -> 'b) -> f_inverse:('b -> 'a) -> 'b t
+val map : 'a 'b. 'a t -> f:('a -> 'b) -> f_inverse:('b -> 'a) -> 'b t
 val filter : 'a t -> f:('a -> bool) -> 'a t
 
 (** Filters and maps according to [f], and provides input to [t] via [f_inverse]. Only the
@@ -74,9 +74,10 @@ val of_portable_lazy : 'a t Portable_lazy.t -> 'a t
 
     Most users will not need to call these. *)
 
-val%template create : ('a -> 'a Sequence.t) -> 'a t [@@mode p = (nonportable, portable)]
+val%template create : 'a. ('a -> 'a Sequence.t) -> 'a t
+[@@mode p = (nonportable, portable)]
 
-val shrink : 'a t -> 'a -> 'a Sequence.t
+val shrink : 'a. 'a t -> 'a -> 'a Sequence.t
 
 module Via_thunk : sig
   type 'a thunk := unit -> 'a

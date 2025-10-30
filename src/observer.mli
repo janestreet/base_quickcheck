@@ -15,7 +15,7 @@ include With_basic_types.S with type 'a t := 'a t (** @inline *)
 
 (** Produces an observer that generates random inputs for a given function, calls the
     function on them, then observes the corresponding outputs. *)
-val fn : 'a Generator.t -> 'b t -> ('a -> 'b) t
+val fn : 'a 'b. 'a Generator.t -> 'b t -> ('a -> 'b) t
 
 val%template map_t : 'key t -> 'data t -> ('key, 'data, 'cmp) Map.t t
 [@@mode p = (nonportable, portable)]
@@ -39,7 +39,8 @@ val%template of_hash_fold : (Hash.state -> 'a -> Hash.state) -> 'a t
 
 (** {2 Modifying Observers} *)
 
-val%template unmap : 'a t -> f:('b -> 'a) -> 'b t [@@mode p = (nonportable, portable)]
+val%template unmap : 'a 'b. 'a t -> f:('b -> 'a) -> 'b t
+[@@mode p = (nonportable, portable)]
 
 (** {2 Observers for Recursive Types} *)
 

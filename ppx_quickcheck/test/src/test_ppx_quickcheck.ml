@@ -862,27 +862,27 @@ module type Modalities = sig
   include sig
     [@@@ocaml.warning "-32"]
 
-    val quickcheck_generator__portable
-      :  'a Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
-      -> 'a t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
-
     val quickcheck_generator
       :  'a Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
       -> 'a t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
 
-    val quickcheck_observer__portable
-      :  'a Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
-      -> 'a t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
+    val quickcheck_generator__portable
+      :  'a Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
+      -> 'a t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
 
     val quickcheck_observer
       :  'a Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
       -> 'a t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
 
-    val quickcheck_shrinker__portable
+    val quickcheck_observer__portable
+      :  'a Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
+      -> 'a t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
+
+    val quickcheck_shrinker
       :  'a Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
       -> 'a t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
 
-    val quickcheck_shrinker
+    val quickcheck_shrinker__portable
       :  'a Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
       -> 'a t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
   end

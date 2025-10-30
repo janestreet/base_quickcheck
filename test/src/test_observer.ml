@@ -192,6 +192,16 @@ let%expect_test "option" =
   [%expect {| (observer transparent) |}]
 ;;
 
+let%template or_null = (Observer.or_null [@mode p]) [@@mode p = (portable, nonportable)]
+
+let%expect_test "or_null" =
+  [%expect {| |}];
+  test_observer
+    (Observer.unmap (Observer.or_null Observer.bool) ~f:Or_null.of_option)
+    (m_option m_bool);
+  [%expect {| (observer transparent) |}]
+;;
+
 let%template list = (Observer.list [@mode p]) [@@mode p = (portable, nonportable)]
 
 let%expect_test "list" =

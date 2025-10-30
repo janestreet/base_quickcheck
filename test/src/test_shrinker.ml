@@ -404,6 +404,25 @@ let%expect_test "option" =
     |}]
 ;;
 
+let%template or_null = (Shrinker.or_null [@mode p]) [@@mode p = (portable, nonportable)]
+
+let%expect_test "or_null" =
+  test_shrinker (Shrinker.or_null natural_number_shrinker) (m_or_null (m_nat ~up_to:4));
+  [%expect
+    {|
+    (shrinker
+     (((0) => ())
+      ((1) => ())
+      ((1) => (0))
+      ((2) => ())
+      ((2) => (1))
+      ((3) => ())
+      ((3) => (2))
+      ((4) => ())
+      ((4) => (3))))
+    |}]
+;;
+
 let%template list = (Shrinker.list [@mode p]) [@@mode p = (portable, nonportable)]
 
 let%expect_test "list" =

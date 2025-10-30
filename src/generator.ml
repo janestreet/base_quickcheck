@@ -18,10 +18,10 @@ type 'a thunk = unit -> 'a
 module T : sig
   type +'a t
 
-  val%template create : (size:int -> random:Splittable_random.t -> 'a) -> 'a t
+  val%template create : 'a. (size:int -> random:Splittable_random.t -> 'a) -> 'a t
   [@@mode p = (nonportable, portable)]
 
-  val generate : 'a t -> size:int -> random:Splittable_random.t -> 'a
+  val generate : 'a. 'a t -> size:int -> random:Splittable_random.t -> 'a
 
   module Via_thunk : sig
     val%template create : 'a. (size:int -> random:Splittable_random.t -> 'a thunk) -> 'a t
@@ -386,6 +386,11 @@ let%template bool =
 let option value_t =
   (union [@mode p])
     [ (map [@mode p]) unit ~f:(fun () -> None); (map [@mode p]) value_t ~f:Option.return ]
+;;
+
+let or_null value_t =
+  (union [@mode p])
+    [ (map [@mode p]) unit ~f:(fun () -> Null); (map [@mode p]) value_t ~f:Or_null.this ]
 ;;
 
 let either fst_t snd_t =

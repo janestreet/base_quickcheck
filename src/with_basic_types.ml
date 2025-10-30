@@ -33,6 +33,7 @@ module type S = sig
   [@@@mode.default p = (portable, nonportable)]
 
   val option : 'a t -> 'a option t
+  val or_null : 'a t -> 'a or_null t
   val list : 'a t -> 'a list t
   val array : 'a t -> 'a array t
   val ref : 'a t -> 'a ref t

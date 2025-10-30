@@ -2478,59 +2478,53 @@ module Poly_recursive = struct
     open struct
       let rec quickcheck_generator
         : 'a.
-        ('a Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
-         -> 'a t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t)
-          Ppx_quickcheck_runtime.Base.Lazy.t
+        'a Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
+        -> 'a t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
         =
-        lazy
-          (fun _generator__367_ ->
-            let quickcheck_generator _recur__377_ =
-              Ppx_quickcheck_runtime.Base_quickcheck.Generator.of_lazy
-                (lazy
-                  (Ppx_quickcheck_runtime.Base.Lazy.force
-                     quickcheck_generator
-                     _recur__377_))
-            in
-            ignore quickcheck_generator;
-            let _pair__371_ =
-              ( 1.
-              , Ppx_quickcheck_runtime.Base_quickcheck.Generator.Via_thunk.create
-                  (fun ~size:_size__375_ ~random:_random__376_ () -> Zero) )
-            and _pair__372_ =
-              ( 1.
-              , Ppx_quickcheck_runtime.Base_quickcheck.Generator.bind
-                  Ppx_quickcheck_runtime.Base_quickcheck.Generator.size
-                  ~f:(fun _size__368_ ->
-                    Ppx_quickcheck_runtime.Base_quickcheck.Generator.with_size
-                      ~size:(Ppx_quickcheck_runtime.Base.Int.pred _size__368_)
-                      (Ppx_quickcheck_runtime.Base_quickcheck.Generator.Via_thunk.create
-                         (fun ~size:_size__373_ ~random:_random__374_ () ->
-                            Succ
-                              ( Ppx_quickcheck_runtime.Base_quickcheck.Generator.Via_thunk
-                                .generate
-                                  _generator__367_
-                                  ~size:_size__373_
-                                  ~random:_random__374_
-                                  ()
-                              , Ppx_quickcheck_runtime.Base_quickcheck.Generator.Via_thunk
-                                .generate
-                                  (quickcheck_generator _generator__367_)
-                                  ~size:_size__373_
-                                  ~random:_random__374_
-                                  () )))) )
-            in
-            let _gen__369_ =
-              Ppx_quickcheck_runtime.Base_quickcheck.Generator.weighted_union
-                [ _pair__371_ ]
-            and _gen__370_ =
-              Ppx_quickcheck_runtime.Base_quickcheck.Generator.weighted_union
-                [ _pair__371_; _pair__372_ ]
-            in
-            Ppx_quickcheck_runtime.Base_quickcheck.Generator.bind
+        fun _generator__367_ ->
+        let quickcheck_generator _recur__377_ =
+          Ppx_quickcheck_runtime.Base_quickcheck.Generator.of_lazy
+            (lazy (quickcheck_generator _recur__377_))
+        in
+        ignore quickcheck_generator;
+        let _pair__371_ =
+          ( 1.
+          , Ppx_quickcheck_runtime.Base_quickcheck.Generator.Via_thunk.create
+              (fun ~size:_size__375_ ~random:_random__376_ () -> Zero) )
+        and _pair__372_ =
+          ( 1.
+          , Ppx_quickcheck_runtime.Base_quickcheck.Generator.bind
               Ppx_quickcheck_runtime.Base_quickcheck.Generator.size
-              ~f:(function
-              | 0 -> _gen__369_
-              | _ -> _gen__370_))
+              ~f:(fun _size__368_ ->
+                Ppx_quickcheck_runtime.Base_quickcheck.Generator.with_size
+                  ~size:(Ppx_quickcheck_runtime.Base.Int.pred _size__368_)
+                  (Ppx_quickcheck_runtime.Base_quickcheck.Generator.Via_thunk.create
+                     (fun ~size:_size__373_ ~random:_random__374_ () ->
+                        Succ
+                          ( Ppx_quickcheck_runtime.Base_quickcheck.Generator.Via_thunk
+                            .generate
+                              _generator__367_
+                              ~size:_size__373_
+                              ~random:_random__374_
+                              ()
+                          , Ppx_quickcheck_runtime.Base_quickcheck.Generator.Via_thunk
+                            .generate
+                              (quickcheck_generator _generator__367_)
+                              ~size:_size__373_
+                              ~random:_random__374_
+                              () )))) )
+        in
+        let _gen__369_ =
+          Ppx_quickcheck_runtime.Base_quickcheck.Generator.weighted_union [ _pair__371_ ]
+        and _gen__370_ =
+          Ppx_quickcheck_runtime.Base_quickcheck.Generator.weighted_union
+            [ _pair__371_; _pair__372_ ]
+        in
+        Ppx_quickcheck_runtime.Base_quickcheck.Generator.bind
+          Ppx_quickcheck_runtime.Base_quickcheck.Generator.size
+          ~f:(function
+          | 0 -> _gen__369_
+          | _ -> _gen__370_)
       ;;
 
       let _ = quickcheck_generator
@@ -2538,7 +2532,7 @@ module Poly_recursive = struct
 
     let quickcheck_generator _recur__378_ =
       Ppx_quickcheck_runtime.Base_quickcheck.Generator.of_lazy
-        (lazy (Ppx_quickcheck_runtime.Base.Lazy.force quickcheck_generator _recur__378_))
+        (lazy (quickcheck_generator _recur__378_))
     ;;
 
     let _ = quickcheck_generator
@@ -2548,48 +2542,43 @@ module Poly_recursive = struct
     open struct
       let rec quickcheck_observer
         : 'a.
-        ('a Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
-         -> 'a t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t)
-          Ppx_quickcheck_runtime.Base.Lazy.t
+        'a Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
+        -> 'a t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
         =
-        lazy
-          (fun _observer__358_ ->
-            let quickcheck_observer _recur__365_ =
-              Ppx_quickcheck_runtime.Base_quickcheck.Observer.of_lazy
-                (lazy
-                  (Ppx_quickcheck_runtime.Base.Lazy.force
-                     quickcheck_observer
-                     _recur__365_))
-            in
-            ignore quickcheck_observer;
-            Ppx_quickcheck_runtime.Base_quickcheck.Observer.Via_thunk.create
-              (fun _f__360_ ~size:_size__361_ ~hash:_hash__362_ ->
-                 let _x__359_ = _f__360_ () in
-                 match _x__359_ with
-                 | Zero ->
-                   let _hash__362_ =
-                     Ppx_quickcheck_runtime.Base.hash_fold_int _hash__362_ 0
-                   in
-                   _hash__362_
-                 | Succ (_x__363_, _x__364_) ->
-                   let _hash__362_ =
-                     Ppx_quickcheck_runtime.Base.hash_fold_int _hash__362_ 1
-                   in
-                   let _hash__362_ =
-                     Ppx_quickcheck_runtime.Base_quickcheck.Observer.Via_thunk.observe
-                       _observer__358_
-                       (fun () -> _x__363_)
-                       ~size:_size__361_
-                       ~hash:_hash__362_
-                   in
-                   let _hash__362_ =
-                     Ppx_quickcheck_runtime.Base_quickcheck.Observer.Via_thunk.observe
-                       (quickcheck_observer _observer__358_)
-                       (fun () -> _x__364_)
-                       ~size:_size__361_
-                       ~hash:_hash__362_
-                   in
-                   _hash__362_))
+        fun _observer__358_ ->
+        let quickcheck_observer _recur__365_ =
+          Ppx_quickcheck_runtime.Base_quickcheck.Observer.of_lazy
+            (lazy (quickcheck_observer _recur__365_))
+        in
+        ignore quickcheck_observer;
+        Ppx_quickcheck_runtime.Base_quickcheck.Observer.Via_thunk.create
+          (fun _f__360_ ~size:_size__361_ ~hash:_hash__362_ ->
+             let _x__359_ = _f__360_ () in
+             match _x__359_ with
+             | Zero ->
+               let _hash__362_ =
+                 Ppx_quickcheck_runtime.Base.hash_fold_int _hash__362_ 0
+               in
+               _hash__362_
+             | Succ (_x__363_, _x__364_) ->
+               let _hash__362_ =
+                 Ppx_quickcheck_runtime.Base.hash_fold_int _hash__362_ 1
+               in
+               let _hash__362_ =
+                 Ppx_quickcheck_runtime.Base_quickcheck.Observer.Via_thunk.observe
+                   _observer__358_
+                   (fun () -> _x__363_)
+                   ~size:_size__361_
+                   ~hash:_hash__362_
+               in
+               let _hash__362_ =
+                 Ppx_quickcheck_runtime.Base_quickcheck.Observer.Via_thunk.observe
+                   (quickcheck_observer _observer__358_)
+                   (fun () -> _x__364_)
+                   ~size:_size__361_
+                   ~hash:_hash__362_
+               in
+               _hash__362_)
       ;;
 
       let _ = quickcheck_observer
@@ -2597,7 +2586,7 @@ module Poly_recursive = struct
 
     let quickcheck_observer _recur__366_ =
       Ppx_quickcheck_runtime.Base_quickcheck.Observer.of_lazy
-        (lazy (Ppx_quickcheck_runtime.Base.Lazy.force quickcheck_observer _recur__366_))
+        (lazy (quickcheck_observer _recur__366_))
     ;;
 
     let _ = quickcheck_observer
@@ -2607,41 +2596,35 @@ module Poly_recursive = struct
     open struct
       let rec quickcheck_shrinker
         : 'a.
-        ('a Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
-         -> 'a t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t)
-          Ppx_quickcheck_runtime.Base.Lazy.t
+        'a Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+        -> 'a t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
         =
-        lazy
-          (fun _shrinker__350_ ->
-            let quickcheck_shrinker _recur__356_ =
-              Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.of_lazy
-                (lazy
-                  (Ppx_quickcheck_runtime.Base.Lazy.force
-                     quickcheck_shrinker
-                     _recur__356_))
-            in
-            ignore quickcheck_shrinker;
-            Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.Via_thunk.create
-              (fun _f__351_ ->
-                 match _f__351_ () with
-                 | Zero -> Ppx_quickcheck_runtime.Base.Sequence.round_robin []
-                 | Succ (_x__353_, _x__354_) ->
-                   Ppx_quickcheck_runtime.Base.Sequence.round_robin
-                     [ Ppx_quickcheck_runtime.Base.Sequence.map
-                         (Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.Via_thunk.shrink
-                            _shrinker__350_
-                            (fun () -> _x__353_))
-                         ~f:(fun _f__355_ () ->
-                           let _x__353_ = _f__355_ () in
-                           Succ (_x__353_, _x__354_))
-                     ; Ppx_quickcheck_runtime.Base.Sequence.map
-                         (Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.Via_thunk.shrink
-                            (quickcheck_shrinker _shrinker__350_)
-                            (fun () -> _x__354_))
-                         ~f:(fun _f__355_ () ->
-                           let _x__354_ = _f__355_ () in
-                           Succ (_x__353_, _x__354_))
-                     ]))
+        fun _shrinker__350_ ->
+        let quickcheck_shrinker _recur__356_ =
+          Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.of_lazy
+            (lazy (quickcheck_shrinker _recur__356_))
+        in
+        ignore quickcheck_shrinker;
+        Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.Via_thunk.create (fun _f__351_ ->
+          match _f__351_ () with
+          | Zero -> Ppx_quickcheck_runtime.Base.Sequence.round_robin []
+          | Succ (_x__353_, _x__354_) ->
+            Ppx_quickcheck_runtime.Base.Sequence.round_robin
+              [ Ppx_quickcheck_runtime.Base.Sequence.map
+                  (Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.Via_thunk.shrink
+                     _shrinker__350_
+                     (fun () -> _x__353_))
+                  ~f:(fun _f__355_ () ->
+                    let _x__353_ = _f__355_ () in
+                    Succ (_x__353_, _x__354_))
+              ; Ppx_quickcheck_runtime.Base.Sequence.map
+                  (Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.Via_thunk.shrink
+                     (quickcheck_shrinker _shrinker__350_)
+                     (fun () -> _x__354_))
+                  ~f:(fun _f__355_ () ->
+                    let _x__354_ = _f__355_ () in
+                    Succ (_x__353_, _x__354_))
+              ])
       ;;
 
       let _ = quickcheck_shrinker
@@ -2649,7 +2632,7 @@ module Poly_recursive = struct
 
     let quickcheck_shrinker _recur__357_ =
       Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.of_lazy
-        (lazy (Ppx_quickcheck_runtime.Base.Lazy.force quickcheck_shrinker _recur__357_))
+        (lazy (quickcheck_shrinker _recur__357_))
     ;;
 
     let _ = quickcheck_shrinker
@@ -2694,10 +2677,7 @@ module Murec_poly_mono = struct
              Ppx_quickcheck_runtime.Base_quickcheck.Generator.of_lazy quickcheck_generator
            and quickcheck_generator_node _recur__406_ =
              Ppx_quickcheck_runtime.Base_quickcheck.Generator.of_lazy
-               (lazy
-                 (Ppx_quickcheck_runtime.Base.Lazy.force
-                    quickcheck_generator_node
-                    _recur__406_))
+               (lazy (quickcheck_generator_node _recur__406_))
            in
            ignore quickcheck_generator_node;
            ignore quickcheck_generator;
@@ -2743,25 +2723,19 @@ module Murec_poly_mono = struct
 
       and quickcheck_generator_node
         : 'a.
-        ('a Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
-         -> 'a node Ppx_quickcheck_runtime.Base_quickcheck.Generator.t)
-          Ppx_quickcheck_runtime.Base.Lazy.t
+        'a Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
+        -> 'a node Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
         =
-        lazy
-          (fun _generator__405_ ->
-            let quickcheck_generator =
-              Ppx_quickcheck_runtime.Base_quickcheck.Generator.of_lazy
-                quickcheck_generator
-            and quickcheck_generator_node _recur__406_ =
-              Ppx_quickcheck_runtime.Base_quickcheck.Generator.of_lazy
-                (lazy
-                  (Ppx_quickcheck_runtime.Base.Lazy.force
-                     quickcheck_generator_node
-                     _recur__406_))
-            in
-            ignore quickcheck_generator_node;
-            ignore quickcheck_generator;
-            quickcheck_generator_list _generator__405_)
+        fun _generator__405_ ->
+        let quickcheck_generator =
+          Ppx_quickcheck_runtime.Base_quickcheck.Generator.of_lazy quickcheck_generator
+        and quickcheck_generator_node _recur__406_ =
+          Ppx_quickcheck_runtime.Base_quickcheck.Generator.of_lazy
+            (lazy (quickcheck_generator_node _recur__406_))
+        in
+        ignore quickcheck_generator_node;
+        ignore quickcheck_generator;
+        quickcheck_generator_list _generator__405_
       ;;
 
       let _ = quickcheck_generator
@@ -2773,8 +2747,7 @@ module Murec_poly_mono = struct
 
     and quickcheck_generator_node _recur__407_ =
       Ppx_quickcheck_runtime.Base_quickcheck.Generator.of_lazy
-        (lazy
-          (Ppx_quickcheck_runtime.Base.Lazy.force quickcheck_generator_node _recur__407_))
+        (lazy (quickcheck_generator_node _recur__407_))
     ;;
 
     let _ = quickcheck_generator
@@ -2792,10 +2765,7 @@ module Murec_poly_mono = struct
              Ppx_quickcheck_runtime.Base_quickcheck.Observer.of_lazy quickcheck_observer
            and quickcheck_observer_node _recur__394_ =
              Ppx_quickcheck_runtime.Base_quickcheck.Observer.of_lazy
-               (lazy
-                 (Ppx_quickcheck_runtime.Base.Lazy.force
-                    quickcheck_observer_node
-                    _recur__394_))
+               (lazy (quickcheck_observer_node _recur__394_))
            in
            ignore quickcheck_observer_node;
            ignore quickcheck_observer;
@@ -2830,24 +2800,19 @@ module Murec_poly_mono = struct
 
       and quickcheck_observer_node
         : 'a.
-        ('a Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
-         -> 'a node Ppx_quickcheck_runtime.Base_quickcheck.Observer.t)
-          Ppx_quickcheck_runtime.Base.Lazy.t
+        'a Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
+        -> 'a node Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
         =
-        lazy
-          (fun _observer__393_ ->
-            let quickcheck_observer =
-              Ppx_quickcheck_runtime.Base_quickcheck.Observer.of_lazy quickcheck_observer
-            and quickcheck_observer_node _recur__394_ =
-              Ppx_quickcheck_runtime.Base_quickcheck.Observer.of_lazy
-                (lazy
-                  (Ppx_quickcheck_runtime.Base.Lazy.force
-                     quickcheck_observer_node
-                     _recur__394_))
-            in
-            ignore quickcheck_observer_node;
-            ignore quickcheck_observer;
-            quickcheck_observer_list _observer__393_)
+        fun _observer__393_ ->
+        let quickcheck_observer =
+          Ppx_quickcheck_runtime.Base_quickcheck.Observer.of_lazy quickcheck_observer
+        and quickcheck_observer_node _recur__394_ =
+          Ppx_quickcheck_runtime.Base_quickcheck.Observer.of_lazy
+            (lazy (quickcheck_observer_node _recur__394_))
+        in
+        ignore quickcheck_observer_node;
+        ignore quickcheck_observer;
+        quickcheck_observer_list _observer__393_
       ;;
 
       let _ = quickcheck_observer
@@ -2859,8 +2824,7 @@ module Murec_poly_mono = struct
 
     and quickcheck_observer_node _recur__395_ =
       Ppx_quickcheck_runtime.Base_quickcheck.Observer.of_lazy
-        (lazy
-          (Ppx_quickcheck_runtime.Base.Lazy.force quickcheck_observer_node _recur__395_))
+        (lazy (quickcheck_observer_node _recur__395_))
     ;;
 
     let _ = quickcheck_observer
@@ -2878,10 +2842,7 @@ module Murec_poly_mono = struct
              Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.of_lazy quickcheck_shrinker
            and quickcheck_shrinker_node _recur__385_ =
              Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.of_lazy
-               (lazy
-                 (Ppx_quickcheck_runtime.Base.Lazy.force
-                    quickcheck_shrinker_node
-                    _recur__385_))
+               (lazy (quickcheck_shrinker_node _recur__385_))
            in
            ignore quickcheck_shrinker_node;
            ignore quickcheck_shrinker;
@@ -2911,24 +2872,19 @@ module Murec_poly_mono = struct
 
       and quickcheck_shrinker_node
         : 'a.
-        ('a Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
-         -> 'a node Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t)
-          Ppx_quickcheck_runtime.Base.Lazy.t
+        'a Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+        -> 'a node Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
         =
-        lazy
-          (fun _shrinker__384_ ->
-            let quickcheck_shrinker =
-              Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.of_lazy quickcheck_shrinker
-            and quickcheck_shrinker_node _recur__385_ =
-              Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.of_lazy
-                (lazy
-                  (Ppx_quickcheck_runtime.Base.Lazy.force
-                     quickcheck_shrinker_node
-                     _recur__385_))
-            in
-            ignore quickcheck_shrinker_node;
-            ignore quickcheck_shrinker;
-            quickcheck_shrinker_list _shrinker__384_)
+        fun _shrinker__384_ ->
+        let quickcheck_shrinker =
+          Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.of_lazy quickcheck_shrinker
+        and quickcheck_shrinker_node _recur__385_ =
+          Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.of_lazy
+            (lazy (quickcheck_shrinker_node _recur__385_))
+        in
+        ignore quickcheck_shrinker_node;
+        ignore quickcheck_shrinker;
+        quickcheck_shrinker_list _shrinker__384_
       ;;
 
       let _ = quickcheck_shrinker
@@ -2940,8 +2896,7 @@ module Murec_poly_mono = struct
 
     and quickcheck_shrinker_node _recur__386_ =
       Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.of_lazy
-        (lazy
-          (Ppx_quickcheck_runtime.Base.Lazy.force quickcheck_shrinker_node _recur__386_))
+        (lazy (quickcheck_shrinker_node _recur__386_))
     ;;
 
     let _ = quickcheck_shrinker
@@ -2963,80 +2918,71 @@ module Polymorphic_recursion = struct
     open struct
       let rec quickcheck_generator
         : 'a.
-        ('a Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
-         -> 'a t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t)
-          Ppx_quickcheck_runtime.Base.Lazy.t
+        'a Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
+        -> 'a t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
         =
-        lazy
-          (fun _generator__435_ ->
-            let quickcheck_generator _recur__447_ =
-              Ppx_quickcheck_runtime.Base_quickcheck.Generator.of_lazy
-                (lazy
-                  (Ppx_quickcheck_runtime.Base.Lazy.force
-                     quickcheck_generator
-                     _recur__447_))
-            in
-            ignore quickcheck_generator;
-            let _pair__439_ =
-              ( 1.
-              , Ppx_quickcheck_runtime.Base_quickcheck.Generator.Via_thunk.create
-                  (fun ~size:_size__445_ ~random:_random__446_ () ->
-                     Single
-                       (Ppx_quickcheck_runtime.Base_quickcheck.Generator.Via_thunk
-                        .generate
-                          _generator__435_
-                          ~size:_size__445_
-                          ~random:_random__446_
-                          ())) )
-            and _pair__440_ =
-              ( 1.
-              , Ppx_quickcheck_runtime.Base_quickcheck.Generator.bind
-                  Ppx_quickcheck_runtime.Base_quickcheck.Generator.size
-                  ~f:(fun _size__436_ ->
-                    Ppx_quickcheck_runtime.Base_quickcheck.Generator.with_size
-                      ~size:(Ppx_quickcheck_runtime.Base.Int.pred _size__436_)
-                      (Ppx_quickcheck_runtime.Base_quickcheck.Generator.Via_thunk.create
-                         (fun ~size:_size__443_ ~random:_random__444_ () ->
-                            Double
-                              (Ppx_quickcheck_runtime.Base_quickcheck.Generator.Via_thunk
-                               .generate
-                                 (quickcheck_generator
-                                    (Ppx_quickcheck_runtime.Base_quickcheck.Generator
-                                     .Via_thunk
-                                     .create
-                                       (fun ~size:_size__441_ ~random:_random__442_ () ->
-                                          ( Ppx_quickcheck_runtime.Base_quickcheck
-                                            .Generator
-                                            .Via_thunk
-                                            .generate
-                                              _generator__435_
-                                              ~size:_size__441_
-                                              ~random:_random__442_
-                                              ()
-                                          , Ppx_quickcheck_runtime.Base_quickcheck
-                                            .Generator
-                                            .Via_thunk
-                                            .generate
-                                              _generator__435_
-                                              ~size:_size__441_
-                                              ~random:_random__442_
-                                              () ))))
-                                 ~size:_size__443_
-                                 ~random:_random__444_
-                                 ())))) )
-            in
-            let _gen__437_ =
-              Ppx_quickcheck_runtime.Base_quickcheck.Generator.weighted_union
-                [ _pair__439_ ]
-            and _gen__438_ =
-              Ppx_quickcheck_runtime.Base_quickcheck.Generator.weighted_union
-                [ _pair__439_; _pair__440_ ]
-            in
-            Ppx_quickcheck_runtime.Base_quickcheck.Generator.bind
+        fun _generator__435_ ->
+        let quickcheck_generator _recur__447_ =
+          Ppx_quickcheck_runtime.Base_quickcheck.Generator.of_lazy
+            (lazy (quickcheck_generator _recur__447_))
+        in
+        ignore quickcheck_generator;
+        let _pair__439_ =
+          ( 1.
+          , Ppx_quickcheck_runtime.Base_quickcheck.Generator.Via_thunk.create
+              (fun ~size:_size__445_ ~random:_random__446_ () ->
+                 Single
+                   (Ppx_quickcheck_runtime.Base_quickcheck.Generator.Via_thunk.generate
+                      _generator__435_
+                      ~size:_size__445_
+                      ~random:_random__446_
+                      ())) )
+        and _pair__440_ =
+          ( 1.
+          , Ppx_quickcheck_runtime.Base_quickcheck.Generator.bind
               Ppx_quickcheck_runtime.Base_quickcheck.Generator.size
-              ~f:(function
-              | 0 -> _gen__437_
-              | _ -> _gen__438_))
+              ~f:(fun _size__436_ ->
+                Ppx_quickcheck_runtime.Base_quickcheck.Generator.with_size
+                  ~size:(Ppx_quickcheck_runtime.Base.Int.pred _size__436_)
+                  (Ppx_quickcheck_runtime.Base_quickcheck.Generator.Via_thunk.create
+                     (fun ~size:_size__443_ ~random:_random__444_ () ->
+                        Double
+                          (Ppx_quickcheck_runtime.Base_quickcheck.Generator.Via_thunk
+                           .generate
+                             (quickcheck_generator
+                                (Ppx_quickcheck_runtime.Base_quickcheck.Generator
+                                 .Via_thunk
+                                 .create
+                                   (fun ~size:_size__441_ ~random:_random__442_ () ->
+                                      ( Ppx_quickcheck_runtime.Base_quickcheck.Generator
+                                        .Via_thunk
+                                        .generate
+                                          _generator__435_
+                                          ~size:_size__441_
+                                          ~random:_random__442_
+                                          ()
+                                      , Ppx_quickcheck_runtime.Base_quickcheck.Generator
+                                        .Via_thunk
+                                        .generate
+                                          _generator__435_
+                                          ~size:_size__441_
+                                          ~random:_random__442_
+                                          () ))))
+                             ~size:_size__443_
+                             ~random:_random__444_
+                             ())))) )
+        in
+        let _gen__437_ =
+          Ppx_quickcheck_runtime.Base_quickcheck.Generator.weighted_union [ _pair__439_ ]
+        and _gen__438_ =
+          Ppx_quickcheck_runtime.Base_quickcheck.Generator.weighted_union
+            [ _pair__439_; _pair__440_ ]
+        in
+        Ppx_quickcheck_runtime.Base_quickcheck.Generator.bind
+          Ppx_quickcheck_runtime.Base_quickcheck.Generator.size
+          ~f:(function
+          | 0 -> _gen__437_
+          | _ -> _gen__438_)
       ;;
 
       let _ = quickcheck_generator
@@ -3044,7 +2990,7 @@ module Polymorphic_recursion = struct
 
     let quickcheck_generator _recur__448_ =
       Ppx_quickcheck_runtime.Base_quickcheck.Generator.of_lazy
-        (lazy (Ppx_quickcheck_runtime.Base.Lazy.force quickcheck_generator _recur__448_))
+        (lazy (quickcheck_generator _recur__448_))
     ;;
 
     let _ = quickcheck_generator
@@ -3054,72 +3000,64 @@ module Polymorphic_recursion = struct
     open struct
       let rec quickcheck_observer
         : 'a.
-        ('a Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
-         -> 'a t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t)
-          Ppx_quickcheck_runtime.Base.Lazy.t
+        'a Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
+        -> 'a t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
         =
-        lazy
-          (fun _observer__420_ ->
-            let quickcheck_observer _recur__433_ =
-              Ppx_quickcheck_runtime.Base_quickcheck.Observer.of_lazy
-                (lazy
-                  (Ppx_quickcheck_runtime.Base.Lazy.force
-                     quickcheck_observer
-                     _recur__433_))
-            in
-            ignore quickcheck_observer;
-            Ppx_quickcheck_runtime.Base_quickcheck.Observer.Via_thunk.create
-              (fun _f__422_ ~size:_size__423_ ~hash:_hash__424_ ->
-                 let _x__421_ = _f__422_ () in
-                 match _x__421_ with
-                 | Single _x__425_ ->
-                   let _hash__424_ =
-                     Ppx_quickcheck_runtime.Base.hash_fold_int _hash__424_ 0
-                   in
-                   let _hash__424_ =
-                     Ppx_quickcheck_runtime.Base_quickcheck.Observer.Via_thunk.observe
-                       _observer__420_
-                       (fun () -> _x__425_)
-                       ~size:_size__423_
-                       ~hash:_hash__424_
-                   in
-                   _hash__424_
-                 | Double _x__432_ ->
-                   let _hash__424_ =
-                     Ppx_quickcheck_runtime.Base.hash_fold_int _hash__424_ 1
-                   in
-                   let _hash__424_ =
-                     Ppx_quickcheck_runtime.Base_quickcheck.Observer.Via_thunk.observe
-                       (quickcheck_observer
-                          (Ppx_quickcheck_runtime.Base_quickcheck.Observer.Via_thunk
-                           .create
-                             (fun _f__427_ ~size:_size__430_ ~hash:_hash__431_ ->
-                                let _x__426_ = _f__427_ () in
-                                let _x__428_, _x__429_ = _x__426_ in
-                                let _hash__431_ =
-                                  Ppx_quickcheck_runtime.Base_quickcheck.Observer
-                                  .Via_thunk
-                                  .observe
-                                    _observer__420_
-                                    (fun () -> _x__428_)
-                                    ~size:_size__430_
-                                    ~hash:_hash__431_
-                                in
-                                let _hash__431_ =
-                                  Ppx_quickcheck_runtime.Base_quickcheck.Observer
-                                  .Via_thunk
-                                  .observe
-                                    _observer__420_
-                                    (fun () -> _x__429_)
-                                    ~size:_size__430_
-                                    ~hash:_hash__431_
-                                in
-                                _hash__431_)))
-                       (fun () -> _x__432_)
-                       ~size:_size__423_
-                       ~hash:_hash__424_
-                   in
-                   _hash__424_))
+        fun _observer__420_ ->
+        let quickcheck_observer _recur__433_ =
+          Ppx_quickcheck_runtime.Base_quickcheck.Observer.of_lazy
+            (lazy (quickcheck_observer _recur__433_))
+        in
+        ignore quickcheck_observer;
+        Ppx_quickcheck_runtime.Base_quickcheck.Observer.Via_thunk.create
+          (fun _f__422_ ~size:_size__423_ ~hash:_hash__424_ ->
+             let _x__421_ = _f__422_ () in
+             match _x__421_ with
+             | Single _x__425_ ->
+               let _hash__424_ =
+                 Ppx_quickcheck_runtime.Base.hash_fold_int _hash__424_ 0
+               in
+               let _hash__424_ =
+                 Ppx_quickcheck_runtime.Base_quickcheck.Observer.Via_thunk.observe
+                   _observer__420_
+                   (fun () -> _x__425_)
+                   ~size:_size__423_
+                   ~hash:_hash__424_
+               in
+               _hash__424_
+             | Double _x__432_ ->
+               let _hash__424_ =
+                 Ppx_quickcheck_runtime.Base.hash_fold_int _hash__424_ 1
+               in
+               let _hash__424_ =
+                 Ppx_quickcheck_runtime.Base_quickcheck.Observer.Via_thunk.observe
+                   (quickcheck_observer
+                      (Ppx_quickcheck_runtime.Base_quickcheck.Observer.Via_thunk.create
+                         (fun _f__427_ ~size:_size__430_ ~hash:_hash__431_ ->
+                            let _x__426_ = _f__427_ () in
+                            let _x__428_, _x__429_ = _x__426_ in
+                            let _hash__431_ =
+                              Ppx_quickcheck_runtime.Base_quickcheck.Observer.Via_thunk
+                              .observe
+                                _observer__420_
+                                (fun () -> _x__428_)
+                                ~size:_size__430_
+                                ~hash:_hash__431_
+                            in
+                            let _hash__431_ =
+                              Ppx_quickcheck_runtime.Base_quickcheck.Observer.Via_thunk
+                              .observe
+                                _observer__420_
+                                (fun () -> _x__429_)
+                                ~size:_size__430_
+                                ~hash:_hash__431_
+                            in
+                            _hash__431_)))
+                   (fun () -> _x__432_)
+                   ~size:_size__423_
+                   ~hash:_hash__424_
+               in
+               _hash__424_)
       ;;
 
       let _ = quickcheck_observer
@@ -3127,7 +3065,7 @@ module Polymorphic_recursion = struct
 
     let quickcheck_observer _recur__434_ =
       Ppx_quickcheck_runtime.Base_quickcheck.Observer.of_lazy
-        (lazy (Ppx_quickcheck_runtime.Base.Lazy.force quickcheck_observer _recur__434_))
+        (lazy (quickcheck_observer _recur__434_))
     ;;
 
     let _ = quickcheck_observer
@@ -3137,69 +3075,60 @@ module Polymorphic_recursion = struct
     open struct
       let rec quickcheck_shrinker
         : 'a.
-        ('a Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
-         -> 'a t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t)
-          Ppx_quickcheck_runtime.Base.Lazy.t
+        'a Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+        -> 'a t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
         =
-        lazy
-          (fun _shrinker__408_ ->
-            let quickcheck_shrinker _recur__418_ =
-              Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.of_lazy
-                (lazy
-                  (Ppx_quickcheck_runtime.Base.Lazy.force
-                     quickcheck_shrinker
-                     _recur__418_))
-            in
-            ignore quickcheck_shrinker;
-            Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.Via_thunk.create
-              (fun _f__409_ ->
-                 match _f__409_ () with
-                 | Single _x__410_ ->
-                   Ppx_quickcheck_runtime.Base.Sequence.round_robin
-                     [ Ppx_quickcheck_runtime.Base.Sequence.map
-                         (Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.Via_thunk.shrink
-                            _shrinker__408_
-                            (fun () -> _x__410_))
-                         ~f:(fun _f__411_ () ->
-                           let _x__410_ = _f__411_ () in
-                           Single _x__410_)
-                     ]
-                 | Double _x__412_ ->
-                   Ppx_quickcheck_runtime.Base.Sequence.round_robin
-                     [ Ppx_quickcheck_runtime.Base.Sequence.map
-                         (Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.Via_thunk.shrink
-                            (quickcheck_shrinker
-                               (Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.Via_thunk
-                                .create
-                                  (fun _f__413_ ->
-                                     let _x__414_, _x__415_ = _f__413_ () in
-                                     Ppx_quickcheck_runtime.Base.Sequence.round_robin
-                                       [ Ppx_quickcheck_runtime.Base.Sequence.map
-                                           (Ppx_quickcheck_runtime.Base_quickcheck
-                                            .Shrinker
-                                            .Via_thunk
-                                            .shrink
-                                              _shrinker__408_
-                                              (fun () -> _x__414_))
-                                           ~f:(fun _f__416_ () ->
-                                             let _x__414_ = _f__416_ () in
-                                             _x__414_, _x__415_)
-                                       ; Ppx_quickcheck_runtime.Base.Sequence.map
-                                           (Ppx_quickcheck_runtime.Base_quickcheck
-                                            .Shrinker
-                                            .Via_thunk
-                                            .shrink
-                                              _shrinker__408_
-                                              (fun () -> _x__415_))
-                                           ~f:(fun _f__416_ () ->
-                                             let _x__415_ = _f__416_ () in
-                                             _x__414_, _x__415_)
-                                       ])))
-                            (fun () -> _x__412_))
-                         ~f:(fun _f__417_ () ->
-                           let _x__412_ = _f__417_ () in
-                           Double _x__412_)
-                     ]))
+        fun _shrinker__408_ ->
+        let quickcheck_shrinker _recur__418_ =
+          Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.of_lazy
+            (lazy (quickcheck_shrinker _recur__418_))
+        in
+        ignore quickcheck_shrinker;
+        Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.Via_thunk.create (fun _f__409_ ->
+          match _f__409_ () with
+          | Single _x__410_ ->
+            Ppx_quickcheck_runtime.Base.Sequence.round_robin
+              [ Ppx_quickcheck_runtime.Base.Sequence.map
+                  (Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.Via_thunk.shrink
+                     _shrinker__408_
+                     (fun () -> _x__410_))
+                  ~f:(fun _f__411_ () ->
+                    let _x__410_ = _f__411_ () in
+                    Single _x__410_)
+              ]
+          | Double _x__412_ ->
+            Ppx_quickcheck_runtime.Base.Sequence.round_robin
+              [ Ppx_quickcheck_runtime.Base.Sequence.map
+                  (Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.Via_thunk.shrink
+                     (quickcheck_shrinker
+                        (Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.Via_thunk.create
+                           (fun _f__413_ ->
+                              let _x__414_, _x__415_ = _f__413_ () in
+                              Ppx_quickcheck_runtime.Base.Sequence.round_robin
+                                [ Ppx_quickcheck_runtime.Base.Sequence.map
+                                    (Ppx_quickcheck_runtime.Base_quickcheck.Shrinker
+                                     .Via_thunk
+                                     .shrink
+                                       _shrinker__408_
+                                       (fun () -> _x__414_))
+                                    ~f:(fun _f__416_ () ->
+                                      let _x__414_ = _f__416_ () in
+                                      _x__414_, _x__415_)
+                                ; Ppx_quickcheck_runtime.Base.Sequence.map
+                                    (Ppx_quickcheck_runtime.Base_quickcheck.Shrinker
+                                     .Via_thunk
+                                     .shrink
+                                       _shrinker__408_
+                                       (fun () -> _x__415_))
+                                    ~f:(fun _f__416_ () ->
+                                      let _x__415_ = _f__416_ () in
+                                      _x__414_, _x__415_)
+                                ])))
+                     (fun () -> _x__412_))
+                  ~f:(fun _f__417_ () ->
+                    let _x__412_ = _f__417_ () in
+                    Double _x__412_)
+              ])
       ;;
 
       let _ = quickcheck_shrinker
@@ -3207,7 +3136,7 @@ module Polymorphic_recursion = struct
 
     let quickcheck_shrinker _recur__419_ =
       Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.of_lazy
-        (lazy (Ppx_quickcheck_runtime.Base.Lazy.force quickcheck_shrinker _recur__419_))
+        (lazy (quickcheck_shrinker _recur__419_))
     ;;
 
     let _ = quickcheck_shrinker
