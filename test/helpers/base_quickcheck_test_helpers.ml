@@ -202,7 +202,7 @@ let test_observer (type a) ?config ?(mode = `transparent) ?cr observer m =
           (lazy [%message "generated functions did not treat input as opaque"]))
 ;;
 
-let test_shrinker (type a) ?config:_ ?(mode = `compound) ?cr shrinker m =
+let test_shrinker (type a : value_or_null) ?config:_ ?(mode = `compound) ?cr shrinker m =
   let (module Value : With_examples with type t = a) = m in
   let alist =
     List.map Value.examples ~f:(fun value ->
@@ -305,6 +305,15 @@ let m_option (type value) (module Value : With_examples with type t = value) =
     let examples = [ None ] @ List.map Value.examples ~f:Option.return
   end : With_examples
     with type t = value option)
+;;
+
+let m_or_null (type value) (module Value : With_examples with type t = value) =
+  (module struct
+    type t = Value.t or_null [@@deriving compare, sexp_of]
+
+    let examples = [ Null ] @ List.map Value.examples ~f:Or_null.this
+  end : With_examples
+    with type t = value or_null)
 ;;
 
 let m_list (type elt) (module Elt : With_examples with type t = elt) =

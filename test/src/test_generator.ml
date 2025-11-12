@@ -25,14 +25,20 @@ include (
   Generator :
   sig
   @@ portable
-    include Applicative.S with type 'a t := 'a t
+    include
+      Applicative.S
+      [@kind value_or_null mod maybe_null]
+      with type ('a : value_or_null) t := 'a t
   end)
 
 include (
   Generator :
   sig
   @@ portable
-    include Monad.S with type 'a t := 'a t
+    include
+      Monad.S
+      [@kind value_or_null mod maybe_null]
+      with type ('a : value_or_null) t := 'a t
   end)
 
 module Portable = Generator.Portable
@@ -448,6 +454,15 @@ let%template option = (Generator.option [@mode p]) [@@mode p = (nonportable, por
 
 let%expect_test "option" =
   test_generator (Generator.option Generator.bool) (m_option m_bool);
+  [%expect {| (generator exhaustive) |}]
+;;
+
+let%template or_null = (Generator.or_null [@mode p]) [@@mode p = (nonportable, portable)]
+
+let%expect_test "or_null" =
+  test_generator
+    (Generator.map (Generator.or_null Generator.bool) ~f:Or_null.to_option)
+    (m_option m_bool);
   [%expect {| (generator exhaustive) |}]
 ;;
 

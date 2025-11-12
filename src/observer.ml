@@ -84,6 +84,12 @@ let option value_t =
     | Some value -> Second value)
 ;;
 
+let or_null value_t =
+  (unmap [@mode p]) ((either [@mode p]) opaque value_t) ~f:(function
+    | Null -> First ()
+    | This value -> Second value)
+;;
+
 let list elt_t =
   (create [@mode p]) (fun list ~size ~hash ->
     let random = Splittable_random.of_int (Hash.get_hash_value hash) in

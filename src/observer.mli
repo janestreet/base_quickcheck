@@ -13,11 +13,11 @@ type (-'a : any) t : value mod contended = 'a Observer0.t
     using this observer will be constant with respect to the value(s) it observes. *)
 val opaque : (_ : any) t
 
-include With_basic_types.S with type 'a t := 'a t (** @inline *)
+include With_basic_types.S with type ('a : value_or_null) t := 'a t (** @inline *)
 
 (** Produces an observer that generates random inputs for a given function, calls the
     function on them, then observes the corresponding outputs. *)
-val fn : 'a Generator.t -> 'b t -> ('a -> 'b) t
+val fn : ('a : value_or_null) ('b : value_or_null). 'a Generator.t -> 'b t -> ('a -> 'b) t
 
 val%template map_t : 'key t @ p -> 'data t @ p -> ('key, 'data, 'cmp) Map.t t @ p
 [@@mode p = (nonportable, portable)]
@@ -41,7 +41,9 @@ val%template of_hash_fold : (Hash.state -> 'a -> Hash.state) @ p -> 'a t @ p
 
 (** {2 Modifying Observers} *)
 
-val%template unmap : 'a t @ p -> f:('b -> 'a) @ p -> 'b t @ p
+val%template unmap
+  : ('a : value_or_null) ('b : value_or_null).
+  'a t @ p -> f:('b -> 'a) @ p -> 'b t @ p
 [@@mode p = (nonportable, portable)]
 
 (** {2 Observers for Recursive Types} *)

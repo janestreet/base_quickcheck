@@ -13,12 +13,14 @@ type (+'a : any) t : value mod contended
     designed to hit corner cases reasonably often, and also generate reasonably good
     coverage of common cases and arbitrary values. *)
 
-include With_basic_types.S with type 'a t := 'a t (** @inline *)
+include With_basic_types.S with type ('a : value_or_null) t := 'a t (** @inline *)
 
 (** Generates random functions that use the given observer to perturb the pseudo-random
     state that is then used to generate the output value. The resulting functions are
     therefore deterministic, assuming the observer is deterministic. *)
-val%template fn : 'a Observer0.t @ p -> 'b t @ p -> ('a -> 'b) t @ p
+val%template fn
+  : ('a : value_or_null) ('b : value_or_null).
+  'a Observer0.t @ p -> 'b t @ p -> ('a -> 'b) t @ p
 [@@mode p = (nonportable, portable)]
 
 val%template map_t_m
@@ -57,8 +59,13 @@ val%template of_list : ('a : value mod contended). 'a list @ portable -> 'a t @ 
 val%template union : 'a t list @ p -> 'a t @ p
 [@@mode p = (nonportable, portable)]
 
-include Applicative.S with type 'a t := 'a t
-include Monad.S with type 'a t := 'a t
+include%template
+  Applicative.S
+  [@kind value_or_null mod maybe_null]
+  with type ('a : value_or_null) t := 'a t
+
+include%template
+  Monad.S [@kind value_or_null mod maybe_null] with type ('a : value_or_null) t := 'a t
 
 module Portable : sig
   module Let_syntax : sig
@@ -384,10 +391,12 @@ val sexp_of : string t -> Sexp.t t
 
 (** {3 List Distributions} *)
 
-val%template list_non_empty : 'a t @ p -> 'a list t @ p
+val%template list_non_empty : ('a : value_or_null). 'a t @ p -> 'a list t @ p
 [@@mode p = (nonportable, portable)]
 
-val%template list_with_length : 'a t @ p -> length:int -> 'a list t @ p
+val%template list_with_length
+  : ('a : value_or_null).
+  'a t @ p -> length:int -> 'a list t @ p
 [@@mode p = (nonportable, portable)]
 
 (** Randomly drops elements from a list. The length of each result is chosen uniformly
@@ -451,7 +460,7 @@ val%template create : (size:int -> random:Splittable_random.t -> 'a) @ p -> 'a t
 
 (** Generates a random value using the given size and pseudorandom state. Useful when
     using [create] and dispatching to other existing generators. *)
-val generate : 'a t -> size:int -> random:Splittable_random.t -> 'a
+val generate : ('a : value_or_null). 'a t -> size:int -> random:Splittable_random.t -> 'a
 
 module Via_thunk : sig
   type ('a : any) thunk := unit -> 'a

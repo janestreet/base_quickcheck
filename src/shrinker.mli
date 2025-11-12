@@ -12,7 +12,7 @@ type ('a : any) t : value mod contended
 (** This shrinker treats a type as atomic, never attempting to produce smaller values. *)
 val atomic : ('a : any). 'a t
 
-include With_basic_types.S with type 'a t := 'a t (** @inline *)
+include With_basic_types.S with type ('a : value_or_null) t := 'a t (** @inline *)
 
 val%template map_t
   : 'key 'data ('cmp : value mod p).
@@ -39,7 +39,10 @@ val set_tree_using_comparator
 [%%template:
 [@@@mode.default p = (nonportable, portable)]
 
-val map : 'a t @ p -> f:('a -> 'b) @ p -> f_inverse:('b -> 'a) @ p -> 'b t @ p
+val map
+  : ('a : value_or_null) ('b : value_or_null).
+  'a t @ p -> f:('a -> 'b) @ p -> f_inverse:('b -> 'a) @ p -> 'b t @ p
+
 val filter : 'a t @ p -> f:('a -> bool) @ p -> 'a t @ p
 
 (** Filters and maps according to [f], and provides input to [t] via [f_inverse]. Only the
@@ -82,10 +85,10 @@ val of_portable_lazy : 'a t Portable_lazy.t -> 'a t @ portable
 
     Most users will not need to call these. *)
 
-val%template create : ('a -> 'a Sequence.t) @ p -> 'a t @ p
+val%template create : ('a : value_or_null). ('a -> 'a Sequence.t) @ p -> 'a t @ p
 [@@mode p = (nonportable, portable)]
 
-val shrink : 'a t -> 'a -> 'a Sequence.t
+val shrink : ('a : value_or_null). 'a t -> 'a -> 'a Sequence.t
 
 module Via_thunk : sig
   type ('a : any) thunk := unit -> 'a

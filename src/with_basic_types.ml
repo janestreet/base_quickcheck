@@ -14,7 +14,7 @@ module type S_bigarray = sig
 end
 
 module type S = sig
-  type 'a t
+  type ('a : value_or_null) t
 
   val unit : unit t
   val bool : bool t
@@ -33,6 +33,7 @@ module type S = sig
   [@@@mode.default p = (portable, nonportable)]
 
   val option : 'a t @ p -> 'a option t @ p
+  val or_null : 'a t @ p -> 'a or_null t @ p
   val list : 'a t @ p -> 'a list t @ p
   val array : 'a t @ p -> 'a array t @ p
   val ref : 'a t @ p -> 'a ref t @ p

@@ -40,16 +40,19 @@ val quickcheck_shrinker_float : float Shrinker.t
 [@@@mode.default p = (portable, nonportable)]
 
 val quickcheck_generator_option : 'a Generator.t @ p -> 'a option Generator.t @ p
+val quickcheck_generator_or_null : 'a Generator.t @ p -> 'a or_null Generator.t @ p
 val quickcheck_generator_list : 'a Generator.t @ p -> 'a list Generator.t @ p
 val quickcheck_generator_array : 'a Generator.t @ p -> 'a array Generator.t @ p
 val quickcheck_generator_ref : 'a Generator.t @ p -> 'a ref Generator.t @ p
 val quickcheck_generator_lazy_t : 'a Generator.t @ p -> 'a Lazy.t Generator.t @ p
 val quickcheck_observer_option : 'a Observer.t @ p -> 'a option Observer.t @ p
+val quickcheck_observer_or_null : 'a Observer.t @ p -> 'a or_null Observer.t @ p
 val quickcheck_observer_list : 'a Observer.t @ p -> 'a list Observer.t @ p
 val quickcheck_observer_array : 'a Observer.t @ p -> 'a array Observer.t @ p
 val quickcheck_observer_ref : 'a Observer.t @ p -> 'a ref Observer.t @ p
 val quickcheck_observer_lazy_t : 'a Observer.t @ p -> 'a Lazy.t Observer.t @ p
 val quickcheck_shrinker_option : 'a Shrinker.t @ p -> 'a option Shrinker.t @ p
+val quickcheck_shrinker_or_null : 'a Shrinker.t @ p -> 'a or_null Shrinker.t @ p
 val quickcheck_shrinker_list : 'a Shrinker.t @ p -> 'a list Shrinker.t @ p
 val quickcheck_shrinker_array : 'a Shrinker.t @ p -> 'a array Shrinker.t @ p
 val quickcheck_shrinker_ref : 'a Shrinker.t @ p -> 'a ref Shrinker.t @ p
