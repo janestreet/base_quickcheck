@@ -36,22 +36,35 @@ let observer_attribute =
 ;;
 
 (* Here and elsewhere:
-    - [portable_value] refers to whether the generator/observer/shrinker
-      values manipulated by the binding are portable.
-    - [portable_export] refers to whether the binding itself is portable.
+   - [portable_value] refers to whether the generator/observer/shrinker values manipulated
+     by the binding are portable.
+   - [portable_export] refers to whether the binding itself is portable.
 
    These diverge for parameterized types. For example,
-   [type 'a t [@@deriving quickcheck ~generator ~portable]] involves
-   two bindings:
+   [type 'a t [@@deriving quickcheck ~generator ~portable]] involves two bindings:
 
-     - [val quickcheck_generator : 'a generator -> 'a t generator @@ portable]
-       + [portable_value] is [false]
-       + [portable_export] is [true]
-     - [val quickcheck_generator__portable :
-          'a generator @ portable -> 'a t generator @ portable @@ portable]
-       + [portable_value] is [true]
-       + [portable_export] is [true]
+   - [val quickcheck_generator : 'a generator -> 'a t generator @@ portable]
+     + [portable_value] is [false]
+     + [portable_export] is [true]
+   - [val quickcheck_generator__portable : 'a generator @ portable -> 'a t generator @ portable @@ portable]
+     + [portable_value] is [true]
+     + [portable_export] is [true]
 *)
+
+let without_attributes =
+  object
+    inherit Ast_traverse.map
+    method! attributes _ = []
+  end
+;;
+
+let core_type_with_anonymous_params_of_type_declaration td =
+  let loc = td.ptype_name.loc in
+  ptyp_constr
+    ~loc
+    (Located.map lident td.ptype_name)
+    (List.map td.ptype_params ~f:(fun _ -> [%type: _]))
+;;
 
 let rec generator_of_core_type core_type ~gen_env ~obs_env ~portable_value =
   let loc = { core_type.ptyp_loc with loc_ghost = true } in
@@ -117,7 +130,7 @@ let rec generator_of_core_type core_type ~gen_env ~obs_env ~portable_value =
          ~generator_of_core_type:
            (generator_of_core_type ~gen_env ~obs_env ~portable_value)
          ~loc
-         ~variant_type:core_type
+         ~variant_type:(without_attributes#core_type core_type)
          ~clauses
          ~rec_names:(Set.empty (module String))
          ~portable_value
@@ -194,6 +207,7 @@ and observer_of_core_type core_type ~obs_env ~gen_env ~portable_value =
        Ppx_observer_expander.variant
          ~observer_of_core_type:(observer_of_core_type ~obs_env ~gen_env ~portable_value)
          ~loc
+         ~variant_type:(without_attributes#core_type core_type)
          ~clauses
          ~portable_value
          (module Clause_syntax.Polymorphic_variant)
@@ -258,7 +272,7 @@ let rec shrinker_of_core_type core_type ~env ~portable_value =
        Ppx_shrinker_expander.variant
          ~shrinker_of_core_type:(shrinker_of_core_type ~env ~portable_value)
          ~loc
-         ~variant_type:core_type
+         ~variant_type:(without_attributes#core_type core_type)
          ~clauses
          ~portable_value
          (module Clause_syntax.Polymorphic_variant)
@@ -280,14 +294,14 @@ type impl =
   ; var : expression
   ; exp : expression
   ; is_fun : bool
-  (* When the body is a function, we don't lazify its creation -- the functions
-     in question are already syntactic values, so there's no change in semantics
-     to lazify them.
+  (* When the body is a function, we don't lazify its creation -- the functions in
+     question are already syntactic values, so there's no change in semantics to lazify
+     them.
   *)
   }
 
-(* Inlined from [Ppxlib.combinator_type_of_type_declaration], but allowing
-   the modes of the arg/return type to be specified. *)
+(* Inlined from [Ppxlib.combinator_type_of_type_declaration], but allowing the modes of
+   the arg/return type to be specified. *)
 let combinator_type_of_type_declaration td ~f ~portable_value =
   let open Ppxlib_jane in
   let td = name_type_params_in_td td in
@@ -317,7 +331,19 @@ let combinator_type_of_type_declaration td ~f ~portable_value =
         ; result_modes = [] (* intermediate results do not use [modes] *)
         })
   in
-  arrow_as_result.result_type (* remove the outer, unnecessary mode annotation *)
+  let arrow =
+    arrow_as_result.result_type (* remove the outer, unnecessary mode annotation *)
+  in
+  if List.is_empty td.ptype_params
+  then arrow
+  else (
+    let type_params =
+      List.filter_map td.ptype_params ~f:(fun (typ, _) ->
+        match Ppxlib_jane.Shim.Core_type_desc.of_parsetree typ.ptyp_desc with
+        | Ptyp_var (label, jkind) -> Some (Loc.make ~loc:typ.ptyp_loc label, jkind)
+        | _ -> None)
+    in
+    Ast_builder.Default.ptyp_poly ~loc:td.ptype_loc type_params arrow)
 ;;
 
 let generator_impl ~rec_names ~portable_value type_decl =
@@ -346,7 +372,7 @@ let generator_impl ~rec_names ~portable_value type_decl =
           ~generator_of_core_type:
             (generator_of_core_type ~gen_env ~obs_env ~portable_value)
           ~loc
-          ~variant_type:[%type: _]
+          ~variant_type:(core_type_with_anonymous_params_of_type_declaration type_decl)
           ~clauses
           ~rec_names
           ~portable_value
@@ -404,6 +430,7 @@ let observer_impl ~rec_names:_ ~portable_value type_decl =
         Ppx_observer_expander.variant
           ~observer_of_core_type:(observer_of_core_type ~obs_env ~gen_env ~portable_value)
           ~loc
+          ~variant_type:(core_type_with_anonymous_params_of_type_declaration type_decl)
           ~clauses
           ~portable_value
           (module Clause_syntax.Variant)
@@ -454,7 +481,7 @@ let shrinker_impl ~rec_names:_ ~portable_value type_decl =
         Ppx_shrinker_expander.variant
           ~shrinker_of_core_type:(shrinker_of_core_type ~env ~portable_value)
           ~loc
-          ~variant_type:[%type: _]
+          ~variant_type:(core_type_with_anonymous_params_of_type_declaration type_decl)
           ~clauses
           ~portable_value
           (module Clause_syntax.Variant)
@@ -500,9 +527,8 @@ let close_the_loop ~of_lazy ~portable_value decl impl =
       then [%expr Ppx_quickcheck_runtime.Base.Portable_lazy.force [%e x]]
       else [%expr Ppx_quickcheck_runtime.Base.Lazy.force [%e x]]
     in
-    (* We lazify the application even if [impl] is a function. *Creating* [impl]
-       does not benefit from laziness (it's a function value), but *applying*
-       it can.
+    (* We lazify the application even if [impl] is a function. *Creating* [impl] does not
+       benefit from laziness (it's a function value), but *applying* it can.
     *)
     let lazify e =
       if portable_value
@@ -596,15 +622,15 @@ let maybe_mutually_recursive decls ~loc ~portable_export ~rec_flag ~of_lazy ~imp
                 ~attrs:exp.pexp_attributes
             | Some (_, _, Pfunction_cases _) | None -> wrap_body exp
           in
-          List.map impls ~f:(fun (decl, impl) ->
+          List.map impls ~f:(fun (_decl, impl) ->
             let body = wrap impl.exp in
             let expr_lazified_if_needed =
               if impl.is_fun
               then body
               else if portable_value
               then (
-                (* Make sure we can expand into [lazy%portable]. Keep this annotation close to
-               the use of [%portable]. *)
+                (* Make sure we can expand into [lazy%portable]. Keep this annotation
+                   close to the use of [%portable]. *)
                 Ppx_portable.registered;
                 [%expr lazy%portable [%e body]])
               else [%expr lazy [%e body]]
@@ -615,7 +641,6 @@ let maybe_mutually_recursive decls ~loc ~portable_export ~rec_flag ~of_lazy ~imp
                else if portable_value
                then [%type: [%t impl.typ] Ppx_quickcheck_runtime.Base.Portable_lazy.t]
                else [%type: [%t impl.typ] Ppx_quickcheck_runtime.Base.Lazy.t])
-              |> ptyp_poly ~loc (List.map decl.ptype_params ~f:get_type_param_name)
               |> ppat_constraint ~loc impl.pat
             in
             value_binding ~loc:impl.loc ~pat:typed_pat ~expr:expr_lazified_if_needed)
@@ -627,8 +652,8 @@ let maybe_mutually_recursive decls ~loc ~portable_export ~rec_flag ~of_lazy ~imp
             let vb = pstr_value ~loc Recursive recursive_bindings in
             if portable_value
             then (
-              (* Make sure we can expand into [let%portable rec]. Keep this annotation close
-             to the use of [%portable]. *)
+              (* Make sure we can expand into [let%portable rec]. Keep this annotation
+                 close to the use of [%portable]. *)
               Ppx_portable.registered;
               [%str [%%portable [%%i vb]]])
             else [ vb ]
@@ -784,8 +809,8 @@ let try_include_decl
              else [])
           include_info))
   | _ ->
-    (* Don't bother testing anything since [mk_named_sig] will definitely return
-       [None] anyway *)
+    (* Don't bother testing anything since [mk_named_sig] will definitely return [None]
+       anyway *)
     None
 ;;
 

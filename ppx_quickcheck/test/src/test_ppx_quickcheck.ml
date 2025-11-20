@@ -301,6 +301,8 @@ module Poly_with_variance = Poly_with_variance
 module Instance_with_variance = Instance_with_variance
 module Poly_with_phantom = Poly_with_phantom
 module Instance_with_phantom = Instance_with_phantom
+module Poly_with_kind = Poly_with_kind
+module Instance_with_kind = Instance_with_kind
 
 let%expect_test "polymorphic type" =
   test (module Instance_of_unary) (m_list m_bool);
@@ -367,6 +369,13 @@ let%expect_test "polymorphic type" =
     (generator exhaustive)
     (observer transparent)
     (shrinker (((()) => ())))
+    |}];
+  test (module Instance_with_kind) (m_option (m_or_null m_unit));
+  [%expect
+    {|
+    (generator exhaustive)
+    (observer transparent)
+    (shrinker (((()) => ()) (((())) => ()) (((())) => (()))))
     |}]
 ;;
 
@@ -863,32 +872,38 @@ module type Modalities = sig
     [@@@ocaml.warning "-32"]
 
     val quickcheck_generator
-      :  'a Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
+      : 'a.
+      'a Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
       -> 'a t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
       @@ portable
 
     val quickcheck_generator__portable
-      :  'a Ppx_quickcheck_runtime.Base_quickcheck.Generator.t @ portable
+      : 'a.
+      'a Ppx_quickcheck_runtime.Base_quickcheck.Generator.t @ portable
       -> 'a t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t @ portable
       @@ portable
 
     val quickcheck_observer
-      :  'a Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
+      : 'a.
+      'a Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
       -> 'a t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
       @@ portable
 
     val quickcheck_observer__portable
-      :  'a Ppx_quickcheck_runtime.Base_quickcheck.Observer.t @ portable
+      : 'a.
+      'a Ppx_quickcheck_runtime.Base_quickcheck.Observer.t @ portable
       -> 'a t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t @ portable
       @@ portable
 
     val quickcheck_shrinker
-      :  'a Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      : 'a.
+      'a Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
       -> 'a t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
       @@ portable
 
     val quickcheck_shrinker__portable
-      :  'a Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t @ portable
+      : 'a.
+      'a Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t @ portable
       -> 'a t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t @ portable
       @@ portable
   end
@@ -935,3 +950,63 @@ module type Modalities = sig
 
   [@@@end]
 end
+
+module Type_based_constructor_disambiguation = struct
+  type a = Type_based_constructor_disambiguation.a =
+    | A of a
+    | B
+    | C of (a, a b) c
+
+  and 'a b = 'a Type_based_constructor_disambiguation.b =
+    | A
+    | B of 'a b
+    | C of ('a, 'a b) c
+
+  and ('a, 'b) c = ('a, 'b) Type_based_constructor_disambiguation.c =
+    | A of 'a
+    | B of 'b
+    | C of ('a, 'b) c
+  [@@deriving compare, sexp_of]
+
+  include (
+    Type_based_constructor_disambiguation :
+      module type of struct
+        include Type_based_constructor_disambiguation
+      end
+      with type a := a
+       and type 'a b := 'a b
+       and type ('a, 'b) c := ('a, 'b) c)
+
+  module Examples = struct
+    type t = (a, a b) c [@@deriving compare, quickcheck, sexp_of]
+
+    let examples : t list =
+      [ A (A B)
+      ; A B
+      ; A (C (A (A B)))
+      ; A (C (A B))
+      ; B A
+      ; B (B A)
+      ; B (C (B A))
+      ; B (C (B (B A)))
+      ; C (A (A B))
+      ; C (A B)
+      ; C (B A)
+      ; C (B (B A))
+      ]
+    ;;
+  end
+end
+
+let%expect_test "type based constructor disambiguation" =
+  test
+    ~shrinker:`atomic
+    (module Type_based_constructor_disambiguation.Examples)
+    (module Type_based_constructor_disambiguation.Examples);
+  [%expect
+    {|
+    (generator "generated 2_236 distinct values in 10_000 iterations")
+    (observer transparent)
+    (shrinker atomic)
+    |}]
+;;

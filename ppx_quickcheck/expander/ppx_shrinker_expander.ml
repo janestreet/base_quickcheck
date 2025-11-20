@@ -82,7 +82,7 @@ let variant
                     (List.map core_type_list ~f:(fun core_type -> core_type.ptyp_loc))
                 in
                 let shrinker_exprs = List.map core_type_list ~f:shrinker_of_core_type in
-                let lhs = Clause.pattern clause ~loc field_pats in
+                let lhs = Clause.pattern clause ~loc variant_type field_pats in
                 let rhs =
                   compound_sequence
                     ~loc

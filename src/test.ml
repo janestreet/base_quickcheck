@@ -104,7 +104,7 @@ let with_sample ~f ?(config = default_config) ?(examples = []) generator =
   f sequence
 ;;
 
-let result (type a) ~f ?(config = default_config) ?(examples = []) m =
+let result (type a : value_or_null) ~f ?(config = default_config) ?(examples = []) m =
   let (module M : S with type t = a) = m in
   with_sample M.quickcheck_generator ~config ~examples ~f:(fun sequence ->
     match
@@ -120,7 +120,7 @@ let result (type a) ~f ?(config = default_config) ?(examples = []) m =
       Error (input, error))
 ;;
 
-let run (type a) ~f ?config ?examples (module M : S with type t = a) =
+let run (type a : value_or_null) ~f ?config ?examples (module M : S with type t = a) =
   let f x =
     Or_error.try_with_join ~backtrace:(Backtrace.Exn.am_recording ()) (fun () -> f x)
   in

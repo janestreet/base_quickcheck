@@ -22,7 +22,7 @@ module type S = sig
   val core_type_list : t -> core_type list
 
   (** constructing a pattern to match the clause *)
-  val pattern : t -> loc:location -> pattern list -> pattern
+  val pattern : t -> loc:location -> core_type -> pattern list -> pattern
 
   (** constructing an expression to create an instance of the clause *)
   val expression : t -> loc:location -> core_type -> expression list -> expression

@@ -53,7 +53,7 @@ module Variant = struct
       List.map label_decl_list ~f:(fun label_decl -> label_decl.pld_type)
   ;;
 
-  let pattern t ~loc pat_list =
+  let pattern t ~loc core_type pat_list =
     let arg =
       match t.ast.pcd_args with
       | Pcstr_tuple _ ->
@@ -68,10 +68,10 @@ module Variant = struct
         in
         Some (ppat_record ~loc alist Closed)
     in
-    ppat_construct ~loc (lident_loc t.ast.pcd_name) arg
+    [%pat? ([%p ppat_construct ~loc (lident_loc t.ast.pcd_name) arg] : [%t core_type])]
   ;;
 
-  let expression t ~loc _ expr_list =
+  let expression t ~loc core_type expr_list =
     let arg =
       match t.ast.pcd_args with
       | Pcstr_tuple _ ->
@@ -86,7 +86,12 @@ module Variant = struct
         in
         Some (pexp_record ~loc alist None)
     in
-    pexp_construct ~loc (lident_loc t.ast.pcd_name) arg
+    let pat, expr = gensym "x" loc in
+    [%expr
+      let [%p pat] =
+        ([%e pexp_construct ~loc (lident_loc t.ast.pcd_name) arg] : [%t core_type])
+      in
+      [%e expr]]
   ;;
 end
 
@@ -136,7 +141,7 @@ module Polymorphic_variant = struct
     | Rinherit core_type -> [ core_type ]
   ;;
 
-  let pattern t ~loc pat_list =
+  let pattern t ~loc core_type pat_list =
     match t.prf_desc, pat_list with
     | Rtag (label, true, []), [] -> ppat_variant ~loc label.txt None
     | Rtag (label, false, [ _ ]), [ pat ] -> ppat_variant ~loc label.txt (Some pat)
@@ -146,7 +151,8 @@ module Polymorphic_variant = struct
       (match ptyp_desc with
        | Ptyp_constr (id, _) ->
          (match ppat_desc with
-          | Ppat_var var -> ppat_alias ~loc (ppat_type ~loc id) var
+          | Ppat_var var ->
+            [%pat? ([%p ppat_alias ~loc (ppat_type ~loc id) var] : [%t core_type])]
           | _ ->
             internal_error
               ~loc

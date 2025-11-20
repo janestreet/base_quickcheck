@@ -92,13 +92,17 @@ end
 
 module%template [@mode portable] Let_syntax = Portable.Let_syntax
 
-val%template return : ('a : value mod contended). 'a @ portable -> 'a t @ portable
+val%template return : ('a : value_or_null mod contended). 'a @ portable -> 'a t @ portable
 [@@mode portable]
 
-val%template map : 'a t @ portable -> f:('a -> 'b) @ portable -> 'b t @ portable
+val%template map
+  : ('a : value_or_null) ('b : value_or_null).
+  'a t @ portable -> f:('a -> 'b) @ portable -> 'b t @ portable
 [@@mode portable]
 
-val%template bind : 'a t @ portable -> f:('a -> 'b t) @ portable -> 'b t @ portable
+val%template bind
+  : ('a : value_or_null) ('b : value_or_null).
+  'a t @ portable -> f:('a -> 'b t) @ portable -> 'b t @ portable
 [@@mode portable]
 
 (** {2 Size of Random Values}

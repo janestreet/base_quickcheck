@@ -84,6 +84,7 @@ let variant
   (type clause)
   ~observer_of_core_type
   ~loc
+  ~variant_type
   ~clauses
   ~portable_value
   (module Clause : Clause_syntax.S with type ast = clause)
@@ -110,7 +111,7 @@ let variant
                     "x"
                     (List.map core_type_list ~f:(fun core_type -> core_type.ptyp_loc))
                 in
-                let lhs = Clause.pattern clause ~loc field_pats in
+                let lhs = Clause.pattern clause ~loc variant_type field_pats in
                 let body =
                   compound_hash
                     ~loc

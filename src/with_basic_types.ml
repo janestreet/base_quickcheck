@@ -32,15 +32,24 @@ module type S = sig
   [%%template:
   [@@@mode.default p = (portable, nonportable)]
 
-  val option : 'a t @ p -> 'a option t @ p
+  val option : ('a : value_or_null). 'a t @ p -> 'a option t @ p
   val or_null : 'a t @ p -> 'a or_null t @ p
-  val list : 'a t @ p -> 'a list t @ p
+  val list : ('a : value_or_null). 'a t @ p -> 'a list t @ p
   val array : 'a t @ p -> 'a array t @ p
-  val ref : 'a t @ p -> 'a ref t @ p
+  val ref : ('a : value_or_null). 'a t @ p -> 'a ref t @ p
   val lazy_t : 'a t @ p -> 'a Lazy.t t @ p
-  val both : 'a t @ p -> 'b t @ p -> ('a * 'b) t @ p
-  val either : 'a t @ p -> 'b t @ p -> ('a, 'b) Either.t t @ p
-  val result : 'a t @ p -> 'b t @ p -> ('a, 'b) Result.t t @ p]
+
+  val both
+    : ('a : value_or_null) ('b : value_or_null).
+    'a t @ p -> 'b t @ p -> ('a * 'b) t @ p
+
+  val either
+    : ('a : value_or_null) ('b : value_or_null).
+    'a t @ p -> 'b t @ p -> ('a, 'b) Either.t t @ p
+
+  val result
+    : ('a : value_or_null) ('b : value_or_null).
+    'a t @ p -> 'b t @ p -> ('a, 'b) Result.t t @ p]
 
   include S_bigarray with type 'a t := 'a t (** @inline *)
 end

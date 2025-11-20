@@ -298,7 +298,10 @@ let m_biject (type a b) (module A : With_examples with type t = a) ~f ~f_inverse
     with type t = b)
 ;;
 
-let m_option (type value) (module Value : With_examples with type t = value) =
+let m_option
+  (type value : value_or_null)
+  (module Value : With_examples with type t = value)
+  =
   (module struct
     type t = Value.t option [@@deriving compare, sexp_of]
 
@@ -316,7 +319,7 @@ let m_or_null (type value) (module Value : With_examples with type t = value) =
     with type t = value or_null)
 ;;
 
-let m_list (type elt) (module Elt : With_examples with type t = elt) =
+let m_list (type elt : value_or_null) (module Elt : With_examples with type t = elt) =
   (module struct
     type t = Elt.t list [@@deriving sexp_of]
 
@@ -390,7 +393,7 @@ let m_arrow_optional
 ;;
 
 let m_either
-  (type a b)
+  (type (a : value_or_null) (b : value_or_null))
   (module A : With_examples with type t = a)
   (module B : With_examples with type t = b)
   =
@@ -405,7 +408,7 @@ let m_either
 ;;
 
 let m_result
-  (type a b)
+  (type (a : value_or_null) (b : value_or_null))
   (module A : With_examples with type t = a)
   (module B : With_examples with type t = b)
   =
@@ -420,7 +423,7 @@ let m_result
 ;;
 
 let m_pair
-  (type a b)
+  (type (a : value_or_null) (b : value_or_null))
   (module A : With_examples with type t = a)
   (module B : With_examples with type t = b)
   =
@@ -433,7 +436,7 @@ let m_pair
 ;;
 
 let m_triple
-  (type a b c)
+  (type (a : value_or_null) (b : value_or_null) (c : value_or_null))
   (module A : With_examples with type t = a)
   (module B : With_examples with type t = b)
   (module C : With_examples with type t = c)
