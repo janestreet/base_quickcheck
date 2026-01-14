@@ -480,9 +480,8 @@ let%template char_alpha = (union [@mode portable]) [ char_lowercase; char_upperc
 
 let%template char_alphanum =
   (weighted_union [@mode portable])
-    (* Most people probably expect this to be a uniform distribution, not weighted
-       toward digits like we would get with [union] (since there are fewer digits than
-       letters). *)
+    (* Most people probably expect this to be a uniform distribution, not weighted toward
+       digits like we would get with [union] (since there are fewer digits than letters). *)
     [ 52., char_alpha; 10., char_digit ]
 ;;
 
@@ -936,8 +935,8 @@ let%template sexp_of atom =
   (fixed_point [@mode p]) (fun self ->
     let open Syntax.Let_syntax [@mode p] in
     let%bind size in
-    (* choose a number weighted low so we have a decreasing, but not vanishing, chance
-       to generate atoms as size grows *)
+    (* choose a number weighted low so we have a decreasing, but not vanishing, chance to
+       generate atoms as size grows *)
     let open Syntax.Let_syntax in
     match%bind For_int.log_uniform_inclusive 0 (size + 1) with
     (* generate an atom using the given size *)

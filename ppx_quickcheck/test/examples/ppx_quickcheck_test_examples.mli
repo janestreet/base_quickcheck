@@ -362,17 +362,20 @@ module Poly_with_variance : sig
     [@@@ocaml.warning "-32"]
 
     val quickcheck_generator
-      :  'a Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
+      : 'a 'b.
+      'a Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
       -> 'b Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
       -> ('a, 'b) t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
 
     val quickcheck_observer
-      :  'a Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
+      : 'a 'b.
+      'a Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
       -> 'b Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
       -> ('a, 'b) t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
 
     val quickcheck_shrinker
-      :  'a Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      : 'a 'b.
+      'a Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
       -> 'b Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
       -> ('a, 'b) t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
   end
@@ -411,6 +414,46 @@ module Poly_with_phantom : sig
 
 module Instance_with_phantom : sig
   type t = [ `phantom ] Poly_with_phantom.t
+  [@@deriving_inline quickcheck ~generator ~observer ~shrinker]
+
+  include sig
+    [@@@ocaml.warning "-32"]
+
+    include Ppx_quickcheck_runtime.Quickcheckable.S with type t := t
+  end
+  [@@ocaml.doc "@inline"]
+
+  [@@@end]
+end
+
+module Poly_with_kind : sig
+  type 'a t = 'a option [@@deriving_inline quickcheck ~generator ~observer ~shrinker]
+
+  include sig
+    [@@@ocaml.warning "-32"]
+
+    val quickcheck_generator
+      : 'a.
+      'a Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
+      -> 'a t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
+
+    val quickcheck_observer
+      : 'a.
+      'a Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
+      -> 'a t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
+
+    val quickcheck_shrinker
+      : 'a.
+      'a Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      -> 'a t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+  end
+  [@@ocaml.doc "@inline"]
+
+  [@@@end]
+end
+
+module Instance_with_kind : sig
+  type t = unit or_null Poly_with_kind.t
   [@@deriving_inline quickcheck ~generator ~observer ~shrinker]
 
   include sig
@@ -533,19 +576,22 @@ module Murec_poly_mono : sig
     val quickcheck_generator : t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
 
     val quickcheck_generator_node
-      :  'a Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
+      : 'a.
+      'a Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
       -> 'a node Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
 
     val quickcheck_observer : t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
 
     val quickcheck_observer_node
-      :  'a Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
+      : 'a.
+      'a Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
       -> 'a node Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
 
     val quickcheck_shrinker : t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
 
     val quickcheck_shrinker_node
-      :  'a Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      : 'a.
+      'a Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
       -> 'a node Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
   end
   [@@ocaml.doc "@inline"]
@@ -659,15 +705,18 @@ module Deriving_from_wildcard : sig
     [@@@ocaml.warning "-32"]
 
     val quickcheck_generator_transparent
-      :  'a__004_ Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
+      : 'a__004_.
+      'a__004_ Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
       -> 'a__004_ transparent Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
 
     val quickcheck_observer_transparent
-      :  'a__003_ Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
+      : 'a__003_.
+      'a__003_ Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
       -> 'a__003_ transparent Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
 
     val quickcheck_shrinker_transparent
-      :  'a__002_ Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      : 'a__002_.
+      'a__002_ Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
       -> 'a__002_ transparent Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
   end
   [@@ocaml.doc "@inline"]
@@ -680,15 +729,18 @@ module Deriving_from_wildcard : sig
     [@@@ocaml.warning "-32"]
 
     val quickcheck_generator_opaque
-      :  'a__007_ Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
+      : 'a__007_.
+      'a__007_ Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
       -> 'a__007_ opaque Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
 
     val quickcheck_observer_opaque
-      :  'a__006_ Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
+      : 'a__006_.
+      'a__006_ Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
       -> 'a__006_ opaque Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
 
     val quickcheck_shrinker_opaque
-      :  'a__005_ Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      : 'a__005_.
+      'a__005_ Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
       -> 'a__005_ opaque Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
   end
   [@@ocaml.doc "@inline"]
@@ -739,4 +791,68 @@ module Do_not_generate_clauses : sig
 
     [@@@end]
   end
+end
+
+module Type_based_constructor_disambiguation : sig
+  type a =
+    | A of a
+    | B
+    | C of (a, a b) c
+
+  and 'a b =
+    | A
+    | B of 'a b
+    | C of ('a, 'a b) c
+
+  and ('a, 'b) c =
+    | A of 'a
+    | B of 'b
+    | C of ('a, 'b) c
+  [@@deriving_inline quickcheck]
+
+  include sig
+    [@@@ocaml.warning "-32"]
+
+    val quickcheck_generator_a : a Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
+
+    val quickcheck_generator_b
+      : 'a.
+      'a Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
+      -> 'a b Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
+
+    val quickcheck_generator_c
+      : 'a 'b.
+      'a Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
+      -> 'b Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
+      -> ('a, 'b) c Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
+
+    val quickcheck_observer_a : a Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
+
+    val quickcheck_observer_b
+      : 'a.
+      'a Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
+      -> 'a b Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
+
+    val quickcheck_observer_c
+      : 'a 'b.
+      'a Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
+      -> 'b Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
+      -> ('a, 'b) c Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
+
+    val quickcheck_shrinker_a : a Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+
+    val quickcheck_shrinker_b
+      : 'a.
+      'a Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      -> 'a b Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+
+    val quickcheck_shrinker_c
+      : 'a 'b.
+      'a Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      -> 'b Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      -> ('a, 'b) c Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+  end
+  [@@ocaml.doc "@inline"]
+
+  [@@@end]
 end

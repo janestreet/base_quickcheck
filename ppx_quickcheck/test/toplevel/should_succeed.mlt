@@ -27,8 +27,8 @@ end
 
 [%%expect {| |}]
 
-(* Make sure [@quickcheck.do_not_generate] works with recursive variant types.
-   (There was formerly an issue with this.) *)
+(* Make sure [@quickcheck.do_not_generate] works with recursive variant types. (There was
+   formerly an issue with this.) *)
 type recursive_with_do_not_generate =
   | A
   | B of recursive_with_do_not_generate [@quickcheck.do_not_generate]

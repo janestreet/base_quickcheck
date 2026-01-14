@@ -76,7 +76,8 @@ module type Base_quickcheck_test_helpers = sig
   val m_sexp : (module With_examples with type t = Sexp.t)
 
   val m_option
-    :  (module With_examples with type t = 'a)
+    : 'a.
+    (module With_examples with type t = 'a)
     -> (module With_examples with type t = 'a option)
 
   val m_or_null
@@ -84,7 +85,8 @@ module type Base_quickcheck_test_helpers = sig
     -> (module With_examples with type t = 'a or_null)
 
   val m_list
-    :  (module With_examples with type t = 'a)
+    : 'a.
+    (module With_examples with type t = 'a)
     -> (module With_examples with type t = 'a list)
 
   val m_array
@@ -100,22 +102,26 @@ module type Base_quickcheck_test_helpers = sig
     -> (module With_examples with type t = 'a lazy_t)
 
   val m_either
-    :  (module With_examples with type t = 'a)
+    : 'a 'b.
+    (module With_examples with type t = 'a)
     -> (module With_examples with type t = 'b)
     -> (module With_examples with type t = ('a, 'b) Either.t)
 
   val m_result
-    :  (module With_examples with type t = 'a)
+    : 'a 'b.
+    (module With_examples with type t = 'a)
     -> (module With_examples with type t = 'b)
     -> (module With_examples with type t = ('a, 'b) Result.t)
 
   val m_pair
-    :  (module With_examples with type t = 'a)
+    : 'a 'b.
+    (module With_examples with type t = 'a)
     -> (module With_examples with type t = 'b)
     -> (module With_examples with type t = 'a * 'b)
 
   val m_triple
-    :  (module With_examples with type t = 'a)
+    : 'a 'b 'c.
+    (module With_examples with type t = 'a)
     -> (module With_examples with type t = 'b)
     -> (module With_examples with type t = 'c)
     -> (module With_examples with type t = 'a * 'b * 'c)

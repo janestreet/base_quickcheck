@@ -99,10 +99,10 @@ Line _, characters _-_:
 Error: ppx_quickcheck: invalid syntax: variant had no (generated) cases
 |}]
 
-(* While the following might look like the above, there's an important distinction
-   which is that to quickcheck, "0." is just an expression when doing the ppx
-   expansion (as opposed to being a float).  So, the following gives a runtime
-   error where the above gives a compile-time error.
+(* While the following might look like the above, there's an important distinction which
+   is that to quickcheck, "0." is just an expression when doing the ppx expansion (as
+   opposed to being a float). So, the following gives a runtime error where the above
+   gives a compile-time error.
 *)
 type t = A [@quickcheck.weight 0.] [@@deriving quickcheck]
 

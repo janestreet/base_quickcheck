@@ -37,21 +37,21 @@ val quickcheck_shrinker_float : float Shrinker.t
 [%%template:
 [@@@mode.default p = (portable, nonportable)]
 
-val quickcheck_generator_option : 'a Generator.t -> 'a option Generator.t
+val quickcheck_generator_option : 'a. 'a Generator.t -> 'a option Generator.t
 val quickcheck_generator_or_null : 'a Generator.t -> 'a or_null Generator.t
-val quickcheck_generator_list : 'a Generator.t -> 'a list Generator.t
+val quickcheck_generator_list : 'a. 'a Generator.t -> 'a list Generator.t
 val quickcheck_generator_array : 'a Generator.t -> 'a array Generator.t
-val quickcheck_generator_ref : 'a Generator.t -> 'a ref Generator.t
+val quickcheck_generator_ref : 'a. 'a Generator.t -> 'a ref Generator.t
 val quickcheck_generator_lazy_t : 'a Generator.t -> 'a Lazy.t Generator.t
-val quickcheck_observer_option : 'a Observer.t -> 'a option Observer.t
+val quickcheck_observer_option : 'a. 'a Observer.t -> 'a option Observer.t
 val quickcheck_observer_or_null : 'a Observer.t -> 'a or_null Observer.t
-val quickcheck_observer_list : 'a Observer.t -> 'a list Observer.t
+val quickcheck_observer_list : 'a. 'a Observer.t -> 'a list Observer.t
 val quickcheck_observer_array : 'a Observer.t -> 'a array Observer.t
-val quickcheck_observer_ref : 'a Observer.t -> 'a ref Observer.t
+val quickcheck_observer_ref : 'a. 'a Observer.t -> 'a ref Observer.t
 val quickcheck_observer_lazy_t : 'a Observer.t -> 'a Lazy.t Observer.t
-val quickcheck_shrinker_option : 'a Shrinker.t -> 'a option Shrinker.t
+val quickcheck_shrinker_option : 'a. 'a Shrinker.t -> 'a option Shrinker.t
 val quickcheck_shrinker_or_null : 'a Shrinker.t -> 'a or_null Shrinker.t
-val quickcheck_shrinker_list : 'a Shrinker.t -> 'a list Shrinker.t
+val quickcheck_shrinker_list : 'a. 'a Shrinker.t -> 'a list Shrinker.t
 val quickcheck_shrinker_array : 'a Shrinker.t -> 'a array Shrinker.t
-val quickcheck_shrinker_ref : 'a Shrinker.t -> 'a ref Shrinker.t
+val quickcheck_shrinker_ref : 'a. 'a Shrinker.t -> 'a ref Shrinker.t
 val quickcheck_shrinker_lazy_t : 'a Shrinker.t -> 'a Lazy.t Shrinker.t]

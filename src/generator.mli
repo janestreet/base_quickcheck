@@ -42,13 +42,12 @@ val set_tree_using_comparator
 (** {2 Combining and Modifying Generators} *)
 
 (** Produces any of the given values, weighted uniformly. *)
-val of_list : 'a list -> 'a t
-
-val%template of_list : 'a. 'a list -> 'a t [@@mode portable]
+val%template of_list : 'a. 'a list -> 'a t
+[@@mode (p, c) = ((nonportable, uncontended), (portable, contended))]
 
 (** Chooses among the given generators, weighted uniformly; then chooses a value from that
     generator. *)
-val%template union : 'a t list -> 'a t
+val%template union : 'a. 'a t list -> 'a t
 [@@mode p = (nonportable, portable)]
 
 include%template Applicative.S [@kind value_or_null mod maybe_null] with type 'a t := 'a t
@@ -57,21 +56,21 @@ include%template Monad.S [@kind value_or_null mod maybe_null] with type 'a t := 
 module Portable : sig
   module Let_syntax : sig
     val return : 'a. 'a -> 'a t
-    val ( >>| ) : 'a t -> ('a -> 'b) -> 'b t
-    val ( >>= ) : 'a t -> ('a -> 'b t) -> 'b t
+    val ( >>| ) : 'a 'b. 'a t -> ('a -> 'b) -> 'b t
+    val ( >>= ) : 'a 'b. 'a t -> ('a -> 'b t) -> 'b t
 
     module Let_syntax : sig
       val return : 'a. 'a -> 'a t
-      val map : 'a t -> f:('a -> 'b) -> 'b t
-      val bind : 'a t -> f:('a -> 'b t) -> 'b t
-      val both : 'a t -> 'b t -> ('a * 'b) t
+      val map : 'a 'b. 'a t -> f:('a -> 'b) -> 'b t
+      val bind : 'a 'b. 'a t -> f:('a -> 'b t) -> 'b t
+      val both : 'a 'b. 'a t -> 'b t -> ('a * 'b) t
 
       module Open_on_rhs : sig
-        val map : 'a t -> f:('a -> 'b) -> 'b t
-        val ( >>| ) : 'a t -> ('a -> 'b) -> 'b t
+        val map : 'a 'b. 'a t -> f:('a -> 'b) -> 'b t
+        val ( >>| ) : 'a 'b. 'a t -> ('a -> 'b) -> 'b t
         val of_list : 'a. 'a list -> 'a t
-        val union : 'a t list -> 'a t
-        val filter : 'a t -> f:('a -> bool) -> 'a t
+        val union : 'a. 'a t list -> 'a t
+        val filter : 'a. 'a t -> f:('a -> bool) -> 'a t
       end
     end
   end
@@ -80,8 +79,8 @@ end
 module%template [@mode portable] Let_syntax = Portable.Let_syntax
 
 val%template return : 'a. 'a -> 'a t [@@mode portable]
-val%template map : 'a t -> f:('a -> 'b) -> 'b t [@@mode portable]
-val%template bind : 'a t -> f:('a -> 'b t) -> 'b t [@@mode portable]
+val%template map : 'a 'b. 'a t -> f:('a -> 'b) -> 'b t [@@mode portable]
+val%template bind : 'a 'b. 'a t -> f:('a -> 'b t) -> 'b t [@@mode portable]
 
 (** {2 Size of Random Values}
 
@@ -125,7 +124,7 @@ val size : int t
           Some elements
       ;;
     ]} *)
-val%template with_size : 'a t -> size:int -> 'a t
+val%template with_size : 'a. 'a t -> size:int -> 'a t
 [@@mode p = (portable, nonportable)]
 
 (** Produces a list of sizes that distribute the current size among list elements. The
@@ -149,12 +148,12 @@ val sizes : ?min_length:int -> ?max_length:int -> unit -> int list t
 (** Produces values for which [f] returns [true]. If [f] returns [false], retries with
     [size] incremented by 1. This avoids [filter] getting stuck if all values at a given
     size fail [f]; see the note above about not using [size] as a lower bound. *)
-val%template filter : 'a t -> f:('a -> bool) -> 'a t
+val%template filter : 'a. 'a t -> f:('a -> bool) -> 'a t
 [@@mode p = (nonportable, portable)]
 
 (** When [f] produces [Some x], produces [x]. If [f] returns [None], retries with [size]
     incremented by 1, as with [filter]. *)
-val%template filter_map : 'a t -> f:('a -> 'b option) -> 'b t
+val%template filter_map : 'a 'b. 'a t -> f:('a -> 'b option) -> 'b t
 [@@mode p = (nonportable, portable)]
 
 (** {2 Generating Recursive Values} *)
@@ -190,7 +189,7 @@ val%template filter_map : 'a t -> f:('a -> 'b option) -> 'b t
             ])
       ;;
     ]} *)
-val recursive_union : 'a t list -> f:('a t -> 'a t list) -> 'a t
+val recursive_union : 'a. 'a t list -> f:('a t -> 'a t list) -> 'a t
 
 (** Like [recursive_union], without separate clauses or automatic size management. Useful
     for generating recursive types that don't fit the clause structure of
@@ -207,33 +206,33 @@ val recursive_union : 'a t list -> f:('a t -> 'a t list) -> 'a t
         fixed_point (fun tree -> map (list tree) ~f:(fun trees -> Node trees))
       ;;
     ]} *)
-val fixed_point : ('a t -> 'a t) -> 'a t
+val%template fixed_point : 'a. ('a t -> 'a t) -> 'a t
+[@@mode p = (nonportable, portable)]
 
 (** Creates a [t] that forces the lazy argument as necessary. Can be used to tie
     (mutually) recursive knots. *)
-val of_lazy : 'a t Lazy.t -> 'a t
+val of_lazy : 'a. 'a t Lazy.t -> 'a t
 
 (** Like [of_lazy], but for [Portable_lazy.t]. *)
-val of_portable_lazy : 'a t Portable_lazy.t -> 'a t
+val of_portable_lazy : 'a. 'a t Portable_lazy.t -> 'a t
 
 (** {2 Custom Random Distributions} *)
 
 (** Produces one of the given values, chosen with the corresponding weight. Weights must
     be non-negative and must have a strictly positive sum. *)
-val of_weighted_list : (float * 'a) list -> 'a t
+val of_weighted_list : 'a. (float * 'a) list -> 'a t
 
 (** Produces one of the given generators, chosen with the corresponding weight, then
     chooses a value from that generator. Weights must be non-negative and must have a
     strictly positive sum. *)
-val%template weighted_union : (float * 'a t) list -> 'a t
+val%template weighted_union : 'a. (float * 'a t) list -> 'a t
 [@@mode p = (nonportable, portable)]
 
 (** Like [recursive_union], with explicit weights for each clause. Weights must be
     non-negative and the recursive case weights must have a strictly positive sum. *)
 val%template weighted_recursive_union
-  :  (float * 'a t) list
-  -> f:('a t -> (float * 'a t) list)
-  -> 'a t
+  : 'a.
+  (float * 'a t) list -> f:('a t -> (float * 'a t) list) -> 'a t
 [@@mode p = (nonportable, portable)]
 
 (** {3 Integer Distributions} *)
@@ -425,12 +424,12 @@ end
     pseudorandom state, so [perturb] can be used to generate a new generator with the same
     distribution that nonetheless produces different values from the original for any
     given pseudo-random state. *)
-val%template perturb : 'a t -> int -> 'a t
+val%template perturb : 'a. 'a t -> int -> 'a t
 [@@mode p = (nonportable, portable)]
 
 (** Creates a generator that calls the given function with the current size parameter and
     pseudorandom state. *)
-val%template create : (size:int -> random:Splittable_random.t -> 'a) -> 'a t
+val%template create : 'a. (size:int -> random:Splittable_random.t -> 'a) -> 'a t
 [@@mode p = (nonportable, portable)]
 
 (** Generates a random value using the given size and pseudorandom state. Useful when
@@ -464,5 +463,5 @@ module Debug : sig
       [f] for each value. This can help diagnose behavior of generators "hidden" behind
       [map], [filter], etc. One might count the number of values a generator produces, or
       record the set of values that do not satisfy some filter. *)
-  val monitor : 'a t -> f:('a -> unit) -> 'a t
+  val monitor : 'a. 'a t -> f:('a -> unit) -> 'a t
 end

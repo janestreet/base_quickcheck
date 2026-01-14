@@ -13,6 +13,7 @@ val compound
 val variant
   :  observer_of_core_type:(core_type -> expression)
   -> loc:location
+  -> variant_type:core_type
   -> clauses:'a list
   -> portable_value:bool
   -> (module Clause_syntax.S with type ast = 'a)

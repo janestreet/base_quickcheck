@@ -21,3 +21,4 @@ let extend name f =
 let () = extend "quickcheck.generator" generator_extension
 let () = extend "quickcheck.observer" observer_extension
 let () = extend "quickcheck.shrinker" shrinker_extension
+let registered = ()
