@@ -326,7 +326,9 @@ let%expect_test "weighted_union" =
     |}]
 ;;
 
-let fixed_point = Generator.fixed_point
+let%template fixed_point = (Generator.fixed_point [@mode p])
+[@@mode p = (nonportable, portable)]
+;;
 
 let%expect_test "fixed_point" =
   test_generator

@@ -49,14 +49,12 @@ val set_tree_using_comparator
 (** {2 Combining and Modifying Generators} *)
 
 (** Produces any of the given values, weighted uniformly. *)
-val of_list : 'a list -> 'a t
-
-val%template of_list : ('a : value mod contended). 'a list @ portable -> 'a t @ portable
-[@@mode portable]
+val%template of_list : ('a : value mod c). 'a list @ p -> 'a t @ p
+[@@mode (p, c) = ((nonportable, uncontended), (portable, contended))]
 
 (** Chooses among the given generators, weighted uniformly; then chooses a value from that
     generator. *)
-val%template union : 'a t list @ p -> 'a t @ p
+val%template union : ('a : value_or_null). 'a t list @ p -> 'a t @ p
 [@@mode p = (nonportable, portable)]
 
 include%template
@@ -69,22 +67,46 @@ include%template
 
 module Portable : sig
   module Let_syntax : sig
-    val return : ('a : value mod contended). 'a @ portable -> 'a t @ portable
-    val ( >>| ) : 'a t @ portable -> ('a -> 'b) @ portable -> 'b t @ portable
-    val ( >>= ) : 'a t @ portable -> ('a -> 'b t) @ portable -> 'b t @ portable
+    val return : ('a : value_or_null mod contended). 'a @ portable -> 'a t @ portable
+
+    val ( >>| )
+      : ('a : value_or_null) ('b : value_or_null).
+      'a t @ portable -> ('a -> 'b) @ portable -> 'b t @ portable
+
+    val ( >>= )
+      : ('a : value_or_null) ('b : value_or_null).
+      'a t @ portable -> ('a -> 'b t) @ portable -> 'b t @ portable
 
     module Let_syntax : sig
-      val return : ('a : value mod contended). 'a @ portable -> 'a t @ portable
-      val map : 'a t @ portable -> f:('a -> 'b) @ portable -> 'b t @ portable
-      val bind : 'a t @ portable -> f:('a -> 'b t) @ portable -> 'b t @ portable
-      val both : 'a t @ portable -> 'b t @ portable -> ('a * 'b) t @ portable
+      val return : ('a : value_or_null mod contended). 'a @ portable -> 'a t @ portable
+
+      val map
+        : ('a : value_or_null) ('b : value_or_null).
+        'a t @ portable -> f:('a -> 'b) @ portable -> 'b t @ portable
+
+      val bind
+        : ('a : value_or_null) ('b : value_or_null).
+        'a t @ portable -> f:('a -> 'b t) @ portable -> 'b t @ portable
+
+      val both
+        : ('a : value_or_null) ('b : value_or_null).
+        'a t @ portable -> 'b t @ portable -> ('a * 'b) t @ portable
 
       module Open_on_rhs : sig
-        val map : 'a t @ portable -> f:('a -> 'b) @ portable -> 'b t @ portable
-        val ( >>| ) : 'a t @ portable -> ('a -> 'b) @ portable -> 'b t @ portable
+        val map
+          : ('a : value_or_null) ('b : value_or_null).
+          'a t @ portable -> f:('a -> 'b) @ portable -> 'b t @ portable
+
+        val ( >>| )
+          : ('a : value_or_null) ('b : value_or_null).
+          'a t @ portable -> ('a -> 'b) @ portable -> 'b t @ portable
+
         val of_list : ('a : value mod contended). 'a list @ portable -> 'a t @ portable
-        val union : 'a t list @ portable -> 'a t @ portable
-        val filter : 'a t @ portable -> f:('a -> bool) @ portable -> 'a t @ portable
+        val union : ('a : value_or_null). 'a t list @ portable -> 'a t @ portable
+
+        val filter
+          : ('a : value_or_null).
+          'a t @ portable -> f:('a -> bool) @ portable -> 'a t @ portable
       end
     end
   end
@@ -147,7 +169,7 @@ val size : int t
           Some elements
       ;;
     ]} *)
-val%template with_size : 'a t @ p -> size:int -> 'a t @ p
+val%template with_size : ('a : value_or_null). 'a t @ p -> size:int -> 'a t @ p
 [@@mode p = (portable, nonportable)]
 
 (** Produces a list of sizes that distribute the current size among list elements. The
@@ -171,12 +193,14 @@ val sizes : ?min_length:int -> ?max_length:int -> unit -> int list t @ portable
 (** Produces values for which [f] returns [true]. If [f] returns [false], retries with
     [size] incremented by 1. This avoids [filter] getting stuck if all values at a given
     size fail [f]; see the note above about not using [size] as a lower bound. *)
-val%template filter : 'a t @ p -> f:('a -> bool) @ p -> 'a t @ p
+val%template filter : ('a : value_or_null). 'a t @ p -> f:('a -> bool) @ p -> 'a t @ p
 [@@mode p = (nonportable, portable)]
 
 (** When [f] produces [Some x], produces [x]. If [f] returns [None], retries with [size]
     incremented by 1, as with [filter]. *)
-val%template filter_map : 'a t @ p -> f:('a -> 'b option) @ p -> 'b t @ p
+val%template filter_map
+  : ('a : value_or_null) ('b : value_or_null).
+  'a t @ p -> f:('a -> 'b option) @ p -> 'b t @ p
 [@@mode p = (nonportable, portable)]
 
 (** {2 Generating Recursive Values} *)
@@ -212,7 +236,7 @@ val%template filter_map : 'a t @ p -> f:('a -> 'b option) @ p -> 'b t @ p
             ])
       ;;
     ]} *)
-val recursive_union : 'a t list -> f:('a t -> 'a t list) -> 'a t
+val recursive_union : ('a : value_or_null). 'a t list -> f:('a t -> 'a t list) -> 'a t
 
 (** Like [recursive_union], without separate clauses or automatic size management. Useful
     for generating recursive types that don't fit the clause structure of
@@ -229,33 +253,35 @@ val recursive_union : 'a t list -> f:('a t -> 'a t list) -> 'a t
         fixed_point (fun tree -> map (list tree) ~f:(fun trees -> Node trees))
       ;;
     ]} *)
-val fixed_point : ('a t -> 'a t) -> 'a t
+val%template fixed_point : ('a : value_or_null). ('a t @ p -> 'a t @ p) @ p -> 'a t @ p
+[@@mode p = (nonportable, portable)]
 
 (** Creates a [t] that forces the lazy argument as necessary. Can be used to tie
     (mutually) recursive knots. *)
-val of_lazy : 'a t Lazy.t -> 'a t
+val of_lazy : ('a : value_or_null). 'a t Lazy.t -> 'a t
 
 (** Like [of_lazy], but for [Portable_lazy.t]. *)
-val of_portable_lazy : 'a t Portable_lazy.t @ portable -> 'a t @ portable
+val of_portable_lazy
+  : ('a : value_or_null).
+  'a t Portable_lazy.t @ portable -> 'a t @ portable
 
 (** {2 Custom Random Distributions} *)
 
 (** Produces one of the given values, chosen with the corresponding weight. Weights must
     be non-negative and must have a strictly positive sum. *)
-val of_weighted_list : (float * 'a) list -> 'a t
+val of_weighted_list : ('a : value_or_null). (float * 'a) list -> 'a t
 
 (** Produces one of the given generators, chosen with the corresponding weight, then
     chooses a value from that generator. Weights must be non-negative and must have a
     strictly positive sum. *)
-val%template weighted_union : (float * 'a t) list @ p -> 'a t @ p
+val%template weighted_union : ('a : value_or_null). (float * 'a t) list @ p -> 'a t @ p
 [@@mode p = (nonportable, portable)]
 
 (** Like [recursive_union], with explicit weights for each clause. Weights must be
     non-negative and the recursive case weights must have a strictly positive sum. *)
 val%template weighted_recursive_union
-  :  (float * 'a t) list @ p
-  -> f:('a t @ p -> (float * 'a t) list @ p) @ p
-  -> 'a t @ p
+  : ('a : value_or_null).
+  (float * 'a t) list @ p -> f:('a t @ p -> (float * 'a t) list @ p) @ p -> 'a t @ p
 [@@mode p = (nonportable, portable)]
 
 (** {3 Integer Distributions} *)
@@ -454,12 +480,14 @@ end
     pseudorandom state, so [perturb] can be used to generate a new generator with the same
     distribution that nonetheless produces different values from the original for any
     given pseudo-random state. *)
-val%template perturb : 'a t @ p -> int -> 'a t @ p
+val%template perturb : ('a : value_or_null). 'a t @ p -> int -> 'a t @ p
 [@@mode p = (nonportable, portable)]
 
 (** Creates a generator that calls the given function with the current size parameter and
     pseudorandom state. *)
-val%template create : (size:int -> random:Splittable_random.t -> 'a) @ p -> 'a t @ p
+val%template create
+  : ('a : value_or_null).
+  (size:int -> random:Splittable_random.t -> 'a) @ p -> 'a t @ p
 [@@mode p = (nonportable, portable)]
 
 (** Generates a random value using the given size and pseudorandom state. Useful when
@@ -497,5 +525,5 @@ module Debug : sig
       [f] for each value. This can help diagnose behavior of generators "hidden" behind
       [map], [filter], etc. One might count the number of values a generator produces, or
       record the set of values that do not satisfy some filter. *)
-  val monitor : 'a t -> f:('a -> unit) -> 'a t
+  val monitor : ('a : value_or_null). 'a t -> f:('a -> unit) -> 'a t
 end
