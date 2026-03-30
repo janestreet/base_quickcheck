@@ -107,3 +107,37 @@ let generator = [%quickcheck.generator: [%custom Generator.int_uniform] * char *
 let observer = [%quickcheck.observer: int *  [%custom Observer.opaque] * string]
 let shrinker = [%quickcheck.shrinker: int * char * [%custom Shrinker.atomic]]
 ```
+
+Implicit unboxed records
+------------------------
+
+Use the `~unboxed` attribute to also derive for implicit unboxed records:
+
+```ocaml
+(* This: *)
+type t = { x : Int64_u.t; y : Int64_u.t } [@@deriving quickcheck ~unboxed]
+
+(* will derive this: *)
+val quickcheck_generator : t Base_quickcheck.Generator.t
+val quickcheck_generator_u : t# Base_quickcheck.Generator.t
+val quickcheck_observer : t Base_quickcheck.Observer.t
+val quickcheck_observer_u : t# Base_quickcheck.Observer.t
+val quickcheck_shrinker : t Base_quickcheck.Shrinker.t
+val quickcheck_shrinker_u : t# Base_quickcheck.Shrinker.t
+```
+
+For types other than `t`, the type name appears before `_u`:
+
+```ocaml
+(* This: *)
+type s = { x : Int64_u.t; y : Int64_u.t } [@@deriving quickcheck ~unboxed]
+
+(* will derive this: *)
+val quickcheck_generator_s : s Base_quickcheck.Generator.t
+val quickcheck_generator_s_u : s# Base_quickcheck.Generator.t
+val quickcheck_observer_s : s Base_quickcheck.Observer.t
+val quickcheck_observer_s_u : s# Base_quickcheck.Observer.t
+val quickcheck_shrinker_s : s Base_quickcheck.Shrinker.t
+val quickcheck_shrinker_s_u : s# Base_quickcheck.Shrinker.t
+```
+

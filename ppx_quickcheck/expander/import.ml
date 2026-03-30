@@ -16,9 +16,12 @@ let loc_map { loc; txt } ~f = { loc; txt = f txt }
 let lident_loc = loc_map ~f:lident
 
 let prefixed_type_name ~name_is_portable prefix type_name =
-  let suffix = if name_is_portable then "__portable" else "" in
+  let type_name, suffix = Ppx_helpers.demangle_template type_name in
+  (* Notice the potential clash if [type_name] is portable. *)
+  let suffix = suffix ^ if name_is_portable then "__portable" else "" in
   match type_name with
   | "t" -> prefix ^ suffix
+  | "t_u" -> prefix ^ "_u" ^ suffix
   | _ -> prefix ^ "_" ^ type_name ^ suffix
 ;;
 
@@ -47,7 +50,21 @@ let portability_mode ~loc ~portable_value =
   if portable_value then [%expr portable] else [%expr nonportable]
 ;;
 
-let name_is_portable ~portable_value args = portable_value && not (List.is_empty args)
+let name_is_portable ?constr ~portable_value args =
+  (* To support portability for generators (etc.) parameterized types and
+     applicative-functor types (like [Set.M(X).t]), we need mode polymorphism, as the
+     portability of the resulting generator depends on the portability of the input
+     generator (of the type parameter or functor module argument).
+
+     For simple, non-parameterized types, we can just directly upgrade the existing
+     binding.
+  *)
+  match constr with
+  | Some { txt = Ldot (Lapply _, _); _ } -> portable_value
+  | _ ->
+    let is_parameterized = not (List.is_empty args) in
+    portable_value && is_parameterized
+;;
 
 let ptuple ~loc list =
   match list with

@@ -24,7 +24,10 @@ val%template map_t_m
   ('key, 'cmp) Comparator.Module.t -> 'key t -> 'data t -> ('key, 'data, 'cmp) Map.t t
 [@@mode p = (nonportable, portable)]
 
-val set_t_m : ('elt, 'cmp) Comparator.Module.t -> 'elt t -> ('elt, 'cmp) Set.t t
+val%template set_t_m
+  : 'elt 'cmp.
+  ('elt, 'cmp) Comparator.Module.t -> 'elt t -> ('elt, 'cmp) Set.t t
+[@@mode p = (nonportable, portable)]
 
 val%template map_tree_using_comparator
   : 'key 'data 'cmp.
@@ -34,10 +37,12 @@ val%template map_tree_using_comparator
   -> ('key, 'data, 'cmp) Map.Using_comparator.Tree.t t
 [@@mode p = (nonportable, portable)]
 
-val set_tree_using_comparator
-  :  comparator:('elt, 'cmp) Comparator.t
+val%template set_tree_using_comparator
+  : 'elt 'cmp.
+  comparator:('elt, 'cmp) Comparator.t
   -> 'elt t
   -> ('elt, 'cmp) Set.Using_comparator.Tree.t t
+[@@mode p = (nonportable, portable)]
 
 (** {2 Combining and Modifying Generators} *)
 

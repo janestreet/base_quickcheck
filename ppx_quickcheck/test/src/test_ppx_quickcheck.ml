@@ -865,43 +865,143 @@ module type Modality = sig
   [@@@end]
 end
 
-module type Modalities = sig
-  type 'a t [@@deriving_inline quickcheck ~portable]
+module type%template Modalities = sig
+  (* Notice the clash of [quickcheck_generator__portable]. *)
+  [@@@expand_inline:
+    type 'a t
+    [@@kind k = (value, bits64)]
+    [@@mode m = (portable, nonportable)]
+    [@@deriving quickcheck ~portable]]
+
+  type 'a t__portable [@@deriving quickcheck ~portable]
+  and 'a t
+  and 'a t__bits64__portable
+  and 'a t__bits64
 
   include sig
     [@@@ocaml.warning "-32"]
+
+    val quickcheck_generator__portable
+      : 'a.
+      'a Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
+      -> 'a t__portable Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
 
     val quickcheck_generator
       : 'a.
       'a Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
       -> 'a t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
 
+    val quickcheck_generator__bits64__portable
+      : 'a.
+      'a Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
+      -> 'a t__bits64__portable Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
+
+    val quickcheck_generator__bits64
+      : 'a.
+      'a Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
+      -> 'a t__bits64 Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
+
+    val quickcheck_generator__portable__portable
+      : 'a.
+      'a Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
+      -> 'a t__portable Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
+
     val quickcheck_generator__portable
       : 'a.
       'a Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
       -> 'a t Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
+
+    val quickcheck_generator__bits64__portable__portable
+      : 'a.
+      'a Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
+      -> 'a t__bits64__portable Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
+
+    val quickcheck_generator__bits64__portable
+      : 'a.
+      'a Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
+      -> 'a t__bits64 Ppx_quickcheck_runtime.Base_quickcheck.Generator.t
+
+    val quickcheck_observer__portable
+      : 'a.
+      'a Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
+      -> 'a t__portable Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
 
     val quickcheck_observer
       : 'a.
       'a Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
       -> 'a t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
 
+    val quickcheck_observer__bits64__portable
+      : 'a.
+      'a Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
+      -> 'a t__bits64__portable Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
+
+    val quickcheck_observer__bits64
+      : 'a.
+      'a Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
+      -> 'a t__bits64 Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
+
+    val quickcheck_observer__portable__portable
+      : 'a.
+      'a Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
+      -> 'a t__portable Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
+
     val quickcheck_observer__portable
       : 'a.
       'a Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
       -> 'a t Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
+
+    val quickcheck_observer__bits64__portable__portable
+      : 'a.
+      'a Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
+      -> 'a t__bits64__portable Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
+
+    val quickcheck_observer__bits64__portable
+      : 'a.
+      'a Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
+      -> 'a t__bits64 Ppx_quickcheck_runtime.Base_quickcheck.Observer.t
+
+    val quickcheck_shrinker__portable
+      : 'a.
+      'a Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      -> 'a t__portable Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
 
     val quickcheck_shrinker
       : 'a.
       'a Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
       -> 'a t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
 
+    val quickcheck_shrinker__bits64__portable
+      : 'a.
+      'a Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      -> 'a t__bits64__portable Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+
+    val quickcheck_shrinker__bits64
+      : 'a.
+      'a Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      -> 'a t__bits64 Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+
+    val quickcheck_shrinker__portable__portable
+      : 'a.
+      'a Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      -> 'a t__portable Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+
     val quickcheck_shrinker__portable
       : 'a.
       'a Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
       -> 'a t Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+
+    val quickcheck_shrinker__bits64__portable__portable
+      : 'a.
+      'a Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      -> 'a t__bits64__portable Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+
+    val quickcheck_shrinker__bits64__portable
+      : 'a.
+      'a Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
+      -> 'a t__bits64 Ppx_quickcheck_runtime.Base_quickcheck.Shrinker.t
   end
-  [@@ocaml.doc "@inline"]
+  [@@ocaml.doc "@inline"] [@@merlin.hide]
 
   [@@@end]
 

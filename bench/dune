@@ -2,4 +2,4 @@
  (name base_quickcheck_benchmarks)
  (libraries base base_quickcheck splittable_random)
  (preprocess
-  (pps ppx_jane)))
+  (pps ppx_jane -compare-require-explicit-locality)))

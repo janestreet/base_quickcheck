@@ -15,7 +15,8 @@ include With_basic_types.S with type 'a t := 'a t (** @inline *)
 val%template map_t : 'key 'data 'cmp. 'key t -> 'data t -> ('key, 'data, 'cmp) Map.t t
 [@@mode p = (nonportable, portable)]
 
-val set_t : 'elt t -> ('elt, 'cmp) Set.t t
+val%template set_t : 'elt 'cmp. 'elt t -> ('elt, 'cmp) Set.t t
+[@@mode p = (nonportable, portable)]
 
 val%template map_tree_using_comparator
   : 'key 'data 'cmp.
@@ -25,10 +26,12 @@ val%template map_tree_using_comparator
   -> ('key, 'data, 'cmp) Map.Using_comparator.Tree.t t
 [@@mode p = (nonportable, portable)]
 
-val set_tree_using_comparator
-  :  comparator:('elt, 'cmp) Comparator.t
+val%template set_tree_using_comparator
+  : 'elt 'cmp.
+  comparator:('elt, 'cmp) Comparator.t
   -> 'elt t
   -> ('elt, 'cmp) Set.Using_comparator.Tree.t t
+[@@mode p = (nonportable, portable)]
 
 (** {2 Modifying Shrinkers} *)
 

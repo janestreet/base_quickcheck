@@ -474,28 +474,31 @@ let%expect_test "result" =
   [%expect {| (generator exhaustive) |}]
 ;;
 
-let%template map_t_m = (Generator.map_t_m [@mode p]) [@@mode p = (nonportable, portable)]
+[%%template
+[@@@mode.default p = (nonportable, portable)]
 
-let%template map_tree_using_comparator = (Generator.map_tree_using_comparator [@mode p])
-[@@mode p = (nonportable, portable)]
-;;
+let map_t_m = (Generator.map_t_m [@mode p])
+let map_tree_using_comparator = (Generator.map_tree_using_comparator [@mode p])
 
 let%expect_test "map_t_m" =
   test_generator
-    (Generator.map_t_m (module Bool) Generator.bool Generator.bool)
+    ((Generator.map_t_m [@mode p]) (module Bool) Generator.bool Generator.bool)
     (m_map (module Bool) m_bool m_bool);
   [%expect {| (generator "generated 9 distinct values in 10_000 iterations") |}]
-;;
+;;]
 
-let set_t_m = Generator.set_t_m
-let set_tree_using_comparator = Generator.set_tree_using_comparator
+[%%template
+[@@@mode.default p = (nonportable, portable)]
+
+let set_t_m = (Generator.set_t_m [@mode p])
+let set_tree_using_comparator = (Generator.set_tree_using_comparator [@mode p])
 
 let%expect_test "set_t_m" =
   test_generator
-    (Generator.set_t_m (module Bool) Generator.bool)
+    ((Generator.set_t_m [@mode p]) (module Bool) Generator.bool)
     (m_set (module Bool) m_bool);
   [%expect {| (generator exhaustive) |}]
-;;
+;;]
 
 let small_positive_or_zero_int = Generator.small_positive_or_zero_int
 

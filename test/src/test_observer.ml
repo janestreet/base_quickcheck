@@ -244,23 +244,29 @@ let%expect_test "result" =
   [%expect {| (observer transparent) |}]
 ;;
 
-let%template map_t = (Observer.map_t [@mode p]) [@@mode p = (portable, nonportable)]
-let%template map_tree = (Observer.map_tree [@mode p]) [@@mode p = (portable, nonportable)]
+[%%template
+[@@@mode.default p = (nonportable, portable)]
+
+let map_t = (Observer.map_t [@mode p])
+let map_tree = (Observer.map_tree [@mode p])
 
 let%expect_test "map_t" =
   test_observer
-    (Observer.map_t Observer.bool Observer.bool)
+    ((Observer.map_t [@mode p]) Observer.bool Observer.bool)
     (m_map (module Bool) m_bool m_bool);
   [%expect {| (observer transparent) |}]
-;;
+;;]
 
-let set_t = Observer.set_t
-let set_tree = Observer.set_tree
+[%%template
+[@@@mode.default p = (nonportable, portable)]
+
+let set_t = (Observer.set_t [@mode p])
+let set_tree = (Observer.set_tree [@mode p])
 
 let%expect_test "set_t" =
-  test_observer (Observer.set_t Observer.bool) (m_set (module Bool) m_bool);
+  test_observer ((Observer.set_t [@mode p]) Observer.bool) (m_set (module Bool) m_bool);
   [%expect {| (observer transparent) |}]
-;;
+;;]
 
 let of_lazy = Observer.of_lazy
 
