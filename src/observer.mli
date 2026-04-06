@@ -22,7 +22,8 @@ val fn : ('a : value_or_null) ('b : value_or_null). 'a Generator.t -> 'b t -> ('
 val%template map_t : 'key t @ p -> 'data t @ p -> ('key, 'data, 'cmp) Map.t t @ p
 [@@mode p = (nonportable, portable)]
 
-val set_t : 'elt t -> ('elt, 'cmp) Set.t t
+val%template set_t : 'elt t @ p -> ('elt, 'cmp) Set.t t @ p
+[@@mode p = (nonportable, portable)]
 
 val%template map_tree
   :  'key t @ p
@@ -30,7 +31,8 @@ val%template map_tree
   -> ('key, 'data, 'cmp) Map.Using_comparator.Tree.t t @ p
 [@@mode p = (nonportable, portable)]
 
-val set_tree : 'elt t -> ('elt, 'cmp) Set.Using_comparator.Tree.t t
+val%template set_tree : 'elt t @ p -> ('elt, 'cmp) Set.Using_comparator.Tree.t t @ p
+[@@mode p = (nonportable, portable)]
 
 (** {2 Observers Based on Hash Functions} *)
 

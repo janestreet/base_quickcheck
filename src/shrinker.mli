@@ -19,7 +19,8 @@ val%template map_t
   'key t @ p -> 'data t @ p -> ('key, 'data, 'cmp) Map.t t @ p
 [@@mode p = (nonportable, portable)]
 
-val set_t : 'elt t -> ('elt, 'cmp) Set.t t
+val%template set_t : 'elt ('cmp : value mod p). 'elt t @ p -> ('elt, 'cmp) Set.t t @ p
+[@@mode p = (nonportable, portable)]
 
 val%template map_tree_using_comparator
   : 'key 'data ('cmp : value mod p).
@@ -29,10 +30,12 @@ val%template map_tree_using_comparator
   -> ('key, 'data, 'cmp) Map.Using_comparator.Tree.t t @ p
 [@@mode p = (nonportable, portable)]
 
-val set_tree_using_comparator
-  :  comparator:('elt, 'cmp) Comparator.t
-  -> 'elt t
-  -> ('elt, 'cmp) Set.Using_comparator.Tree.t t
+val%template set_tree_using_comparator
+  : 'elt ('cmp : value mod p).
+  comparator:('elt, 'cmp) Comparator.t
+  -> 'elt t @ p
+  -> ('elt, 'cmp) Set.Using_comparator.Tree.t t @ p
+[@@mode p = (nonportable, portable)]
 
 (** {2 Modifying Shrinkers} *)
 

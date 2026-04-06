@@ -75,7 +75,9 @@ let rec generator_of_core_type core_type ~gen_env ~obs_env ~portable_value =
      | Ptyp_constr (constr, args) ->
        type_constr_conv
          ~loc
-         ~f:(generator_name ~name_is_portable:(name_is_portable ~portable_value args))
+         ~f:
+           (generator_name
+              ~name_is_portable:(name_is_portable ~constr ~portable_value args))
          constr
          (List.map args ~f:(generator_of_core_type ~gen_env ~obs_env ~portable_value))
      | Ptyp_var (tyvar, _) -> Environment.lookup gen_env ~loc ~tyvar
@@ -153,7 +155,9 @@ and observer_of_core_type core_type ~obs_env ~gen_env ~portable_value =
      | Ptyp_constr (constr, args) ->
        type_constr_conv
          ~loc
-         ~f:(observer_name ~name_is_portable:(name_is_portable ~portable_value args))
+         ~f:
+           (observer_name
+              ~name_is_portable:(name_is_portable ~constr ~portable_value args))
          constr
          (List.map args ~f:(observer_of_core_type ~obs_env ~gen_env ~portable_value))
      | Ptyp_var (tyvar, _) -> Environment.lookup obs_env ~loc ~tyvar
@@ -231,7 +235,9 @@ let rec shrinker_of_core_type core_type ~env ~portable_value =
      | Ptyp_constr (constr, args) ->
        type_constr_conv
          ~loc
-         ~f:(shrinker_name ~name_is_portable:(name_is_portable ~portable_value args))
+         ~f:
+           (shrinker_name
+              ~name_is_portable:(name_is_portable ~constr ~portable_value args))
          constr
          (List.map args ~f:(shrinker_of_core_type ~env ~portable_value))
      | Ptyp_var (tyvar, _) -> Environment.lookup env ~loc ~tyvar
@@ -816,7 +822,12 @@ let try_include_decl
 
 let args () =
   Deriving.Args.(
-    empty +> flag "generator" +> flag "observer" +> flag "shrinker" +> flag "portable")
+    empty
+    +> flag "generator"
+    +> flag "observer"
+    +> flag "shrinker"
+    +> flag "portable"
+    +> flag "unboxed")
 ;;
 
 let flags ~incl_generator ~incl_observer ~incl_shrinker =
@@ -853,8 +864,10 @@ let sig_type_decl ~portable =
         incl_observer
         incl_shrinker
         portable_export
+        unboxed
       ->
        let portable_export = portable_export || portable in
+       let decls = Ppx_helpers.with_implicit_unboxed_types ~loc ~unboxed decls in
        let incl_generator, incl_observer, incl_shrinker =
          flags ~incl_generator ~incl_observer ~incl_shrinker
        in
@@ -879,7 +892,7 @@ let sig_type_decl ~portable =
              ~make_shrinker_list:(shrinker_intf_list ~portable_export)
              decls
        in
-       Ppx_template_expander.Monomorphize.t_no_inline#signature_items
+       Ppx_template_expander.Monomorphize.t#signature_items
          Ppx_template_expander.Monomorphize.Context.top
          items)
 ;;
@@ -895,8 +908,10 @@ let str_type_decl ~portable =
         incl_observer
         incl_shrinker
         portable_export
+        unboxed
       ->
        let portable_export = portable_export || portable in
+       let decls = Ppx_helpers.with_implicit_unboxed_types ~loc ~unboxed decls in
        let rec_flag = really_recursive rec_flag decls in
        let incl_generator, incl_observer, incl_shrinker =
          flags ~incl_generator ~incl_observer ~incl_shrinker
@@ -909,7 +924,7 @@ let str_type_decl ~portable =
          ~make_observer_list:(observer_impl_list ~rec_flag ~loc ~portable_export)
          ~make_shrinker_list:(shrinker_impl_list ~rec_flag ~loc ~portable_export)
          decls
-       |> Ppx_template_expander.Monomorphize.t_no_inline#structure
+       |> Ppx_template_expander.Monomorphize.t#structure
             Ppx_template_expander.Monomorphize.Context.top)
 ;;
 
@@ -919,7 +934,7 @@ let generator_extension ~portable:portable_value ~loc:_ ~path:_ core_type =
     ~gen_env:Environment.empty
     ~obs_env:Environment.empty
     ~portable_value
-  |> Ppx_template_expander.Monomorphize.t_no_inline#expression
+  |> Ppx_template_expander.Monomorphize.t#expression
        Ppx_template_expander.Monomorphize.Context.top
 ;;
 
@@ -929,12 +944,12 @@ let observer_extension ~portable:portable_value ~loc:_ ~path:_ core_type =
     ~obs_env:Environment.empty
     ~gen_env:Environment.empty
     ~portable_value
-  |> Ppx_template_expander.Monomorphize.t_no_inline#expression
+  |> Ppx_template_expander.Monomorphize.t#expression
        Ppx_template_expander.Monomorphize.Context.top
 ;;
 
 let shrinker_extension ~portable:portable_value ~loc:_ ~path:_ core_type =
   shrinker_of_core_type core_type ~env:Environment.empty ~portable_value
-  |> Ppx_template_expander.Monomorphize.t_no_inline#expression
+  |> Ppx_template_expander.Monomorphize.t#expression
        Ppx_template_expander.Monomorphize.Context.top
 ;;

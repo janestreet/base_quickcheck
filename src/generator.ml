@@ -80,85 +80,86 @@ let%template return (type a : value_or_null mod c) (x : a) =
 [@@mode (p, c) = ((nonportable, uncontended), (portable, contended))]
 ;;
 
-[%%template
-[@@@mode p = (nonportable, portable)]
+include%template struct
+  [@@@mode p = (nonportable, portable)]
 
-open struct
-  let create = (create [@mode p])
+  open struct
+    let create = (create [@mode p])
+  end
+
+  [@@@mode.default p]
+
+  let fn dom rng =
+    create (fun ~size ~random ->
+      let random = Splittable_random.split random in
+      fun x ->
+        let hash = Observer0.observe dom x ~size ~hash:(Hash.alloc ()) in
+        let random = Splittable_random.copy random in
+        Splittable_random.perturb random (Hash.get_hash_value hash);
+        generate rng ~size ~random)
+  ;;
+
+  let with_size t ~size = create (fun ~size:_ ~random -> generate t ~size ~random)
+
+  let perturb t salt =
+    create (fun ~size ~random ->
+      Splittable_random.perturb random salt;
+      generate t ~size ~random)
+  ;;
+
+  let filter_map t ~f =
+    let rec loop ~size ~random =
+      let x = generate t ~size ~random in
+      match f x with
+      | Some y -> y
+      | None -> loop ~size:(size + 1) ~random
+    in
+    create loop
+  ;;
+
+  let filter t ~f = (filter_map [@mode p]) t ~f:(fun x -> if f x then Some x else None)
+  let map t ~f = create (fun ~size ~random -> f (generate t ~size ~random))
+
+  let apply tf tx =
+    create (fun ~size ~random ->
+      let f = generate tf ~size ~random in
+      let x = generate tx ~size ~random in
+      f x)
+  ;;
+
+  let bind t ~f =
+    create (fun ~size ~random ->
+      let x = generate t ~size ~random in
+      generate (f x) ~size ~random)
+  ;;
+
+  let all (list : _ t list) =
+    create (fun ~size ~random -> List.map list ~f:(generate ~size ~random))
+  ;;
+
+  let all_unit (list : unit t list) =
+    create (fun ~size ~random -> List.iter list ~f:(generate ~size ~random))
+  ;;
+
+  let map2 ta tb ~f =
+    create (fun ~size ~random ->
+      let a = generate ta ~size ~random in
+      let b = generate tb ~size ~random in
+      f a b)
+  ;;
+
+  let map3 ta tb tc ~f =
+    create (fun ~size ~random ->
+      let a = generate ta ~size ~random in
+      let b = generate tb ~size ~random in
+      let c = generate tc ~size ~random in
+      f a b c)
+  ;;
+
+  let both a b = (map2 [@mode p]) a b ~f:(fun x y -> x, y)
+  let join t = (bind [@mode p]) t ~f:Fn.id
+  let ignore_m t = (map [@mode p]) t ~f:ignore
 end
-
-[@@@mode.default p]
-
-let fn dom rng =
-  create (fun ~size ~random ->
-    let random = Splittable_random.split random in
-    fun x ->
-      let hash = Observer0.observe dom x ~size ~hash:(Hash.alloc ()) in
-      let random = Splittable_random.copy random in
-      Splittable_random.perturb random (Hash.get_hash_value hash);
-      generate rng ~size ~random)
-;;
-
-let with_size t ~size = create (fun ~size:_ ~random -> generate t ~size ~random)
-
-let perturb t salt =
-  create (fun ~size ~random ->
-    Splittable_random.perturb random salt;
-    generate t ~size ~random)
-;;
-
-let filter_map t ~f =
-  let rec loop ~size ~random =
-    let x = generate t ~size ~random in
-    match f x with
-    | Some y -> y
-    | None -> loop ~size:(size + 1) ~random
-  in
-  create loop
-;;
-
-let filter t ~f = (filter_map [@mode p]) t ~f:(fun x -> if f x then Some x else None)
-let map t ~f = create (fun ~size ~random -> f (generate t ~size ~random))
-
-let apply tf tx =
-  create (fun ~size ~random ->
-    let f = generate tf ~size ~random in
-    let x = generate tx ~size ~random in
-    f x)
-;;
-
-let bind t ~f =
-  create (fun ~size ~random ->
-    let x = generate t ~size ~random in
-    generate (f x) ~size ~random)
-;;
-
-let all (list : _ t list) =
-  create (fun ~size ~random -> List.map list ~f:(generate ~size ~random))
-;;
-
-let all_unit (list : unit t list) =
-  create (fun ~size ~random -> List.iter list ~f:(generate ~size ~random))
-;;
-
-let map2 ta tb ~f =
-  create (fun ~size ~random ->
-    let a = generate ta ~size ~random in
-    let b = generate tb ~size ~random in
-    f a b)
-;;
-
-let map3 ta tb tc ~f =
-  create (fun ~size ~random ->
-    let a = generate ta ~size ~random in
-    let b = generate tb ~size ~random in
-    let c = generate tc ~size ~random in
-    f a b c)
-;;
-
-let both a b = (map2 [@mode p]) a b ~f:(fun x y -> x, y)
-let join t = (bind [@mode p]) t ~f:Fn.id
-let ignore_m t = (map [@mode p]) t ~f:ignore]
 
 let (_ : _) = apply__portable, all_unit__portable, map3__portable, ignore_m__portable
 let ( >>| ) t f = map t ~f
@@ -971,8 +972,10 @@ let%template map_tree_using_comparator ~comparator key_gen data_gen =
 [@@mode p = (nonportable, portable)]
 ;;
 
-let set_tree_using_comparator ~comparator elt_gen =
-  map (list elt_gen) ~f:(Set.Using_comparator.Tree.of_list ~comparator)
+let%template set_tree_using_comparator ~comparator elt_gen =
+  (map [@mode p]) ((list [@mode p]) elt_gen) ~f:(fun elts ->
+    Set.Using_comparator.Tree.of_list ~comparator elts)
+[@@mode p = (nonportable, portable)]
 ;;
 
 let%template map_t_m (type cmp : value mod p) m key_gen data_gen =
@@ -982,10 +985,11 @@ let%template map_t_m (type cmp : value mod p) m key_gen data_gen =
 [@@mode p = (nonportable, portable)]
 ;;
 
-let set_t_m m elt_gen =
-  let comparator = Comparator.of_module m in
-  set_tree_using_comparator ~comparator elt_gen
-  |> map ~f:(Set.Using_comparator.of_tree ~comparator)
+let%template set_t_m (type cmp : value mod p) m elt_gen =
+  let (comparator : (_, cmp) Comparator.t) = Comparator.of_module m in
+  (set_tree_using_comparator [@mode p]) ~comparator elt_gen
+  |> (map [@mode p]) ~f:(fun tree -> Set.Using_comparator.of_tree ~comparator tree)
+[@@mode p = (nonportable, portable)]
 ;;
 
 let%template bigarray1 t kind layout ~length =
