@@ -387,14 +387,16 @@ val list_filtered : 'a list -> 'a list t
 (** Produces permutations of the given list, weighted uniformly. *)
 val list_permutations : 'a list -> 'a list t
 
-val fold_until
-  :  ?min_length:int
+val%template fold_until
+  : 'acc 'final.
+  ?min_length:int
   -> ?max_length:int
   -> init:'acc
   -> f:('acc -> ('acc, 'final) Continue_or_stop.t t)
   -> finish:('acc -> 'final)
   -> unit
   -> 'final t
+[@@mode (p, c) = ((nonportable, uncontended), (portable, contended))]
 
 (** {3 Bigarray Distributions} *)
 include sig

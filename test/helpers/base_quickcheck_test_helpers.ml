@@ -334,6 +334,7 @@ let m_list (type elt) (module Elt : With_examples with type t = elt) =
 ;;
 
 let m_array m = m_biject (m_list m) ~f:Array.of_list ~f_inverse:Array.to_list
+let m_iarray m = m_biject (m_list m) ~f:Iarray.of_list ~f_inverse:Iarray.to_list
 let m_ref m = m_biject m ~f:Ref.create ~f_inverse:Ref.( ! )
 let m_lazy_t m = m_biject m ~f:Lazy.from_val ~f_inverse:Lazy.force
 

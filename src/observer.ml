@@ -103,6 +103,7 @@ let list elt_t =
 ;;
 
 let array t = (unmap [@mode p]) ((list [@mode p]) t) ~f:Array.to_list
+let iarray t = (unmap [@mode p]) ((list [@mode p]) t) ~f:Iarray.to_list
 let ref t = (unmap [@mode p]) t ~f:Ref.( ! )
 let lazy_t t = (unmap [@mode p]) t ~f:Lazy.force]
 

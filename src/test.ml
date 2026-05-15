@@ -88,7 +88,7 @@ let shrink_error ~shrinker ~config ~f input error =
   in
   let shrink_count = Config.shrink_count config in
   let alternates = Shrinker.shrink shrinker input in
-  loop ~shrink_count ~alternates input error
+  loop ~shrink_count ~alternates input error [@nontail]
 ;;
 
 let input_sequence ~config ~examples ~generator =
@@ -118,11 +118,13 @@ let result (type a) ~f ?(config = default_config) ?(examples = []) m =
       let shrinker = M.quickcheck_shrinker in
       let input, error = shrink_error ~shrinker ~config ~f input error in
       Error (input, error))
+  [@nontail]
 ;;
 
 let run (type a) ~f ?config ?examples (module M : S with type t = a) =
   let f x =
     Or_error.try_with_join ~backtrace:(Backtrace.Exn.am_recording ()) (fun () -> f x)
+    [@nontail]
   in
   match result ~f ?config ?examples (module M) with
   | Ok () -> Ok ()
@@ -132,13 +134,14 @@ let run (type a) ~f ?config ?examples (module M : S with type t = a) =
 ;;
 
 let with_sample_exn ~f ?config ?examples generator =
-  let f x = Or_error.try_with (fun () -> f x) in
+  let f x = Or_error.try_with (fun () -> f x) [@nontail] in
   with_sample ~f ?config ?examples generator |> Or_error.ok_exn
 ;;
 
 let run_exn ~f ?config ?examples testable =
   let f x =
     Or_error.try_with ~backtrace:(Backtrace.Exn.am_recording ()) (fun () -> f x)
+    [@nontail]
   in
   run ~f ?config ?examples testable |> Or_error.ok_exn
 ;;

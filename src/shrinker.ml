@@ -186,6 +186,10 @@ let array t =
   (map [@mode p]) ((list [@mode p]) t) ~f:Array.of_list ~f_inverse:Array.to_list
 ;;
 
+let iarray t =
+  (map [@mode p]) ((list [@mode p]) t) ~f:Iarray.of_list ~f_inverse:Iarray.to_list
+;;
+
 let ref t = (map [@mode p]) t ~f:Ref.create ~f_inverse:Ref.( ! )
 let lazy_t t = (map [@mode p]) t ~f:Lazy.from_val ~f_inverse:Lazy.force
 

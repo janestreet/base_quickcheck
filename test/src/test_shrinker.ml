@@ -498,6 +498,43 @@ let%expect_test "array" =
     |}]
 ;;
 
+let%template iarray = (Shrinker.iarray [@mode p]) [@@mode p = (portable, nonportable)]
+
+let%expect_test "iarray" =
+  test_shrinker (Shrinker.iarray natural_number_shrinker) (m_iarray (m_nat ~up_to:4));
+  [%expect
+    {|
+    (shrinker
+     (((0) => ())
+      ((1) => ())
+      ((1) => (0))
+      ((2) => ())
+      ((2) => (1))
+      ((3) => ())
+      ((3) => (2))
+      ((4) => ())
+      ((4) => (3))
+      ((0 4) => (4))
+      ((0 4) => (0))
+      ((0 4) => (0 3))
+      ((1 3) => (3))
+      ((1 3) => (0 3))
+      ((1 3) => (1))
+      ((1 3) => (1 2))
+      ((2 2) => (2))
+      ((2 2) => (1 2))
+      ((2 2) => (2))
+      ((2 2) => (2 1))
+      ((3 1) => (1))
+      ((3 1) => (2 1))
+      ((3 1) => (3))
+      ((3 1) => (3 0))
+      ((4 0) => (0))
+      ((4 0) => (3 0))
+      ((4 0) => (4))))
+    |}]
+;;
+
 let%template ref = (Shrinker.ref [@mode p]) [@@mode p = (portable, nonportable)]
 
 let%expect_test "ref" =

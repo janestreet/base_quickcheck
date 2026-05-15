@@ -446,8 +446,10 @@ let list_permutations list =
     Array.to_list array)
 ;;
 
-let fold_until ?min_length ?max_length ~init ~f ~finish () =
+let%template fold_until ?min_length ?max_length ~init ~f ~finish () =
+  let open Syntax.Let_syntax [@mode p] in
   let%bind sizes = sizes ?min_length ?max_length () in
+  let open Syntax.Let_syntax in
   let rec loop acc sizes =
     match sizes with
     | [] -> return (finish acc)
@@ -457,12 +459,14 @@ let fold_until ?min_length ?max_length ~init ~f ~finish () =
        | Continue acc -> loop acc sizes)
   in
   loop init sizes
+[@@mode p = (nonportable, portable)]
 ;;
 
 [%%template
 [@@@mode.default p = (nonportable, portable)]
 
 let array t = (map [@mode p]) ((list [@mode p]) t) ~f:Array.of_list
+let iarray t = (map [@mode p]) ((list [@mode p]) t) ~f:Iarray.of_list
 let ref t = (map [@mode p]) t ~f:Ref.create
 let lazy_t t = (map [@mode p]) t ~f:Lazy.from_val]
 

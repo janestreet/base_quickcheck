@@ -36,6 +36,7 @@ module type S = sig
   val or_null : 'a t -> 'a or_null t
   val list : 'a. 'a t -> 'a list t
   val array : 'a t -> 'a array t
+  val iarray : 'a t -> 'a iarray t
   val ref : 'a. 'a t -> 'a ref t
   val lazy_t : 'a t -> 'a Lazy.t t
   val both : 'a 'b. 'a t -> 'b t -> ('a * 'b) t
