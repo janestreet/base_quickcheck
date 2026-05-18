@@ -50,6 +50,7 @@ val quickcheck_generator_list
   'a Generator.t @ p -> 'a list Generator.t @ p
 
 val quickcheck_generator_array : 'a Generator.t @ p -> 'a array Generator.t @ p
+val quickcheck_generator_iarray : 'a Generator.t @ p -> 'a iarray Generator.t @ p
 
 val quickcheck_generator_ref
   : ('a : value_or_null).
@@ -68,6 +69,7 @@ val quickcheck_observer_list
   'a Observer.t @ p -> 'a list Observer.t @ p
 
 val quickcheck_observer_array : 'a Observer.t @ p -> 'a array Observer.t @ p
+val quickcheck_observer_iarray : 'a Observer.t @ p -> 'a iarray Observer.t @ p
 
 val quickcheck_observer_ref
   : ('a : value_or_null).
@@ -86,6 +88,7 @@ val quickcheck_shrinker_list
   'a Shrinker.t @ p -> 'a list Shrinker.t @ p
 
 val quickcheck_shrinker_array : 'a Shrinker.t @ p -> 'a array Shrinker.t @ p
+val quickcheck_shrinker_iarray : 'a Shrinker.t @ p -> 'a iarray Shrinker.t @ p
 
 val quickcheck_shrinker_ref
   : ('a : value_or_null).

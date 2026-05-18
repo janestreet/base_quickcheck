@@ -93,6 +93,10 @@ module type Base_quickcheck_test_helpers = sig
     :  (module With_examples with type t = 'a)
     -> (module With_examples with type t = 'a array)
 
+  val m_iarray
+    :  (module With_examples with type t = 'a)
+    -> (module With_examples with type t = 'a iarray)
+
   val m_ref
     :  (module With_examples with type t = 'a)
     -> (module With_examples with type t = 'a ref)

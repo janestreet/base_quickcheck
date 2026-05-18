@@ -216,6 +216,13 @@ let%expect_test "array" =
   [%expect {| (observer transparent) |}]
 ;;
 
+let%template iarray = (Observer.iarray [@mode p]) [@@mode p = (portable, nonportable)]
+
+let%expect_test "iarray" =
+  test_observer (Observer.iarray Observer.bool) (m_iarray m_bool);
+  [%expect {| (observer transparent) |}]
+;;
+
 let%template ref = (Observer.ref [@mode p]) [@@mode p = (portable, nonportable)]
 
 let%expect_test "ref" =

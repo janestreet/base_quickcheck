@@ -1952,7 +1952,9 @@ let%expect_test "list_with_length" =
     |}]
 ;;
 
-let fold_until = Generator.fold_until
+let%template fold_until = (Generator.fold_until [@mode p])
+[@@mode p = (nonportable, portable)]
+;;
 
 let%expect_test "fold_until" =
   test_generator
@@ -1998,6 +2000,13 @@ let%template array = (Generator.array [@mode p]) [@@mode p = (nonportable, porta
 
 let%expect_test "array" =
   test_generator (Generator.array Generator.bool) (m_array m_bool);
+  [%expect {| (generator "generated 2_248 distinct values in 10_000 iterations") |}]
+;;
+
+let%template iarray = (Generator.iarray [@mode p]) [@@mode p = (nonportable, portable)]
+
+let%expect_test "iarray" =
+  test_generator (Generator.iarray Generator.bool) (m_iarray m_bool);
   [%expect {| (generator "generated 2_248 distinct values in 10_000 iterations") |}]
 ;;
 

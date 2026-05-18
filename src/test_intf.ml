@@ -43,7 +43,7 @@ module type Test = sig
       count toward the [test_count] total, not values from [examples]. *)
   val run
     : ('a : value_or_null).
-    f:('a -> unit Or_error.t)
+    f:('a -> unit Or_error.t) @ local
     -> ?config:Config.t (** defaults to [default_config] *)
     -> ?examples:'a list (** defaults to the empty list *)
     -> (module S with type t = 'a)
@@ -52,7 +52,7 @@ module type Test = sig
   (** Like [run], but raises on failure. *)
   val run_exn
     : ('a : value_or_null).
-    f:('a -> unit)
+    f:('a -> unit) @ local
     -> ?config:Config.t (** defaults to [default_config] *)
     -> ?examples:'a list (** defaults to the empty list *)
     -> (module S with type t = 'a)
@@ -62,7 +62,7 @@ module type Test = sig
       types and returns the input that failed along with the error. *)
   val result
     : ('a : value_or_null) ('e : value_or_null).
-    f:('a -> (unit, 'e) Result.t)
+    f:('a -> (unit, 'e) Result.t) @ local
     -> ?config:Config.t (** defaults to [default_config] *)
     -> ?examples:'a list (** defaults to the empty list *)
     -> (module S with type t = 'a)
@@ -72,7 +72,7 @@ module type Test = sig
       configuration. *)
   val with_sample
     : ('a : value_or_null).
-    f:('a Sequence.t -> unit Or_error.t)
+    f:('a Sequence.t -> unit Or_error.t) @ local
     -> ?config:Config.t (** defaults to [default_config] *)
     -> ?examples:'a list (** defaults to the empty list *)
     -> 'a Generator.t
@@ -81,7 +81,7 @@ module type Test = sig
   (** Like [with_sample], but raises on failure. *)
   val with_sample_exn
     : ('a : value_or_null).
-    f:('a Sequence.t -> unit)
+    f:('a Sequence.t -> unit) @ local
     -> ?config:Config.t (** defaults to [default_config] *)
     -> ?examples:'a list (** defaults to the empty list *)
     -> 'a Generator.t
