@@ -25,10 +25,13 @@ depends: [
   "ppxlib_jane"
   "splittable_random"
   "dune"                {>= "3.17.0"}
-  "ocaml-compiler-libs" {= "v0.17.0+ox"}
-  "ppxlib"              {= "0.33.0+ox"}
+  "ocaml-compiler-libs" {>= "v0.11.0"}
+  "ppxlib"              {>= "0.33.0" & < "0.36.0"}
 ]
 available: arch != "x86_32"
+conflicts: [
+  "oxcaml-compiler" {< "5.2.0minus39"}
+]
 synopsis: "Randomized testing framework, designed for compatibility with Base"
 description: "
 Base_quickcheck provides randomized testing in the style of Haskell's Quickcheck library,
